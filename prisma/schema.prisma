@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      UserRole @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AdminLoginAttempt {
+  id           String    @id @default(uuid())
+  key          String    @unique
+  failedCount  Int       @default(0)
+  lockedUntil  DateTime?
+  lastFailedAt DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  techStack   Json
+  imageUrl    String?
+  link        String?
+  githubUrl   String?
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Experience {
+  id          String    @id @default(uuid())
+  title       String
+  company     String
+  periodStart DateTime
+  periodEnd   DateTime?
+  description String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model HeroSection {
+  id                String   @id
+  headline          String
+  description       String
+  domainLogoUrl     String?
+  domainLabel       String
+  name              String
+  role              String
+  techTags          Json
+  cvUrl             String
+  avatarUrl         String?
+  avatarAlt         String
+  githubUrl         String?
+  linkedinUrl       String?
+  twitterUrl        String?
+  statusBadgeDetail String
+  openToWork        Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model AboutSection {
+  id        String   @id
+  headline  String
+  paragraph String   @db.Text
+  stats     Json
+  skills    Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Certificate {
+  id            String   @id @default(uuid())
+  title         String
+  issuer        String
+  imageUrl      String?
+  issueDate     DateTime
+  credentialUrl String?
+  featured      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
