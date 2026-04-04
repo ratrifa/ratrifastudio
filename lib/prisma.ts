@@ -8,7 +8,11 @@ function withConnectionLimit(databaseUrl: string) {
   }
 
   if (!url.searchParams.has("pool_timeout")) {
-    url.searchParams.set("pool_timeout", "20");
+    url.searchParams.set("pool_timeout", "30");
+  }
+
+  if (!url.searchParams.has("idle_in_transaction_session_timeout")) {
+    url.searchParams.set("idle_in_transaction_session_timeout", "25000");
   }
 
   return url.toString();
