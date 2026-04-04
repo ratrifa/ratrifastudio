@@ -17,7 +17,7 @@ model User {
   email     String   @unique
   password  String
   role      UserRole @default(ADMIN)
-  createdAt DateTime @default(now())
+   description String   @db.Text
   updatedAt DateTime @updatedAt
 }
 
@@ -50,7 +50,7 @@ model Experience {
   company     String
   periodStart DateTime
   periodEnd   DateTime?
-  description String
+   description String    @db.Text
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
