@@ -22,6 +22,7 @@ function toFormValues(content: AboutSectionContent): AboutSectionFormValues {
     stats: content.stats.filter((stat) => !isDerivedStatLabel(stat.label)),
     skills: content.skills.map((skill) => ({
       title: skill.title,
+      icon: skill.icon,
       itemsRaw: skill.items.join(", "),
     })),
   };
@@ -35,6 +36,7 @@ function toPreviewContent(values: AboutSectionFormValues, derivedMetrics: AboutD
     skills: values.skills
       .map((skill) => ({
         title: skill.title,
+        icon: skill.icon,
         items: skill.itemsRaw
           .split(",")
           .map((item) => item.trim())

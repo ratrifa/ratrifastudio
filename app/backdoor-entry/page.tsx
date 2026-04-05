@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AUTH_COOKIE_NAME, createAdminToken } from "@/lib/auth";
+import { createAdminSession, getSessionTtlSeconds } from "@/lib/admin-session";
 import { clearLoginFailures, isLoginLocked, recordLoginFailure } from "@/lib/login-security";
 import { cleanupPrisma, prisma } from "@/lib/prisma";
 import { getCurrentAdmin } from "@/lib/server-auth";
@@ -14,6 +15,10 @@ import { loginInputSchema } from "@/lib/validation";
 
 async function loginAction(formData: FormData) {
   "use server";
+
+  const databaseErrorRedirect = () => {
+    redirect("/backdoor-entry?error=Database+belum+bisa+diakses");
+  };
 
   try {
     const parsed = loginInputSchema.safeParse({
@@ -37,7 +42,21 @@ async function loginAction(formData: FormData) {
       redirect("/backdoor-entry?error=Terlalu+banyak+percobaan.+Coba+lagi+beberapa+menit+lagi");
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    let user: { id: string; email: string; password: string; role: "ADMIN" } | null = null;
+    try {
+      user = await prisma.user.findUnique({
+        where: { email },
+        select: {
+          id: true,
+          email: true,
+          password: true,
+          role: true,
+        },
+      });
+    } catch {
+      databaseErrorRedirect();
+    }
+
     if (!user) {
       await recordLoginFailure(lockKey);
       redirect("/backdoor-entry?error=Kredensial+tidak+valid");
@@ -50,11 +69,22 @@ async function loginAction(formData: FormData) {
     }
 
     await clearLoginFailures(lockKey);
+    let sessionId = "";
+    try {
+      sessionId = await createAdminSession(user.id);
+    } catch {
+      databaseErrorRedirect();
+    }
+
+    if (!sessionId) {
+      databaseErrorRedirect();
+    }
 
     const token = await createAdminToken({
       sub: user.id,
       email: user.email,
       role: "ADMIN",
+      sid: sessionId,
     });
 
     const cookieStore = await cookies();
@@ -63,7 +93,7 @@ async function loginAction(formData: FormData) {
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
       path: "/",
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: getSessionTtlSeconds(),
     });
 
     redirect("/admin");

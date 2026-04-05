@@ -54,6 +54,7 @@ pnpm-debug.log*
 *.sql
 *.sqlite
 *.db
+!prisma/migrations/**/migration.sql
 
 # Documentation (development notes)
 CMS_SETUP.md
@@ -61,3 +62,4 @@ DEPLOYMENT_READY.md
 DEPLOYMENT_CHECKLIST.md
 prd.md
 TESTING.md
+.vercel

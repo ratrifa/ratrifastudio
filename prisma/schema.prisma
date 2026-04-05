@@ -17,8 +17,19 @@ model User {
   email     String   @unique
   password  String
   role      UserRole @default(ADMIN)
-   description String   @db.Text
+  sessions    AdminSession[]
   updatedAt DateTime @updatedAt
+}
+
+model AdminSession {
+  id         String    @id @default(uuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  lastSeenAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model AdminLoginAttempt {
@@ -34,7 +45,7 @@ model AdminLoginAttempt {
 model Project {
   id          String   @id @default(uuid())
   title       String
-  description String
+  description String   @db.Text
   techStack   Json
   imageUrl    String?
   link        String?
@@ -50,7 +61,7 @@ model Experience {
   company     String
   periodStart DateTime
   periodEnd   DateTime?
-   description String    @db.Text
+  description String    @db.Text
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
@@ -58,7 +69,7 @@ model Experience {
 model HeroSection {
   id                String   @id
   headline          String
-  description       String
+  description       String   @db.Text
   domainLogoUrl     String?
   domainLabel       String
   name              String

@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
@@ -23,6 +24,7 @@ type AdminNavbarProps = {
 
 export function AdminNavbar({ logoutAction }: AdminNavbarProps) {
   const pathname = usePathname();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className="flex items-center gap-2 sm:gap-3">
@@ -49,14 +51,27 @@ export function AdminNavbar({ logoutAction }: AdminNavbarProps) {
         </Button>
       </form>
 
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button variant="outline" size="icon" className="md:hidden shrink-0" aria-label="Open admin menu">
-            <Menu size={20} />
-          </Button>
-        </SheetTrigger>
+      <Button
+        type="button"
+        variant="outline"
+        size="icon"
+        className="md:hidden shrink-0 touch-manipulation"
+        aria-label="Open admin menu"
+        aria-expanded={isMenuOpen}
+        aria-controls="admin-mobile-menu"
+        onClick={() => setIsMenuOpen(true)}
+      >
+        <Menu size={20} />
+      </Button>
+
+      <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <SheetContent side="right" className="w-80 pt-14">
-          <div className="px-1">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Admin menu</SheetTitle>
+            <SheetDescription>Navigasi admin dan tombol logout.</SheetDescription>
+          </SheetHeader>
+
+          <div id="admin-mobile-menu" className="px-1">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Admin menu</p>
             <div className="mt-6 flex flex-col gap-1">
               {NAV_LINKS.map((link) => {

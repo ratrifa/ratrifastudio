@@ -14,10 +14,16 @@ const firaCode = Fira_Code({
   variable: "--font-fira-code",
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "Your Name — Web Developer",
-  description: "Personal portfolio of a passionate web developer crafting modern, performant digital experiences.",
-  generator: "v0.app",
+  title: "ratrifaStudio",
+  description: "a personal web.",
+  generator: "ratrifa",
+  metadataBase: new URL(siteUrl),
+  icons: {
+    icon: "/uploads/hero/1775315805088-008a652f-ce9b-47d2-bc29-9d103ad0fa51.png",
+  },
 };
 
 export default function RootLayout({

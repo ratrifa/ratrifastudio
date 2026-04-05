@@ -8,17 +8,21 @@ function lockUntilDate() {
 }
 
 export async function isLoginLocked(key: string) {
-  const row = await prisma.adminLoginAttempt.findUnique({ where: { key } });
+  const row = await prisma.adminLoginAttempt.findUnique({ where: { key } }).catch(() => null);
   if (!row?.lockedUntil) {
     return { locked: false as const, secondsRemaining: 0 };
   }
 
   const remaining = row.lockedUntil.getTime() - Date.now();
   if (remaining <= 0) {
-    await prisma.adminLoginAttempt.update({
-      where: { key },
-      data: { failedCount: 0, lockedUntil: null },
-    });
+    await prisma.adminLoginAttempt
+      .update({
+        where: { key },
+        data: { failedCount: 0, lockedUntil: null },
+      })
+      .catch(() => {
+        return;
+      });
     return { locked: false as const, secondsRemaining: 0 };
   }
 
@@ -26,24 +30,28 @@ export async function isLoginLocked(key: string) {
 }
 
 export async function recordLoginFailure(key: string) {
-  const current = await prisma.adminLoginAttempt.findUnique({ where: { key } });
+  const current = await prisma.adminLoginAttempt.findUnique({ where: { key } }).catch(() => null);
   const nextCount = (current?.failedCount ?? 0) + 1;
   const shouldLock = nextCount >= MAX_FAILED_ATTEMPTS;
 
-  await prisma.adminLoginAttempt.upsert({
-    where: { key },
-    update: {
-      failedCount: shouldLock ? 0 : nextCount,
-      lockedUntil: shouldLock ? lockUntilDate() : null,
-      lastFailedAt: new Date(),
-    },
-    create: {
-      key,
-      failedCount: shouldLock ? 0 : nextCount,
-      lockedUntil: shouldLock ? lockUntilDate() : null,
-      lastFailedAt: new Date(),
-    },
-  });
+  await prisma.adminLoginAttempt
+    .upsert({
+      where: { key },
+      update: {
+        failedCount: shouldLock ? 0 : nextCount,
+        lockedUntil: shouldLock ? lockUntilDate() : null,
+        lastFailedAt: new Date(),
+      },
+      create: {
+        key,
+        failedCount: shouldLock ? 0 : nextCount,
+        lockedUntil: shouldLock ? lockUntilDate() : null,
+        lastFailedAt: new Date(),
+      },
+    })
+    .catch(() => {
+      return;
+    });
 
   return { locked: shouldLock };
 }
