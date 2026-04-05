@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { ABOUT_SKILL_ICON_KEYS } from "@/lib/about-skill-icons";
+
 const optionalUrl = z
   .string()
   .trim()
@@ -99,6 +101,7 @@ export const aboutSectionFormSchema = z.object({
     .array(
       z.object({
         title: z.string().trim().min(1).max(40),
+        icon: z.enum(ABOUT_SKILL_ICON_KEYS),
         itemsRaw: z.string().trim().min(1).max(240),
       }),
     )

@@ -1,7 +1,16 @@
 import { PrismaClient } from "@prisma/client";
 
+const DB_HOST_FALLBACK: Record<string, string> = {
+  "nw4q6m.h.filess.io": "188.245.153.167",
+};
+
 function withConnectionLimit(databaseUrl: string) {
   const url = new URL(databaseUrl);
+
+  const fallbackHost = DB_HOST_FALLBACK[url.hostname];
+  if (fallbackHost) {
+    url.hostname = fallbackHost;
+  }
 
   if (!url.searchParams.has("connection_limit")) {
     url.searchParams.set("connection_limit", "1");
@@ -9,10 +18,6 @@ function withConnectionLimit(databaseUrl: string) {
 
   if (!url.searchParams.has("pool_timeout")) {
     url.searchParams.set("pool_timeout", "30");
-  }
-
-  if (!url.searchParams.has("idle_in_transaction_session_timeout")) {
-    url.searchParams.set("idle_in_transaction_session_timeout", "25000");
   }
 
   return url.toString();

@@ -1,16 +1,37 @@
 "use client";
 
 import { useActionState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { BrainCircuit, Briefcase, Code2, Database, Globe, Layers3, Monitor, Palette, Plus, Rocket, Shield, Smartphone, Sparkles, Server, Terminal, Trash2, Users, Wrench } from "lucide-react";
 
 import { FormStateAlert } from "@/components/admin/form-state-alert";
 import { FormSubmitButton } from "@/components/admin/form-submit-button";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ABOUT_SKILL_ICON_OPTIONS, ABOUT_SKILL_ICON_DEFAULT, type AboutSkillIconKey } from "@/lib/about-skill-icons";
 import type { FormState } from "@/lib/form-state";
 import { initialFormState } from "@/lib/form-state";
+
+const SKILL_ICON_COMPONENTS: Record<AboutSkillIconKey, typeof Code2> = {
+  code: Code2,
+  server: Server,
+  palette: Palette,
+  users: Users,
+  layers: Layers3,
+  wrench: Wrench,
+  sparkles: Sparkles,
+  globe: Globe,
+  database: Database,
+  monitor: Monitor,
+  smartphone: Smartphone,
+  terminal: Terminal,
+  shield: Shield,
+  rocket: Rocket,
+  brain: BrainCircuit,
+  briefcase: Briefcase,
+};
 
 export interface AboutStatFormItem {
   value: string;
@@ -19,6 +40,7 @@ export interface AboutStatFormItem {
 
 export interface AboutSkillFormItem {
   title: string;
+  icon: AboutSkillIconKey;
   itemsRaw: string;
 }
 
@@ -91,7 +113,7 @@ export function CreateAboutForm({ action, values, onValuesChange }: CreateAboutF
 
     onValuesChange({
       ...values,
-      skills: [...values.skills, { title: "", itemsRaw: "" }],
+      skills: [...values.skills, { title: "", icon: ABOUT_SKILL_ICON_DEFAULT, itemsRaw: "" }],
     });
   };
 
@@ -173,7 +195,29 @@ export function CreateAboutForm({ action, values, onValuesChange }: CreateAboutF
         <p className="text-xs text-muted-foreground">Isi item skill dipisahkan koma. Contoh: React, Next.js, TypeScript</p>
         <div className="space-y-3">
           {values.skills.map((skill, index) => (
-            <div key={`skill-${index}`} className="grid gap-3 md:grid-cols-[1fr_1fr_auto] items-start">
+            <div key={`skill-${index}`} className="grid gap-3 md:grid-cols-[180px_1fr_1fr_auto] items-start">
+              <div className="space-y-2">
+                <Label htmlFor={`skillIcon-${index}`}>Skill Card Icon</Label>
+                <Select name="skillIcon" value={skill.icon} onValueChange={(nextValue) => updateSkill(index, "icon", nextValue as AboutSkillIconKey)}>
+                  <SelectTrigger id={`skillIcon-${index}`} className="w-full">
+                    <SelectValue placeholder="Choose icon" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ABOUT_SKILL_ICON_OPTIONS.map(({ value, label }) => {
+                      const Icon = SKILL_ICON_COMPONENTS[value];
+
+                      return (
+                        <SelectItem key={value} value={value}>
+                          <span className="flex items-center gap-2">
+                            <Icon size={14} />
+                            {label}
+                          </span>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="space-y-2">
                 <Label htmlFor={`skillTitle-${index}`}>Skill Card Title</Label>
                 <Input id={`skillTitle-${index}`} name="skillTitle" value={skill.title} onChange={(event) => updateSkill(index, "title", event.target.value)} required />

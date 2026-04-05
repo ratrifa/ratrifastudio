@@ -1,3 +1,5 @@
+import { ABOUT_SKILL_ICON_DEFAULT, type AboutSkillIconKey, isAboutSkillIconKey } from "@/lib/about-skill-icons";
+
 export interface AboutStat {
   value: string;
   label: string;
@@ -5,6 +7,7 @@ export interface AboutStat {
 
 export interface AboutSkill {
   title: string;
+  icon: AboutSkillIconKey;
   items: string[];
 }
 
@@ -25,10 +28,10 @@ export const defaultAboutContent: AboutSectionContent = {
     { value: "10+", label: "Clients" },
   ],
   skills: [
-    { title: "Frontend", items: ["React", "Next.js", "TypeScript", "Tailwind CSS"] },
-    { title: "Backend", items: ["Laravel", "Node.js", "PostgreSQL", "REST API"] },
-    { title: "Design", items: ["Figma", "UI/UX", "Responsive Design", "Accessibility"] },
-    { title: "Soft Skills", items: ["Teamwork", "Problem Solving", "Fast Learner", "Communication"] },
+    { title: "Frontend", icon: "code", items: ["React", "Next.js", "TypeScript", "Tailwind CSS"] },
+    { title: "Backend", icon: "server", items: ["Laravel", "Node.js", "PostgreSQL", "REST API"] },
+    { title: "Design", icon: "palette", items: ["Figma", "UI/UX", "Responsive Design", "Accessibility"] },
+    { title: "Soft Skills", icon: "users", items: ["Teamwork", "Problem Solving", "Fast Learner", "Communication"] },
   ],
 };
 
@@ -64,19 +67,22 @@ function normalizeSkills(value: unknown) {
   }
 
   const parsed = value
-    .map((item) => {
+    .map((item, index) => {
       const title = String((item as { title?: unknown }).title ?? "").trim();
+      const rawIcon = String((item as { icon?: unknown }).icon ?? "").trim();
       const rawItems = Array.isArray((item as { items?: unknown[] }).items) ? (item as { items: unknown[] }).items : [];
       const items = rawItems
         .map((entry) => String(entry).trim())
         .filter(Boolean)
-        .slice(0, 6);
+        .slice(0, 10);
+      const fallbackIcon = defaultAboutContent.skills[index % defaultAboutContent.skills.length]?.icon ?? ABOUT_SKILL_ICON_DEFAULT;
+      const icon = isAboutSkillIconKey(rawIcon) ? rawIcon : fallbackIcon;
 
       if (!title || items.length === 0) {
         return null;
       }
 
-      return { title, items };
+      return { title, icon, items };
     })
     .filter(Boolean) as AboutSkill[];
 

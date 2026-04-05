@@ -8,6 +8,7 @@ export interface AdminAuthPayload extends JWTPayload {
   sub: string;
   email: string;
   role: "ADMIN";
+  sid: string;
 }
 
 const encoder = new TextEncoder();

@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS `AboutSection` (
+  `id` VARCHAR(191) NOT NULL,
+  `eyebrow` VARCHAR(80) NOT NULL,
+  `headline` VARCHAR(191) NOT NULL,
+  `paragraphOne` VARCHAR(1000) NOT NULL,
+  `paragraphTwo` VARCHAR(1000) NOT NULL,
+  `paragraphThree` VARCHAR(1000) NOT NULL,
+  `stats` JSON NOT NULL,
+  `skills` JSON NOT NULL,
+  `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

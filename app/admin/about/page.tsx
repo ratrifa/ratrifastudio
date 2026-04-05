@@ -4,6 +4,7 @@ import { AboutSectionManager } from "@/components/admin/about-section-manager";
 import type { FormState } from "@/lib/form-state";
 import { cleanupPrisma, prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/server-auth";
+import { ABOUT_SKILL_ICON_DEFAULT, isAboutSkillIconKey } from "@/lib/about-skill-icons";
 import { aboutSectionFormSchema, toCommaList } from "@/lib/validation";
 import { defaultAboutContent, normalizeAboutContent } from "@/lib/about-content";
 import { applyDerivedStats, getExperienceValue, getProjectValue, isDerivedStatLabel, type AboutDerivedMetrics } from "@/lib/about-stats";
@@ -114,8 +115,10 @@ async function saveAboutSectionAction(_state: FormState, formData: FormData): Pr
       .getAll("skillItemsRaw")
       .map((entry) => String(entry).trim())
       .filter(Boolean);
+    const skillIcons = formData.getAll("skillIcon").map((entry) => String(entry).trim());
     const skills = skillTitles.map((title, index) => ({
       title,
+      icon: isAboutSkillIconKey(skillIcons[index] ?? "") ? skillIcons[index] : ABOUT_SKILL_ICON_DEFAULT,
       itemsRaw: skillItemsRawValues[index] ?? "",
     }));
 
@@ -140,7 +143,7 @@ async function saveAboutSectionAction(_state: FormState, formData: FormData): Pr
       stats: finalStats,
       skills: parsed.data.skills.map((skill) => ({
         title: skill.title,
-        items: toCommaList(skill.itemsRaw, 6),
+        items: toCommaList(skill.itemsRaw, 10),
       })),
     });
 
