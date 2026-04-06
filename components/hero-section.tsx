@@ -1,12 +1,13 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { ArrowDown, Github, Linkedin, Twitter } from "lucide-react";
 import { Backlight } from "@/components/ui/backlight";
-import { Button } from "@/components/ui/button";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { Particles } from "@/components/ui/particles";
 import { Separator } from "@/components/ui/separator";
+import { useTheme } from "@/components/theme-provider";
 import { defaultHeroContent, type HeroSectionContent } from "@/lib/hero-content";
 
 interface HeroSectionProps {
@@ -15,6 +16,7 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ content = defaultHeroContent, previewAsBanner = false }: HeroSectionProps) {
+  const { resolvedTheme } = useTheme();
   const socialLinks = [
     content.githubUrl ? { icon: Github, href: content.githubUrl, label: "GitHub" } : null,
     content.linkedinUrl ? { icon: Linkedin, href: content.linkedinUrl, label: "LinkedIn" } : null,
@@ -29,6 +31,47 @@ export function HeroSection({ content = defaultHeroContent, previewAsBanner = fa
   const contentGridClasses = previewAsBanner ? "grid grid-cols-2 gap-8 items-center" : "grid md:grid-cols-2 gap-12 items-center";
   const textColumnClasses = previewAsBanner ? "flex flex-col gap-6" : "order-2 md:order-1 flex flex-col gap-6";
   const avatarColumnClasses = previewAsBanner ? "flex justify-end" : "order-1 md:order-2 flex justify-center md:justify-end";
+  const [particleQuantity, setParticleQuantity] = useState(previewAsBanner ? 70 : 100);
+  const particleColor = resolvedTheme === "light" ? "#5e17eb" : "#a78bfa";
+
+  useEffect(() => {
+    const resolveParticleQuantity = () => {
+      const isReducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (isReducedMotion) {
+        setParticleQuantity(previewAsBanner ? 22 : 28);
+        return;
+      }
+
+      const width = typeof window !== "undefined" ? window.innerWidth : 1280;
+      const cores = typeof navigator !== "undefined" ? navigator.hardwareConcurrency ?? 4 : 4;
+      const memory = typeof navigator !== "undefined" && "deviceMemory" in navigator ? Number((navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 4) : 4;
+
+      let base = previewAsBanner ? 70 : 100;
+
+      if (width < 640) {
+        base = previewAsBanner ? 28 : 36;
+      } else if (width < 1024) {
+        base = previewAsBanner ? 44 : 62;
+      }
+
+      if (cores <= 4 || memory <= 4) {
+        base = Math.max(24, Math.floor(base * 0.7));
+      }
+
+      if (cores <= 2 || memory <= 2) {
+        base = Math.max(18, Math.floor(base * 0.6));
+      }
+
+      setParticleQuantity(base);
+    };
+
+    resolveParticleQuantity();
+    window.addEventListener("resize", resolveParticleQuantity);
+
+    return () => {
+      window.removeEventListener("resize", resolveParticleQuantity);
+    };
+  }, [previewAsBanner]);
 
   const handleDownloadCv = () => {
     const cvUrl = content.cvUrl;
@@ -62,21 +105,24 @@ export function HeroSection({ content = defaultHeroContent, previewAsBanner = fa
       />
       <Particles
         className="absolute inset-0 z-0 h-full w-full text-primary opacity-70 mask-[linear-gradient(to_bottom,white,white_72%,transparent)] [-webkit-mask-image:linear-gradient(to_bottom,white,white_72%,transparent)]"
-        quantity={130}
+        quantity={particleQuantity}
         staticity={35}
         ease={38}
         size={1.55}
+        color={particleColor}
       />
       {/* Radial glow */}
-      <div
-        className="absolute z-0 top-1/4 -left-1/4 w-3/4 h-3/4 rounded-full opacity-[0.12] blur-3xl pointer-events-none"
-        style={{
-          background: "var(--color-primary)",
-          maskImage: "linear-gradient(to bottom, black 0%, black 75%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 75%, transparent 100%)",
-        }}
-        aria-hidden="true"
-      />
+      <Backlight className="absolute z-0 top-1/4 -left-1/4 w-3/4 h-3/4 pointer-events-none" blur={3}>
+        <div
+          className="w-full h-full rounded-full opacity-[0.12] blur-3xl"
+          style={{
+            background: "var(--color-primary)",
+            maskImage: "linear-gradient(to bottom, black 0%, black 75%, transparent 100%)", 
+            WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 75%, transparent 100%)",
+          }}
+          aria-hidden="true"
+        />
+      </Backlight>
 
       <div className={contentSpacingClasses}>
         <div className={contentGridClasses}>

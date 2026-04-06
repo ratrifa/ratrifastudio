@@ -131,21 +131,26 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --animate-background-position-spin: background-position-spin 3000ms infinite alternate;
+  @keyframes background-position-spin {
+  0% {
+    background-position: top center;
+    }
+  100% {
+    background-position: bottom center;
+    }
+  }
 }
 
 @layer base {
-  *,
-  *::before,
-  *::after {
+  :where(a, button, input, textarea, select, [role="button"], [data-state]) {
     transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, box-shadow;
-    transition-duration: 460ms;
+    transition-duration: 280ms;
     transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
+    :where(a, button, input, textarea, select, [role="button"], [data-state]) {
       transition: none;
     }
   }
@@ -159,6 +164,6 @@
 }
 
 ::view-transition-old(root), ::view-transition-new(root) {
-    animation: none;
-    mix-blend-mode: normal;
+  animation: none;
+  mix-blend-mode: normal;
 }

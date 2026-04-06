@@ -53,7 +53,7 @@ export function AboutSection({ content = defaultAboutContent, previewAsBanner = 
         cx={1.2}
         cy={1.2}
         cr={1.2}
-        glow={true}
+        glow={false}
       />
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-16 items-start">

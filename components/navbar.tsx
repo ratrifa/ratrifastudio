@@ -30,18 +30,35 @@ export function Navbar({ domainLabel = defaultHeroContent.domainLabel, domainLog
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 20);
+    let ticking = false;
+
+    const updateNavState = () => {
+      const isScrolled = window.scrollY > 20;
+      setScrolled((prev) => (prev === isScrolled ? prev : isScrolled));
 
       const sections = NAV_LINKS.map((l) => l.href.replace("#", ""));
+      let nextActive = sections[0] ?? "home";
+
       for (let i = sections.length - 1; i >= 0; i--) {
         const el = document.getElementById(sections[i]);
         if (el && window.scrollY >= el.offsetTop - 120) {
-          setActiveSection(sections[i]);
+          nextActive = sections[i];
           break;
         }
       }
+
+      setActiveSection((prev) => (prev === nextActive ? prev : nextActive));
+      ticking = false;
     };
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateNavState);
+        ticking = true;
+      }
+    };
+
+    updateNavState();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
