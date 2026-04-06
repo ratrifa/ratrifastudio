@@ -3,6 +3,7 @@ import Link from "next/link";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { FormSubmitButton } from "@/components/admin/form-submit-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -131,9 +132,9 @@ export default async function BackdoorEntryPage({ searchParams }: { searchParams
 
             {params.error ? <p className="text-sm text-red-400">{params.error}</p> : null}
 
-            <Button type="submit" className="w-full">
+            <FormSubmitButton pendingLabel="Signing in..." className="w-full">
               Sign In
-            </Button>
+            </FormSubmitButton>
             <Button type="button" variant="ghost" className="w-full" asChild>
               <Link href="/">Back to Home</Link>
             </Button>

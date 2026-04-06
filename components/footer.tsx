@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Mail, Phone, MapPin, Github, Linkedin, Twitter, Code2, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { NeonGradientCard } from "@/components/ui/neon-gradient-card";
 import { defaultHeroContent } from "@/lib/hero-content";
 import { useState } from "react";
 
@@ -118,66 +119,73 @@ function ContactSection({ social }: { social?: FooterSocialProps }) {
           </div>
 
           {/* Right: Form */}
-          <form onSubmit={handleContactSubmit} className="flex flex-col gap-4 bg-card border border-border rounded-2xl p-6 md:p-8">
-            <div className="grid grid-cols-2 gap-4">
+          <NeonGradientCard
+            borderSize={2}
+            borderRadius={20}
+            neonColors={{ firstColor: "#5e17eb", secondColor: "#38bdf8" }}
+            className="w-full"
+          >
+            <form onSubmit={handleContactSubmit} className="flex flex-col gap-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="contact-name" className="text-xs font-medium text-muted-foreground">
+                    Name
+                  </label>
+                  <input
+                    id="contact-name"
+                    name="name"
+                    type="text"
+                    placeholder="Your Name"
+                    required
+                    className="bg-secondary border border-border rounded-md px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-colors"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="contact-email" className="text-xs font-medium text-muted-foreground">
+                    Email
+                  </label>
+                  <input
+                    id="contact-email"
+                    name="email"
+                    type="email"
+                    placeholder="you@email.com"
+                    required
+                    className="bg-secondary border border-border rounded-md px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-colors"
+                  />
+                </div>
+              </div>
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="contact-name" className="text-xs font-medium text-muted-foreground">
-                  Name
+                <label htmlFor="contact-subject" className="text-xs font-medium text-muted-foreground">
+                  Subject
                 </label>
                 <input
-                  id="contact-name"
-                  name="name"
+                  id="contact-subject"
+                  name="subject"
                   type="text"
-                  placeholder="Your Name"
-                  required
+                  placeholder="What's this about?"
                   className="bg-secondary border border-border rounded-md px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-colors"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="contact-email" className="text-xs font-medium text-muted-foreground">
-                  Email
+                <label htmlFor="contact-message" className="text-xs font-medium text-muted-foreground">
+                  Message
                 </label>
-                <input
-                  id="contact-email"
-                  name="email"
-                  type="email"
-                  placeholder="you@email.com"
+                <textarea
+                  id="contact-message"
+                  name="message"
+                  rows={5}
+                  placeholder="Tell me about your project or idea..."
                   required
-                  className="bg-secondary border border-border rounded-md px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-colors"
+                  className="bg-secondary border border-border rounded-md px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-colors resize-none"
                 />
               </div>
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="contact-subject" className="text-xs font-medium text-muted-foreground">
-                Subject
-              </label>
-              <input
-                id="contact-subject"
-                name="subject"
-                type="text"
-                placeholder="What's this about?"
-                className="bg-secondary border border-border rounded-md px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-colors"
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="contact-message" className="text-xs font-medium text-muted-foreground">
-                Message
-              </label>
-              <textarea
-                id="contact-message"
-                name="message"
-                rows={5}
-                placeholder="Tell me about your project or idea..."
-                required
-                className="bg-secondary border border-border rounded-md px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-colors resize-none"
-              />
-            </div>
-            <Button type="submit" disabled={submitState.status === "loading"} className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 mt-2">
-              Send Message
-              <ArrowUpRight size={15} />
-            </Button>
-            {submitState.message ? <p className={`text-xs ${submitState.status === "error" ? "text-destructive" : "text-muted-foreground"}`}>{submitState.message}</p> : null}
-          </form>
+              <Button type="submit" disabled={submitState.status === "loading"} className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 mt-2">
+                Send Message
+                <ArrowUpRight size={15} />
+              </Button>
+              {submitState.message ? <p className={`text-xs ${submitState.status === "error" ? "text-destructive" : "text-muted-foreground"}`}>{submitState.message}</p> : null}
+            </form>
+          </NeonGradientCard>
         </div>
       </div>
     </section>
