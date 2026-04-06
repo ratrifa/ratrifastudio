@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 
 import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
+import { FileDropInput } from "@/components/admin/file-drop-input";
 import { FormStateAlert } from "@/components/admin/form-state-alert";
 import { FormSwitchField } from "@/components/admin/form-switch-field";
 import { Button } from "@/components/ui/button";
@@ -56,10 +57,7 @@ export function CertificateEditItem({ certificate, updateAction, deleteAction }:
           <Label>Issue Date</Label>
           <Input name="issueDate" type="date" defaultValue={toDateInputValue(certificate.issueDate)} required />
         </div>
-        <div className="space-y-2">
-          <Label>Replace Image (optional)</Label>
-          <Input name="imageFile" type="file" accept="image/png,image/jpeg,image/webp" />
-        </div>
+        <FileDropInput name="imageFile" label="Replace Image (optional)" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" />
         <div className="space-y-2 md:col-span-2">
           <Label>Credential URL</Label>
           <Input name="credentialUrl" defaultValue={certificate.credentialUrl ?? ""} />

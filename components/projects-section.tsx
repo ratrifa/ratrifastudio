@@ -7,7 +7,7 @@ interface ProjectsSectionProps {
 
 export function ProjectsSection({ projects }: ProjectsSectionProps) {
   return (
-    <section id="projects" className="py-24 bg-section-alt">
+    <section id="projects" className="py-24 bg-background">
       <div className="max-w-6xl mx-auto px-6">
         {/* Section header */}
         <div className="flex flex-col gap-3 mb-14">

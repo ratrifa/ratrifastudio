@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { FormStateAlert } from "@/components/admin/form-state-alert";
 import { FormSubmitButton } from "@/components/admin/form-submit-button";
 import { FormSwitchField } from "@/components/admin/form-switch-field";
+import { FileDropInput } from "@/components/admin/file-drop-input";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,10 +32,7 @@ export function CreateProjectForm({ action }: CreateProjectFormProps) {
         <Label htmlFor="description">Description</Label>
         <Textarea id="description" name="description" required />
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="imageFile">Image Upload (PNG/JPG/WEBP, max 2MB)</Label>
-        <Input id="imageFile" name="imageFile" type="file" accept="image/png,image/jpeg,image/webp" />
-      </div>
+      <FileDropInput id="imageFile" name="imageFile" label="Image Upload" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" />
       <div className="space-y-2">
         <Label htmlFor="link">Demo Link</Label>
         <Input id="link" name="link" placeholder="https://..." />

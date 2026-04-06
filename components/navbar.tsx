@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/s
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { defaultHeroContent } from "@/lib/hero-content";
+import { Backlight } from "./ui/backlight";
 
 const NAV_LINKS = [
   { label: "Home", href: "#home" },
@@ -82,16 +83,18 @@ export function Navbar({ domainLabel = defaultHeroContent.domainLabel, domainLog
           className="flex items-center gap-2 group"
           aria-label="Go to home"
         >
-          {domainLogoUrl ? (
-            <span className="relative flex items-center justify-center w-8 h-8 rounded-md overflow-hidden bg-transparent">
-              <Image src={domainLogoUrl} alt={`${brandLabel} logo`} fill className="object-contain p-1" sizes="32px" />
-            </span>
-          ) : (
-            <span className="flex items-center justify-center w-8 h-8 rounded-md bg-primary text-primary-foreground">
-              <Code2 size={16} />
-            </span>
-          )}
-          <span className="font-mono font-semibold text-foreground text-sm tracking-tight">{renderBrandLabel()}</span>
+          <Backlight className="rounded-md" blur={7}>
+            {domainLogoUrl ? (
+              <span className="relative flex items-center justify-center w-8 h-8 rounded-md overflow-hidden bg-transparent">
+                <Image src={domainLogoUrl} alt={`${brandLabel} logo`} fill className="object-contain p-1" sizes="32px" />
+              </span>
+            ) : (
+              <span className="flex items-center justify-center w-8 h-8 rounded-md bg-primary text-primary-foreground">
+                <Code2 size={16} />
+              </span>
+            )}
+          </Backlight>
+          <span className="font-mono font-semibold text-foreground text-sm tracking-tight leading-none">{renderBrandLabel()}</span>
         </a>
 
         {/* Desktop nav */}
@@ -121,9 +124,6 @@ export function Navbar({ domainLabel = defaultHeroContent.domainLabel, domainLog
         {/* CTA Desktop */}
         <div className="hidden md:flex items-center gap-2">
           <ThemeToggle />
-          <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => handleNavClick("#contact")}>
-            Hire Me
-          </Button>
         </div>
 
         {/* Mobile hamburger */}
@@ -149,7 +149,7 @@ export function Navbar({ domainLabel = defaultHeroContent.domainLabel, domainLog
                   <Code2 size={16} />
                 </span>
               )}
-              <span className="font-mono font-semibold text-sm">{renderBrandLabel()}</span>
+              <span className="font-mono font-semibold text-sm leading-none">{renderBrandLabel()}</span>
             </div>
 
             <ul className="flex flex-col gap-1" role="list">
@@ -169,11 +169,8 @@ export function Navbar({ domainLabel = defaultHeroContent.domainLabel, domainLog
               })}
             </ul>
 
-            <div className="mt-auto pt-8 space-y-3">
+            <div className="rounded-full mt-auto pt-8 space-y-3">
               <ThemeToggle />
-              <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => handleNavClick("#contact")}>
-                Hire Me
-              </Button>
             </div>
           </SheetContent>
         </Sheet>

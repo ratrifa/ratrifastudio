@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { FormStateAlert } from "@/components/admin/form-state-alert";
 import { FormSubmitButton } from "@/components/admin/form-submit-button";
 import { FormSwitchField } from "@/components/admin/form-switch-field";
+import { FileDropInput } from "@/components/admin/file-drop-input";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { FormState } from "@/lib/form-state";
@@ -34,10 +35,7 @@ export function CreateCertificateForm({ action }: CreateCertificateFormProps) {
         <Label htmlFor="issueDate">Issue Date</Label>
         <Input id="issueDate" name="issueDate" type="date" required />
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="imageFile">Image Upload (PNG/JPG/WEBP, max 2MB)</Label>
-        <Input id="imageFile" name="imageFile" type="file" accept="image/png,image/jpeg,image/webp" />
-      </div>
+      <FileDropInput id="imageFile" name="imageFile" label="Image Upload" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" />
       <div className="space-y-2 md:col-span-2">
         <Label htmlFor="credentialUrl">Credential URL</Label>
         <Input id="credentialUrl" name="credentialUrl" placeholder="https://..." />

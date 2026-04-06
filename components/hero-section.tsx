@@ -1,8 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowDown, Download, Github, Linkedin, Twitter } from "lucide-react";
+import { ArrowDown, Github, Linkedin, Twitter } from "lucide-react";
+import { Backlight } from "@/components/ui/backlight";
 import { Button } from "@/components/ui/button";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
+import { Particles } from "@/components/ui/particles";
 import { Separator } from "@/components/ui/separator";
 import { defaultHeroContent, type HeroSectionContent } from "@/lib/hero-content";
 
@@ -20,28 +23,60 @@ export function HeroSection({ content = defaultHeroContent, previewAsBanner = fa
   const badgeLabel = content.openToWork ? "Open to work" : "Off the market";
   const eyebrowLabel = content.openToWork ? "Available for work" : "ratrifastudio";
   const sectionClasses = previewAsBanner ? "relative min-h-[440px] flex items-center overflow-hidden" : "relative min-h-screen flex items-center overflow-hidden";
-  const contentSpacingClasses = previewAsBanner ? "relative max-w-6xl mx-auto px-6 py-14 md:py-16 w-full" : "relative max-w-6xl mx-auto px-6 py-24 md:py-32 w-full";
+  const contentSpacingClasses = previewAsBanner ? "relative z-10 max-w-6xl mx-auto px-6 py-14 md:py-16 w-full" : "relative z-10 max-w-6xl mx-auto px-6 py-24 md:py-32 w-full";
   const headlineClasses = previewAsBanner ? "text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-balance text-foreground" : "text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-balance text-foreground";
-  const avatarClasses = previewAsBanner
-    ? "relative w-52 h-52 sm:w-64 sm:h-64 rounded-full overflow-hidden border-2 border-primary/30 ring-4 ring-primary/10"
-    : "relative w-64 h-64 sm:w-80 sm:h-80 rounded-full overflow-hidden border-2 border-primary/30 ring-4 ring-primary/10";
+  const avatarClasses = previewAsBanner ? "relative w-52 h-52 sm:w-64 sm:h-64 rounded-full overflow-hidden" : "relative w-64 h-64 sm:w-80 sm:h-80 rounded-full overflow-hidden";
   const contentGridClasses = previewAsBanner ? "grid grid-cols-2 gap-8 items-center" : "grid md:grid-cols-2 gap-12 items-center";
   const textColumnClasses = previewAsBanner ? "flex flex-col gap-6" : "order-2 md:order-1 flex flex-col gap-6";
   const avatarColumnClasses = previewAsBanner ? "flex justify-end" : "order-1 md:order-2 flex justify-center md:justify-end";
+
+  const handleDownloadCv = () => {
+    const cvUrl = content.cvUrl;
+    if (!cvUrl) {
+      return;
+    }
+
+    if (cvUrl.startsWith("http")) {
+      window.open(cvUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    const anchor = document.createElement("a");
+    anchor.href = cvUrl;
+    anchor.download = "";
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+  };
 
   return (
     <section id={previewAsBanner ? undefined : "home"} className={sectionClasses}>
       {/* Background grid pattern */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
         style={{
           backgroundImage: "linear-gradient(var(--color-border) 1px, transparent 1px), linear-gradient(90deg, var(--color-border) 1px, transparent 1px)",
           backgroundSize: "48px 48px",
         }}
         aria-hidden="true"
       />
+      <Particles
+        className="absolute inset-0 z-0 h-full w-full text-primary opacity-70 mask-[linear-gradient(to_bottom,white,white_72%,transparent)] [-webkit-mask-image:linear-gradient(to_bottom,white,white_72%,transparent)]"
+        quantity={130}
+        staticity={35}
+        ease={38}
+        size={1.55}
+      />
       {/* Radial glow */}
-      <div className="absolute top-1/3 -left-1/4 w-2/3 h-2/3 rounded-full opacity-10 blur-3xl" style={{ background: "var(--color-primary)" }} aria-hidden="true" />
+      <div
+        className="absolute z-0 top-1/4 -left-1/4 w-3/4 h-3/4 rounded-full opacity-[0.12] blur-3xl pointer-events-none"
+        style={{
+          background: "var(--color-primary)",
+          maskImage: "linear-gradient(to bottom, black 0%, black 75%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 75%, transparent 100%)",
+        }}
+        aria-hidden="true"
+      />
 
       <div className={contentSpacingClasses}>
         <div className={contentGridClasses}>
@@ -75,28 +110,18 @@ export function HeroSection({ content = defaultHeroContent, previewAsBanner = fa
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-3 pt-2">
-              <Button
-                size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2"
+              <InteractiveHoverButton
+                className="h-10 border-border text-foreground hover:bg-secondary"
+                aria-label="See my work"
                 onClick={() => {
                   document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
                 }}
               >
                 See My Work
-                <ArrowDown size={16} />
-              </Button>
-              <Button size="lg" variant="outline" className="border-border text-foreground hover:bg-secondary gap-2" asChild>
-                <a
-                  href={content.cvUrl}
-                  download={content.cvUrl.startsWith("/") ? "" : undefined}
-                  target={content.cvUrl.startsWith("http") ? "_blank" : undefined}
-                  rel={content.cvUrl.startsWith("http") ? "noopener noreferrer" : undefined}
-                  aria-label="Download CV"
-                >
-                  <Download size={16} />
-                  Download CV
-                </a>
-              </Button>
+              </InteractiveHoverButton>
+              <InteractiveHoverButton className="h-10 border-border text-foreground hover:bg-secondary" aria-label="Download CV" onClick={handleDownloadCv}>
+                Download CV
+              </InteractiveHoverButton>
             </div>
 
             {/* Social links */}
@@ -115,9 +140,11 @@ export function HeroSection({ content = defaultHeroContent, previewAsBanner = fa
             <div className="relative">
               {/* Decorative ring */}
               <div className="absolute inset-0 rounded-full scale-105 opacity-20 blur-md" style={{ background: "var(--color-primary)" }} aria-hidden="true" />
-              <div className={avatarClasses}>
-                <Image src={content.avatarUrl ?? defaultHeroContent.avatarUrl ?? "/images/hero-avatar.jpg"} alt={content.avatarAlt} fill className="object-cover" priority />
-              </div>
+              <Backlight className="rounded-full" blur={22}>
+                <div className={avatarClasses}>
+                  <Image src={content.avatarUrl ?? defaultHeroContent.avatarUrl ?? "/images/hero-avatar.jpg"} alt={content.avatarAlt} fill className="object-cover" priority />
+                </div>
+              </Backlight>
 
               {/* Floating badge */}
               <div className="absolute -bottom-4 -right-4 bg-card border border-border rounded-xl px-4 py-2 shadow-lg">

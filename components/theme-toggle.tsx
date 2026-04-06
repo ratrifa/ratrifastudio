@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { useTheme } from "@/components/theme-provider";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -16,18 +15,8 @@ export function ThemeToggle() {
 
   // Keep first render deterministic to avoid server/client icon mismatch.
   if (!mounted) {
-    return (
-      <Button type="button" variant="ghost" size="icon" aria-label="Toggle theme" disabled>
-        <Moon size={18} />
-      </Button>
-    );
+    return <button type="button" className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "hover:bg-purple-500 hover:text-white rounded-full transition-colors")} aria-label="Toggle theme" disabled />;
   }
 
-  const isDark = resolvedTheme === "dark";
-
-  return (
-    <Button type="button" variant="ghost" size="icon" aria-label="Toggle theme" onClick={() => setTheme(isDark ? "light" : "dark")}>
-      {isDark ? <Sun size={18} /> : <Moon size={18} />}
-    </Button>
-  );
+  return <AnimatedThemeToggler className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "hover:bg-purple-500 hover:text-white rounded-full transition-colors")} aria-label="Toggle theme" />;
 }

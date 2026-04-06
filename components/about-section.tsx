@@ -1,6 +1,7 @@
 import { BrainCircuit, Briefcase, Code2, Database, Globe, Layers3, Monitor, Palette, Rocket, Shield, Smartphone, Sparkles, Server, Terminal, Users, Wrench } from "lucide-react";
 
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { DotPattern } from "@/components/ui/dot-pattern";
 import { defaultAboutContent, type AboutSectionContent } from "@/lib/about-content";
 import { ABOUT_SKILL_ICON_DEFAULT, type AboutSkillIconKey } from "@/lib/about-skill-icons";
 
@@ -39,14 +40,22 @@ function chunkSkills<T>(items: T[], chunkSize: number) {
 }
 
 export function AboutSection({ content = defaultAboutContent, previewAsBanner = false }: AboutSectionProps) {
-  const sectionClasses = previewAsBanner ? "py-16 bg-background" : "py-24 bg-background";
+  const sectionClasses = previewAsBanner ? "relative overflow-hidden py-16 bg-background" : "relative overflow-hidden py-24 bg-background";
   const shouldUseSkillCarousel = content.skills.length > 5;
-  const shouldCenterLastSkillCard = !shouldUseSkillCarousel && content.skills.length % 2 === 1;
   const skillSlides = chunkSkills(content.skills, 1);
 
   return (
     <section id={previewAsBanner ? undefined : "about"} className={sectionClasses}>
-      <div className="max-w-6xl mx-auto px-6">
+      <DotPattern
+        className="text-primary/40 mask-[radial-gradient(ellipse_at_center,white_45%,transparent_85%)]"
+        width={20}
+        height={20}
+        cx={1.2}
+        cy={1.2}
+        cr={1.2}
+        glow={true}
+      />
+      <div className="relative z-10 max-w-6xl mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-16 items-start">
           <div className="flex flex-col gap-6">
             <div className="flex items-center gap-3">
@@ -107,17 +116,9 @@ export function AboutSection({ content = defaultAboutContent, previewAsBanner = 
             <div className="grid grid-cols-2 gap-4">
               {content.skills.map(({ title, items, icon }, index) => {
                 const Icon = SKILL_ICONS[icon ?? ABOUT_SKILL_ICON_DEFAULT] ?? SKILL_ICONS[ABOUT_SKILL_ICON_DEFAULT];
-                const isLastSkillCard = shouldCenterLastSkillCard && index === content.skills.length - 1;
 
                 return (
-                  <div
-                    key={`${title}-${index}`}
-                    className={`${
-                      isLastSkillCard
-                        ? "bg-card border border-border rounded-xl p-5 hover:border-primary/30 transition-colors col-span-2 justify-self-center w-full max-w-[calc(50%-0.5rem)]"
-                        : "bg-card border border-border rounded-xl p-5 hover:border-primary/30 transition-colors"
-                    }`}
-                  >
+                  <div key={`${title}-${index}`} className="bg-card border border-border rounded-xl p-5 hover:border-primary/30 transition-colors">
                     <div className="flex items-center gap-2 mb-4">
                       <span className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/10 text-primary border border-primary/20">
                         <Icon size={15} />

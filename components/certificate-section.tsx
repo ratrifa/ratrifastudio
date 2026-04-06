@@ -25,7 +25,7 @@ export function CertificateSection({ certificates }: CertificateSectionProps) {
 
   if (!heroCertificate) {
     return (
-      <section id="certificates" className="py-24 bg-section-alt">
+      <section id="certificates" className="py-24 bg-background">
         <div className="max-w-6xl mx-auto px-6">
           <p className="text-muted-foreground text-center py-16">No certificates yet.</p>
         </div>
@@ -34,7 +34,7 @@ export function CertificateSection({ certificates }: CertificateSectionProps) {
   }
 
   return (
-    <section id="certificates" className="py-24 bg-section-alt">
+    <section id="certificates" className="py-24 bg-background">
       <div className="max-w-6xl mx-auto px-6">
         {/* Section header */}
         <div className="flex flex-col gap-3 mb-14">
