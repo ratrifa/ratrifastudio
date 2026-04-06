@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 
 import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
+import { FileDropInput } from "@/components/admin/file-drop-input";
 import { FormStateAlert } from "@/components/admin/form-state-alert";
 import { FormSwitchField } from "@/components/admin/form-switch-field";
 import { Button } from "@/components/ui/button";
@@ -46,10 +47,7 @@ export function ProjectEditItem({ project, updateAction, deleteAction }: Project
           <Label>Description</Label>
           <Textarea name="description" defaultValue={project.description} required />
         </div>
-        <div className="space-y-2">
-          <Label>Replace Image (optional)</Label>
-          <Input name="imageFile" type="file" accept="image/png,image/jpeg,image/webp" />
-        </div>
+        <FileDropInput name="imageFile" label="Replace Image (optional)" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" />
         <div className="space-y-2">
           <Label>Demo Link</Label>
           <Input name="link" defaultValue={project.link ?? ""} />

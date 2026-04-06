@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import Link from "next/link";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -132,6 +133,9 @@ export default async function BackdoorEntryPage({ searchParams }: { searchParams
 
             <Button type="submit" className="w-full">
               Sign In
+            </Button>
+            <Button type="button" variant="ghost" className="w-full" asChild>
+              <Link href="/">Back to Home</Link>
             </Button>
           </form>
         </CardContent>

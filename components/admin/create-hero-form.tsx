@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 
+import { FileDropInput } from "@/components/admin/file-drop-input";
 import { FormStateAlert } from "@/components/admin/form-state-alert";
 import { FormSubmitButton } from "@/components/admin/form-submit-button";
 import { Input } from "@/components/ui/input";
@@ -87,23 +88,26 @@ export function CreateHeroForm({ action, values, onValuesChange }: CreateHeroFor
           <Input id="domainLabel" name="domainLabel" value={safeValues.domainLabel} onChange={(event) => updateField("domainLabel", event.target.value)} placeholder="yourname.dev" required />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="domainLogoFile">Logo domain upload</Label>
-          <Input id="domainLogoFile" name="domainLogoFile" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" />
+          <FileDropInput id="domainLogoFile" name="domainLogoFile" label="Logo domain upload" accept="image/png,image/jpeg,image/webp,image/svg+xml" helperText="PNG/JPG/WEBP/SVG" />
         </div>
       </div>
 
       <div className="md:col-span-2 grid gap-4 md:grid-cols-2 rounded-lg border border-border p-4">
         <div className="space-y-2">
-          <Label htmlFor="avatarFile">Profile photo upload</Label>
-          <Input id="avatarFile" name="avatarFile" type="file" accept="image/png,image/jpeg,image/webp" />
+          <FileDropInput id="avatarFile" name="avatarFile" label="Profile photo upload" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" />
         </div>
         <div className="space-y-2 md:col-span-2">
           <Label htmlFor="avatarAlt">Profile photo alt text</Label>
           <Input id="avatarAlt" name="avatarAlt" value={safeValues.avatarAlt} onChange={(event) => updateField("avatarAlt", event.target.value)} required />
         </div>
         <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="cvFile">Upload CV file (optional)</Label>
-          <Input id="cvFile" name="cvFile" type="file" accept="application/pdf,.pdf,application/msword,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx" />
+          <FileDropInput
+            id="cvFile"
+            name="cvFile"
+            label="Upload CV file (optional)"
+            accept="application/pdf,.pdf,application/msword,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx"
+            helperText="PDF, DOC, DOCX (max 5MB)"
+          />
         </div>
       </div>
 

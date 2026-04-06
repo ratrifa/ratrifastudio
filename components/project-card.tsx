@@ -2,7 +2,7 @@ import Image from "next/image";
 import { ExternalLink, Github } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-
+import { Backlight } from "@/components/ui/backlight";
 export interface Project {
   id: string;
   title: string;
@@ -22,7 +22,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
     <Card className="group bg-card border-border hover:border-primary/40 transition-all duration-300 overflow-hidden flex flex-col">
       {/* Image */}
       <div className="relative w-full h-48 overflow-hidden">
-        <Image src={project.image} alt={project.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
+          <Image src={project.image} alt={project.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
         <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
           {project.demo_url && (
             <a
