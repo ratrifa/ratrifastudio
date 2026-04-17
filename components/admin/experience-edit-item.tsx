@@ -1,14 +1,16 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
 import { FormStateAlert } from "@/components/admin/form-state-alert";
+import { FormSubmitButton } from "@/components/admin/form-submit-button";
 import { PresentEndDateField } from "@/components/admin/present-end-date-field";
-import { Button } from "@/components/ui/button";
+import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { EXPERIENCE_TYPE_LABELS, EXPERIENCE_TYPE_OPTIONS, normalizeExperienceType, type ExperienceTypeValue } from "@/lib/experience-types";
 import type { FormState } from "@/lib/form-state";
 import { initialFormState } from "@/lib/form-state";
 
@@ -17,6 +19,7 @@ interface ExperienceEditItemProps {
     id: string;
     title: string;
     company: string;
+    experienceType?: ExperienceTypeValue | string | null;
     periodStart: Date | string;
     periodEnd: Date | string | null;
     description: string;
@@ -40,6 +43,8 @@ function toDateInputValue(value: Date | string | null) {
 export function ExperienceEditItem({ experience, updateAction, deleteAction }: ExperienceEditItemProps) {
   const [updateState, updateFormAction] = useActionState(updateAction, initialFormState);
   const [deleteState, deleteFormAction] = useActionState(deleteAction, initialFormState);
+  const defaultExperienceType = normalizeExperienceType(experience.experienceType) ?? "full-time";
+  const [experienceType, setExperienceType] = useState<ExperienceTypeValue>(defaultExperienceType);
 
   return (
     <div className="space-y-3">
@@ -57,6 +62,23 @@ export function ExperienceEditItem({ experience, updateAction, deleteAction }: E
           <Input name="company" defaultValue={experience.company} required />
         </div>
         <div className="space-y-2">
+          <Label>Type</Label>
+          <input type="hidden" name="experienceType" value={experienceType} />
+          <Combobox value={experienceType} onValueChange={(value) => setExperienceType(value as ExperienceTypeValue)} items={EXPERIENCE_TYPE_OPTIONS}>
+            <ComboboxInput className="w-full" placeholder="Choose type" />
+            <ComboboxContent>
+              <ComboboxEmpty>No type found.</ComboboxEmpty>
+              <ComboboxList>
+                {EXPERIENCE_TYPE_OPTIONS.map((type) => (
+                  <ComboboxItem key={type} value={type}>
+                    {EXPERIENCE_TYPE_LABELS[type]}
+                  </ComboboxItem>
+                ))}
+              </ComboboxList>
+            </ComboboxContent>
+          </Combobox>
+        </div>
+        <div className="space-y-2">
           <Label>Start Date</Label>
           <Input name="periodStart" type="date" defaultValue={toDateInputValue(experience.periodStart)} required />
         </div>
@@ -65,19 +87,18 @@ export function ExperienceEditItem({ experience, updateAction, deleteAction }: E
           <Label>Description</Label>
           <Textarea name="description" defaultValue={experience.description} required />
         </div>
+        <div className="md:col-span-2 flex flex-row items-center gap-2">
+          <FormSubmitButton pendingLabel="Updating..." variant="secondary" className="transition-all hover:-translate-y-0.5 hover:shadow-sm">
+            Update
+          </FormSubmitButton>
+          <DeleteConfirmDialog
+            title="Delete experience?"
+            description={`Experience \"${experience.title}\" at \"${experience.company}\" akan dihapus permanen. Aksi ini tidak bisa dibatalkan.`}
+            action={deleteFormAction}
+            itemId={experience.id}
+          />
+        </div>
       </form>
-
-      <div className="flex flex-col sm:flex-row gap-2">
-        <Button form={`update-experience-${experience.id}`} type="submit" variant="secondary" className="w-full sm:w-fit transition-all hover:-translate-y-0.5 hover:shadow-sm">
-          Update
-        </Button>
-        <DeleteConfirmDialog
-          title="Delete experience?"
-          description={`Experience \"${experience.title}\" at \"${experience.company}\" akan dihapus permanen. Aksi ini tidak bisa dibatalkan.`}
-          action={deleteFormAction}
-          itemId={experience.id}
-        />
-      </div>
     </div>
   );
 }

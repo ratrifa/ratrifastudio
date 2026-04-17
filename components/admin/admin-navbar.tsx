@@ -5,6 +5,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 
+import { FormSubmitButton } from "@/components/admin/form-submit-button";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
@@ -46,9 +47,9 @@ export function AdminNavbar({ logoutAction }: AdminNavbarProps) {
       </nav>
 
       <form action={logoutAction} className="hidden md:block shrink-0">
-        <Button type="submit" variant="outline" className="shrink-0">
+        <FormSubmitButton pendingLabel="Logging out..." variant="outline" className="shrink-0">
           Logout
-        </Button>
+        </FormSubmitButton>
       </form>
 
       <Button
@@ -92,9 +93,9 @@ export function AdminNavbar({ logoutAction }: AdminNavbarProps) {
             </div>
 
             <form action={logoutAction} className="mt-6">
-              <Button type="submit" variant="outline" className="w-full">
+              <FormSubmitButton pendingLabel="Logging out..." variant="outline" className="w-full">
                 Logout
-              </Button>
+              </FormSubmitButton>
             </form>
           </div>
         </SheetContent>

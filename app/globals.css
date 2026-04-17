@@ -133,11 +133,11 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --animate-background-position-spin: background-position-spin 3000ms infinite alternate;
   @keyframes background-position-spin {
-  0% {
-    background-position: top center;
+    0% {
+      background-position: top center;
     }
-  100% {
-    background-position: bottom center;
+    100% {
+      background-position: bottom center;
     }
   }
 }
@@ -163,7 +163,8 @@
   }
 }
 
-::view-transition-old(root), ::view-transition-new(root) {
+::view-transition-old(root),
+::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
 }

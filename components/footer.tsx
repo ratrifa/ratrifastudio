@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Mail, Phone, MapPin, Github, Linkedin, Twitter, Code2, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NeonGradientCard } from "@/components/ui/neon-gradient-card";
+import { Spinner } from "@/components/ui/spinner";
 import { defaultHeroContent } from "@/lib/hero-content";
 import { useState } from "react";
 
@@ -119,12 +120,7 @@ function ContactSection({ social }: { social?: FooterSocialProps }) {
           </div>
 
           {/* Right: Form */}
-          <NeonGradientCard
-            borderSize={2}
-            borderRadius={20}
-            neonColors={{ firstColor: "#5e17eb", secondColor: "#38bdf8" }}
-            className="w-full"
-          >
+          <NeonGradientCard borderSize={2} borderRadius={20} neonColors={{ firstColor: "#5e17eb", secondColor: "#38bdf8" }} className="w-full">
             <form onSubmit={handleContactSubmit} className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
@@ -180,8 +176,17 @@ function ContactSection({ social }: { social?: FooterSocialProps }) {
                 />
               </div>
               <Button type="submit" disabled={submitState.status === "loading"} className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 mt-2">
-                Send Message
-                <ArrowUpRight size={15} />
+                {submitState.status === "loading" ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Spinner className="size-4" />
+                    Sending...
+                  </span>
+                ) : (
+                  <>
+                    Send Message
+                    <ArrowUpRight size={15} />
+                  </>
+                )}
               </Button>
               {submitState.message ? <p className={`text-xs ${submitState.status === "error" ? "text-destructive" : "text-muted-foreground"}`}>{submitState.message}</p> : null}
             </form>

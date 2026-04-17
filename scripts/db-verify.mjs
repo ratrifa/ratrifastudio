@@ -25,7 +25,7 @@ const EXPECTED_TABLE_COLUMNS = {
   ],
   AboutSection: ["id", "headline", "paragraph", "stats", "skills", "createdAt", "updatedAt"],
   Project: ["id", "title", "description", "techStack", "imageUrl", "link", "githubUrl", "isPublished", "createdAt", "updatedAt"],
-  Experience: ["id", "title", "company", "periodStart", "periodEnd", "description", "createdAt", "updatedAt"],
+  Experience: ["id", "title", "company", "experienceType", "periodStart", "periodEnd", "description", "createdAt", "updatedAt"],
   Certificate: ["id", "title", "issuer", "imageUrl", "issueDate", "credentialUrl", "featured", "createdAt", "updatedAt"],
 };
 
@@ -76,7 +76,15 @@ async function run() {
     certificates: await prisma.certificate.count(),
   };
 
+  const experienceNullTypeCount = await prisma.experience.count({ where: { experienceType: null } });
+  const experienceTypes = await prisma.experience.findMany({
+    select: { experienceType: true },
+    distinct: ["experienceType"],
+  });
+
   console.log("  Counts:", counts);
+  console.log("  Experience types:", experienceTypes.map((row) => row.experienceType));
+  console.log("  Experiences without type:", experienceNullTypeCount);
 
   if (hasSchemaError) {
     console.error("DB Verify failed: schema mismatch detected.");

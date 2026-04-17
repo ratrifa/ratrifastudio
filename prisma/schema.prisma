@@ -11,6 +11,16 @@ enum UserRole {
   ADMIN
 }
 
+enum ExperienceType {
+  ORGANIZATION
+  VOLUNTEER
+  FULL_TIME
+  PART_TIME
+  INTERNSHIP
+  CONTRACT
+  FREELANCE
+}
+
 model User {
   id        String   @id @default(uuid())
   name      String
@@ -59,6 +69,7 @@ model Experience {
   id          String    @id @default(uuid())
   title       String
   company     String
+  experienceType ExperienceType?
   periodStart DateTime
   periodEnd   DateTime?
   description String    @db.Text

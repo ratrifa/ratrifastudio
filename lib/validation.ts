@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { ABOUT_SKILL_ICON_KEYS } from "@/lib/about-skill-icons";
+import { EXPERIENCE_TYPE_OPTIONS } from "@/lib/experience-types";
 
 const optionalUrl = z
   .string()
@@ -34,6 +35,7 @@ export const projectUpdateSchema = projectFormSchema.extend({
 const experienceBaseSchema = z.object({
   title: z.string().trim().min(2).max(120),
   company: z.string().trim().min(2).max(120),
+  experienceType: z.enum(EXPERIENCE_TYPE_OPTIONS),
   periodStart: z.string().trim().min(1),
   periodEnd: z.string().trim().optional(),
   description: z.string().trim().min(10).max(2000),

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { toDbExperienceType } from "@/lib/experience-types";
 import { cleanupPrisma, prisma } from "@/lib/prisma";
 import { experienceFormSchema } from "@/lib/validation";
 
@@ -21,6 +22,7 @@ export async function POST(req: NextRequest) {
     const parsed = experienceFormSchema.safeParse({
       title: body?.title,
       company: body?.company,
+      experienceType: body?.experienceType,
       periodStart: body?.periodStart,
       periodEnd: body?.periodEnd || "",
       description: body?.description,
@@ -30,12 +32,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Payload tidak valid", errors: parsed.error.errors }, { status: 400 });
     }
 
-    const { title, company, periodStart, periodEnd, description } = parsed.data;
+    const { title, company, experienceType, periodStart, periodEnd, description } = parsed.data;
 
     const experience = await prisma.experience.create({
       data: {
         title,
         company,
+        experienceType: toDbExperienceType(experienceType),
         periodStart: new Date(periodStart),
         periodEnd: periodEnd ? new Date(periodEnd) : null,
         description,

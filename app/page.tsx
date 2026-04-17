@@ -12,6 +12,7 @@ import { cleanupPrisma, prisma } from "@/lib/prisma";
 import { normalizeHeroContent } from "@/lib/hero-content";
 import { normalizeAboutContent } from "@/lib/about-content";
 import { applyDerivedStats, getExperienceValue, getProjectValue } from "@/lib/about-stats";
+import { normalizeExperienceType } from "@/lib/experience-types";
 
 export const dynamic = "force-dynamic";
 
@@ -83,6 +84,7 @@ export default async function Home() {
       id: experience.id,
       role: experience.title,
       company: experience.company,
+      experienceType: normalizeExperienceType(experience.experienceType),
       period_start: experience.periodStart.toLocaleDateString("en-US", {
         month: "short",
         year: "numeric",

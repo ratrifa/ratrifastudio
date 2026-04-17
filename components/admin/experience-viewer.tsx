@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { EXPERIENCE_TYPE_LABELS, normalizeExperienceType } from "@/lib/experience-types";
 import { useState } from "react";
 
 interface ExperienceViewerProps {
@@ -25,6 +26,7 @@ export function ExperienceViewer({ experiences }: ExperienceViewerProps) {
         ) : (
           filtered.map((exp) => {
             const isPresent = !exp.periodEnd;
+            const experienceType = normalizeExperienceType(exp.experienceType);
             const startDate = new Date(exp.periodStart).toLocaleDateString("id-ID", {
               year: "numeric",
               month: "short",
@@ -42,6 +44,11 @@ export function ExperienceViewer({ experiences }: ExperienceViewerProps) {
                   <p className="font-medium text-sm">{exp.title}</p>
                   <Badge variant={isPresent ? "default" : "outline"}>{isPresent ? "Ongoing" : "Completed"}</Badge>
                 </div>
+                {experienceType ? (
+                  <Badge variant="secondary" className="text-xs w-fit bg-primary/15 text-primary border border-primary/35 dark:bg-primary/20 dark:border-primary/45">
+                    {EXPERIENCE_TYPE_LABELS[experienceType]}
+                  </Badge>
+                ) : null}
                 <p className="text-sm text-muted-foreground">{exp.company}</p>
                 <p className="text-xs text-muted-foreground">
                   {startDate} {endDate ? `- ${endDate}` : "- Present"}
@@ -59,6 +66,7 @@ export function ExperienceViewer({ experiences }: ExperienceViewerProps) {
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-semibold">Role</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold">Company</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Type</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold">Period</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold">Status</th>
               </tr>
@@ -66,13 +74,14 @@ export function ExperienceViewer({ experiences }: ExperienceViewerProps) {
             <tbody className="divide-y divide-border">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
+                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
                     No experiences found
                   </td>
                 </tr>
               ) : (
                 filtered.map((exp) => {
                   const isPresent = !exp.periodEnd;
+                  const experienceType = normalizeExperienceType(exp.experienceType);
                   const startDate = new Date(exp.periodStart).toLocaleDateString("id-ID", {
                     year: "numeric",
                     month: "short",
@@ -88,6 +97,15 @@ export function ExperienceViewer({ experiences }: ExperienceViewerProps) {
                     <tr key={exp.id} className="hover:bg-muted/30 transition-colors">
                       <td className="px-4 py-3 font-medium text-sm">{exp.title}</td>
                       <td className="px-4 py-3 text-sm">{exp.company}</td>
+                      <td className="px-4 py-3 text-sm">
+                        {experienceType ? (
+                          <Badge variant="secondary" className="bg-primary/15 text-primary border border-primary/35 dark:bg-primary/20 dark:border-primary/45">
+                            {EXPERIENCE_TYPE_LABELS[experienceType]}
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">
                         {startDate} {endDate ? `- ${endDate}` : "- Present"}
                       </td>

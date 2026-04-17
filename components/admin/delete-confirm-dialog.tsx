@@ -1,5 +1,6 @@
 "use client";
 
+import { FormSubmitButton } from "@/components/admin/form-submit-button";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
@@ -31,9 +32,9 @@ export function DeleteConfirmDialog({ triggerLabel = "Delete", title, descriptio
           <form action={action}>
             <input type="hidden" name="id" value={itemId} />
             <AlertDialogAction asChild>
-              <Button type="submit" variant="destructive">
+              <FormSubmitButton pendingLabel="Deleting..." variant="destructive">
                 {confirmLabel}
-              </Button>
+              </FormSubmitButton>
             </AlertDialogAction>
           </form>
         </AlertDialogFooter>
