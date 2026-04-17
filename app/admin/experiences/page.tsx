@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { cleanupPrisma, prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/server-auth";
+import { toDbExperienceType } from "@/lib/experience-types";
 import { experienceFormSchema, experienceUpdateSchema, safeDate } from "@/lib/validation";
 import { ExperienceViewer } from "@/components/admin/experience-viewer";
 import { CreateExperienceForm } from "@/components/admin/create-experience-form";
@@ -55,6 +56,7 @@ async function createExperienceAction(_state: FormState, formData: FormData): Pr
     const parsed = experienceFormSchema.safeParse({
       title: String(formData.get("title") ?? ""),
       company: String(formData.get("company") ?? ""),
+      experienceType: String(formData.get("experienceType") ?? ""),
       periodStart: String(formData.get("periodStart") ?? ""),
       periodEnd: periodEndValue,
       description: String(formData.get("description") ?? ""),
@@ -64,12 +66,13 @@ async function createExperienceAction(_state: FormState, formData: FormData): Pr
       return errorState("Please fix the highlighted experience fields.", parsed.error.flatten().fieldErrors);
     }
 
-    const { title, company, periodStart, periodEnd, description } = parsed.data;
+    const { title, company, experienceType, periodStart, periodEnd, description } = parsed.data;
 
     await prisma.experience.create({
       data: {
         title,
         company,
+        experienceType: toDbExperienceType(experienceType),
         periodStart: safeDate(periodStart),
         periodEnd: periodEnd ? safeDate(periodEnd) : null,
         description,
@@ -100,6 +103,7 @@ async function updateExperienceAction(_state: FormState, formData: FormData): Pr
       id: String(formData.get("id") ?? ""),
       title: String(formData.get("title") ?? ""),
       company: String(formData.get("company") ?? ""),
+      experienceType: String(formData.get("experienceType") ?? ""),
       periodStart: String(formData.get("periodStart") ?? ""),
       periodEnd: periodEndValue,
       description: String(formData.get("description") ?? ""),
@@ -109,13 +113,14 @@ async function updateExperienceAction(_state: FormState, formData: FormData): Pr
       return errorState("Please fix the highlighted experience fields.", parsed.error.flatten().fieldErrors);
     }
 
-    const { id, title, company, periodStart, periodEnd, description } = parsed.data;
+    const { id, title, company, experienceType, periodStart, periodEnd, description } = parsed.data;
 
     await prisma.experience.update({
       where: { id },
       data: {
         title,
         company,
+        experienceType: toDbExperienceType(experienceType),
         periodStart: safeDate(periodStart),
         periodEnd: periodEnd ? safeDate(periodEnd) : null,
         description,

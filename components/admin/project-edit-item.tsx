@@ -5,8 +5,8 @@ import { useActionState } from "react";
 import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
 import { FileDropInput } from "@/components/admin/file-drop-input";
 import { FormStateAlert } from "@/components/admin/form-state-alert";
+import { FormSubmitButton } from "@/components/admin/form-submit-button";
 import { FormSwitchField } from "@/components/admin/form-switch-field";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -61,14 +61,13 @@ export function ProjectEditItem({ project, updateAction, deleteAction }: Project
           <Input name="techStackRaw" defaultValue={Array.isArray(project.techStack) ? project.techStack.join(", ") : ""} required />
         </div>
         <FormSwitchField id={`isPublished-${project.id}`} name="isPublished" label="Published" defaultChecked={project.isPublished} className="md:col-span-2" />
+        <div className="md:col-span-2 flex flex-row items-center gap-2">
+          <FormSubmitButton pendingLabel="Updating..." variant="secondary" className="transition-all hover:-translate-y-0.5 hover:shadow-sm">
+            Update
+          </FormSubmitButton>
+          <DeleteConfirmDialog title="Delete project?" description={`Project \"${project.title}\" akan dihapus permanen. Aksi ini tidak bisa dibatalkan.`} action={deleteFormAction} itemId={project.id} />
+        </div>
       </form>
-
-      <div className="flex flex-col sm:flex-row gap-2">
-        <Button form={`update-project-${project.id}`} type="submit" variant="secondary" className="w-full sm:w-fit transition-all hover:-translate-y-0.5 hover:shadow-sm">
-          Update
-        </Button>
-        <DeleteConfirmDialog title="Delete project?" description={`Project \"${project.title}\" akan dihapus permanen. Aksi ini tidak bisa dibatalkan.`} action={deleteFormAction} itemId={project.id} />
-      </div>
     </div>
   );
 }

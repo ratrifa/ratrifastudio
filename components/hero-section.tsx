@@ -43,7 +43,7 @@ export function HeroSection({ content = defaultHeroContent, previewAsBanner = fa
       }
 
       const width = typeof window !== "undefined" ? window.innerWidth : 1280;
-      const cores = typeof navigator !== "undefined" ? navigator.hardwareConcurrency ?? 4 : 4;
+      const cores = typeof navigator !== "undefined" ? (navigator.hardwareConcurrency ?? 4) : 4;
       const memory = typeof navigator !== "undefined" && "deviceMemory" in navigator ? Number((navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 4) : 4;
 
       let base = previewAsBanner ? 70 : 100;
@@ -117,7 +117,7 @@ export function HeroSection({ content = defaultHeroContent, previewAsBanner = fa
           className="w-full h-full rounded-full opacity-[0.12] blur-3xl"
           style={{
             background: "var(--color-primary)",
-            maskImage: "linear-gradient(to bottom, black 0%, black 75%, transparent 100%)", 
+            maskImage: "linear-gradient(to bottom, black 0%, black 75%, transparent 100%)",
             WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 75%, transparent 100%)",
           }}
           aria-hidden="true"

@@ -46,15 +46,7 @@ export function AboutSection({ content = defaultAboutContent, previewAsBanner = 
 
   return (
     <section id={previewAsBanner ? undefined : "about"} className={sectionClasses}>
-      <DotPattern
-        className="text-primary/40 mask-[radial-gradient(ellipse_at_center,white_45%,transparent_85%)]"
-        width={20}
-        height={20}
-        cx={1.2}
-        cy={1.2}
-        cr={1.2}
-        glow={false}
-      />
+      <DotPattern className="text-primary/40 mask-[radial-gradient(ellipse_at_center,white_45%,transparent_85%)]" width={20} height={20} cx={1.2} cy={1.2} cr={1.2} glow={false} />
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-16 items-start">
           <div className="flex flex-col gap-6">
