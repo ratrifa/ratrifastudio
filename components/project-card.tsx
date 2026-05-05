@@ -1,5 +1,6 @@
+import Link from "next/link";
 import Image from "next/image";
-import { ExternalLink, Github } from "lucide-react";
+import { ExternalLink, Github, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Backlight } from "@/components/ui/backlight";
@@ -23,14 +24,22 @@ export function ProjectCard({ project }: ProjectCardProps) {
       {/* Image */}
       <div className="relative w-full h-48 overflow-hidden">
           <Image src={project.image} alt={project.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
-        <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
+        <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 flex-wrap">
+          <Link
+            href={`/projects/${project.id}`}
+            aria-label={`View details of ${project.title}`}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
+          >
+            <Eye size={13} />
+            View Detail
+          </Link>
           {project.demo_url && (
             <a
               href={project.demo_url}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`Live demo of ${project.title}`}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-secondary text-secondary-foreground text-xs font-medium hover:bg-secondary/80 transition-colors"
             >
               <ExternalLink size={13} />
               Live Demo
@@ -42,7 +51,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`Source code of ${project.title}`}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-secondary text-secondary-foreground text-xs font-medium hover:bg-secondary/80 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-muted text-muted-foreground text-xs font-medium hover:bg-muted/80 transition-colors"
             >
               <Github size={13} />
               Code
