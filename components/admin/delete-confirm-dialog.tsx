@@ -2,7 +2,7 @@
 
 import { FormSubmitButton } from "@/components/admin/form-submit-button";
 import { Button } from "@/components/ui/button";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 interface DeleteConfirmDialogProps {
   triggerLabel?: string;
@@ -31,11 +31,9 @@ export function DeleteConfirmDialog({ triggerLabel = "Delete", title, descriptio
           <AlertDialogCancel>{cancelLabel}</AlertDialogCancel>
           <form action={action}>
             <input type="hidden" name="id" value={itemId} />
-            <AlertDialogAction asChild>
-              <FormSubmitButton pendingLabel="Deleting..." variant="destructive">
-                {confirmLabel}
-              </FormSubmitButton>
-            </AlertDialogAction>
+            <FormSubmitButton pendingLabel="Deleting..." variant="destructive">
+              {confirmLabel}
+            </FormSubmitButton>
           </form>
         </AlertDialogFooter>
       </AlertDialogContent>
