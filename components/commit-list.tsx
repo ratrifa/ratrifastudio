@@ -29,6 +29,11 @@ export function CommitList({ commits, showAll = false }: CommitListProps) {
 
   return (
     <div className="space-y-3">
+      {/* Hint text */}
+      <p className="text-xs text-muted-foreground text-center">
+        Scroll kebawah untuk menampilkan seluruh commit history
+      </p>
+
       {/* Scrollable container untuk semua commits */}
       <div className="relative group">
         {/* Gradient fade at top */}
