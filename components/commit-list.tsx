@@ -24,45 +24,35 @@ export function CommitList({ commits, showAll = false }: CommitListProps) {
     );
   }
 
-  // Show max 5 commits by default, unless showAll is true
-  const displayedCommits = showAll ? commits : commits.slice(0, 5);
-  const hasMoreCommits = commits.length > 5 && !showAll;
+  // Display all commits
+  const displayedCommits = commits;
 
   return (
     <div className="space-y-3">
-      {/* Scrollable container jika lebih dari 5 commits */}
-      {commits.length > 5 && !showAll ? (
-        <div className="relative group">
-          {/* Scrollable wrapper */}
-          <div
-            className="max-h-[500px] overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-muted-foreground/50 scrollbar-track-muted"
-            style={{
-              scrollBehavior: "smooth",
-            }}
-          >
-            {displayedCommits.map((commit) => (
-              <CommitCard key={commit.sha} commit={commit} />
-            ))}
-          </div>
+      {/* Scrollable container untuk semua commits */}
+      <div className="relative group">
+        {/* Gradient fade at top */}
+        <div className="absolute top-0 left-0 right-0 z-10 h-12 bg-gradient-to-b from-background to-transparent pointer-events-none rounded-t-lg" />
 
-          {/* Gradient fade at bottom untuk hint scroll */}
-          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none rounded-b-lg" />
-
-          {/* Scroll hint */}
-          <div className="mt-2 text-center">
-            <p className="text-xs text-muted-foreground">
-              ↓ Scroll untuk lihat lebih banyak commits ({commits.length} total)
-            </p>
-          </div>
-        </div>
-      ) : (
-        // Non-scrollable list jika <= 5 commits
-        <div className="space-y-3">
+        <div
+          className="max-h-[600px] overflow-y-auto space-y-3 pr-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden pt-2"
+          style={{
+            scrollBehavior: "smooth",
+          }}
+        >
           {displayedCommits.map((commit) => (
             <CommitCard key={commit.sha} commit={commit} />
           ))}
         </div>
-      )}
+
+        {/* Gradient fade at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 z-10 h-12 bg-gradient-to-t from-background to-transparent pointer-events-none rounded-b-lg" />
+      </div>
+
+      {/* Info text */}
+      <p className="text-xs text-muted-foreground text-center">
+        Menampilkan {commits.length} commit{commits.length !== 1 ? "s" : ""}
+      </p>
     </div>
   );
 }

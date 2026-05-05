@@ -76,7 +76,7 @@ export function CommitCard({ commit }: CommitCardProps) {
             {/* SHA Badge (clickable untuk copy) */}
             <Badge
               variant="outline"
-              className="font-mono text-xs cursor-pointer hover:bg-accent"
+              className="font-mono border-0 text-xs cursor-pointer hover:bg-accent"
               onClick={handleCopySha}
               title="Click untuk copy full SHA"
             >

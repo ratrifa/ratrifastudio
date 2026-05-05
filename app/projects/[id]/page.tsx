@@ -58,7 +58,7 @@ export async function generateMetadata({
  */
 export default async function ProjectDetailPage({ params }: PageProps) {
   const { id } = await params;
-  
+
   try {
     // Fetch project data
     const project = await prisma.project.findUnique({
@@ -101,65 +101,69 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     }
 
     return (
-      <div className="min-h-screen py-12">
-        <div className="container mx-auto px-4 max-w-4xl">
+      <div className="min-h-screen py-8 sm:py-10 lg:py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
           {/* Back link */}
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <a
               href="/"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               ← Back to Projects
             </a>
           </div>
 
-          {/* Header Section */}
-          <section className="mb-12">
-            <ProjectDetailHeader
-              title={project.title}
-              description={project.description}
-              imageUrl={project.imageUrl}
-              createdAt={project.createdAt}
-              updatedAt={project.updatedAt}
-            />
-          </section>
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px] xl:gap-10">
+            <div className="space-y-8 min-w-0">
+              {/* Header Section */}
+              <section>
+                <ProjectDetailHeader
+                  title={project.title}
+                  description={project.description}
+                  imageUrl={project.imageUrl}
+                  createdAt={project.createdAt}
+                  updatedAt={project.updatedAt}
+                />
+              </section>
 
-          {/* Links Section */}
-          <section className="mb-12 pb-12 border-b border-border">
-            <ProjectDetailLinks
-              demoUrl={project.link}
-              githubUrl={project.githubUrl}
-              isPrivateRepo={project.githubUrl?.includes("private") || false}
-            />
-          </section>
+              {/* Links Section */}
+              <section className="pb-8 border-b border-border">
+                <ProjectDetailLinks
+                  demoUrl={project.link}
+                  githubUrl={project.githubUrl}
+                  isPrivateRepo={project.githubUrl?.includes("private") || false}
+                />
+              </section>
 
-          {/* Tech Stack Section */}
-          {techStack.length > 0 && (
-            <section className="mb-12 pb-12 border-b border-border">
-              <ProjectDetailTechstack techStack={techStack} />
-            </section>
-          )}
-
-          {/* Commit History Section */}
-          {project.githubUrl && (
-            <section>
-              <CommitHistoryViewer
-                commits={commits}
-                error={commitError}
-                repoUrl={project.githubUrl}
-                totalCommits={totalCommits}
-              />
-            </section>
-          )}
-
-          {/* No GitHub URL message */}
-          {!project.githubUrl && (
-            <div className="rounded-lg border-2 border-dashed border-border bg-muted/50 p-8 text-center">
-              <p className="text-sm text-muted-foreground">
-                GitHub repository tidak dikonfigurasi untuk project ini.
-              </p>
+              {/* Tech Stack Section */}
+              {techStack.length > 0 && (
+                <section className="pb-8 border-b border-border">
+                  <ProjectDetailTechstack techStack={techStack} />
+                </section>
+              )}
             </div>
-          )}
+
+            <aside className="lg:sticky lg:top-8 h-fit">
+              {/* Commit History Section */}
+              {project.githubUrl && (
+                <CommitHistoryViewer
+                  commits={commits}
+                  error={commitError}
+                  repoUrl={project.githubUrl}
+                  totalCommits={totalCommits}
+                />
+              )}
+
+              {/* No GitHub URL message */}
+              {!project.githubUrl && (
+                <div className="rounded-lg border-2 border-dashed border-border bg-muted/50 p-6 sm:p-8 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    GitHub repository tidak dikonfigurasi untuk project ini.
+                  </p>
+                </div>
+              )}
+            </aside>
+          </div>
         </div>
       </div>
     );
