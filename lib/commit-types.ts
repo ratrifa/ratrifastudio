@@ -14,6 +14,7 @@ export interface Commit {
     name: string;
     email: string;
     avatarUrl?: string;
+    login?: string; // GitHub username
   };
   date: Date;
   htmlUrl: string;
