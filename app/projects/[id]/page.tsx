@@ -13,9 +13,9 @@ import { ProjectDetailTechstack } from "@/components/project-detail-techstack";
 import { CommitHistoryViewer } from "@/components/commit-history-viewer";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 /**
@@ -24,9 +24,11 @@ interface PageProps {
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  
   try {
     const project = await prisma.project.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!project) {
@@ -55,10 +57,12 @@ export async function generateMetadata({
  * Main component
  */
 export default async function ProjectDetailPage({ params }: PageProps) {
+  const { id } = await params;
+  
   try {
     // Fetch project data
     const project = await prisma.project.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!project) {
@@ -115,8 +119,8 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               title={project.title}
               description={project.description}
               imageUrl={project.imageUrl}
-              createdAt={project.created_at}
-              updatedAt={project.updated_at}
+              createdAt={project.createdAt}
+              updatedAt={project.updatedAt}
             />
           </section>
 
