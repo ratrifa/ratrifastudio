@@ -29,18 +29,13 @@ export function CommitList({ commits, showAll = false }: CommitListProps) {
 
   return (
     <div className="space-y-3">
-      {/* Hint text */}
-      <p className="text-xs text-muted-foreground text-center">
-        Scroll kebawah untuk menampilkan seluruh commit history
-      </p>
-
       {/* Scrollable container untuk semua commits */}
       <div className="relative group">
         {/* Gradient fade at top */}
         <div className="absolute top-0 left-0 right-0 z-10 h-12 bg-gradient-to-b from-background to-transparent pointer-events-none rounded-t-lg" />
 
         <div
-          className="max-h-[600px] overflow-y-auto space-y-3 pr-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden pt-2"
+          className="max-h-[600px] overflow-y-auto space-y-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden pt-2"
           style={{
             scrollBehavior: "smooth",
           }}
@@ -56,7 +51,7 @@ export function CommitList({ commits, showAll = false }: CommitListProps) {
 
       {/* Info text */}
       <p className="text-xs text-muted-foreground text-center">
-        Menampilkan {commits.length} commit{commits.length !== 1 ? "s" : ""}
+        Scroll kebawah untuk menampilkan seluruh commit history
       </p>
     </div>
   );

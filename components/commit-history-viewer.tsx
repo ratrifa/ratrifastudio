@@ -82,7 +82,7 @@ export function CommitHistoryViewer({
             {totalCommits !== undefined && totalCommits > 5 && (
               <div className="pt-2 text-center border-t border-border">
                 <p className="text-xs text-muted-foreground">
-                  Menampilkan 5 dari {totalCommits} commits
+                  Menampilkan {totalCommits} commits
                 </p>
                 <Link href={githubRepoLink} target="_blank">
                   <Button
