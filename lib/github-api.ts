@@ -77,6 +77,7 @@ function formatCommitData(apiCommit: GitHubCommitResponse): Commit {
       name: apiCommit.commit.author.name || "Unknown",
       email: apiCommit.commit.author.email || "",
       avatarUrl: apiCommit.author?.avatar_url,
+      login: apiCommit.author?.login, // GitHub username
     },
     date: new Date(apiCommit.commit.author.date),
     htmlUrl: apiCommit.html_url,
@@ -89,11 +90,13 @@ function formatCommitData(apiCommit: GitHubCommitResponse): Commit {
  *
  * @param repoUrl - GitHub repository URL
  * @param limit - Maximum commits to fetch (default: 5, max: 100)
+ * @param filterAuthor - Filter commits by GitHub author login (optional)
  * @returns Promise<FetchCommitsResult>
  */
 export async function fetchRepositoryCommits(
   repoUrl: string,
-  limit: number = 5
+  limit: number = 5,
+  filterAuthor?: string
 ): Promise<FetchCommitsResult> {
   // Validate input
   if (!repoUrl || typeof repoUrl !== "string") {
@@ -173,7 +176,14 @@ export async function fetchRepositoryCommits(
     }
 
     // Format commits
-    const commits: Commit[] = data.map((commit) => formatCommitData(commit));
+    let commits: Commit[] = data.map((commit) => formatCommitData(commit));
+
+    // Filter by author jika filterAuthor diberikan
+    if (filterAuthor) {
+      commits = commits.filter(
+        (commit) => commit.author.login?.toLowerCase() === filterAuthor.toLowerCase()
+      );
+    }
 
     return {
       success: true,

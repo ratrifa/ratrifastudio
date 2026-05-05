@@ -84,12 +84,7 @@ export function CommitCard({ commit }: CommitCardProps) {
               {copied && <Check className="ml-1 h-3 w-3" />}
             </Badge>
 
-            {/* Email */}
-            {commit.author.email && (
-              <span className="text-xs text-muted-foreground">
-                {commit.author.email}
-              </span>
-            )}
+            
 
             {/* GitHub Link */}
             <Link href={commit.htmlUrl} target="_blank" rel="noopener noreferrer">

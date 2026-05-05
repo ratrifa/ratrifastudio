@@ -76,7 +76,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
     // Fetch commits jika githubUrl tersedia
     if (project.githubUrl) {
-      const result = await fetchRepositoryCommits(project.githubUrl, 100);
+      const result = await fetchRepositoryCommits(project.githubUrl, 100, "ratrifa");
 
       if (result.success && result.commits) {
         commits = result.commits;
