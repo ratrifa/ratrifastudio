@@ -32,16 +32,18 @@ export function ProjectDetailHeader({
   return (
     <div className="space-y-6">
       {/* Project Image */}
-      <div className="relative w-full h-96 rounded-lg overflow-hidden bg-muted">
-        <Image
-          src={imageUrl}
-          alt={title}
-          fill
-          className="object-cover w-full h-full"
-          priority
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 80vw"
-        />
-      </div>
+      {imageUrl && (
+        <div className="relative w-full h-96 rounded-lg overflow-hidden bg-muted">
+          <Image
+            src={imageUrl}
+            alt={title}
+            fill
+            className="object-cover w-full h-full"
+            priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 80vw"
+          />
+        </div>
+      )}
 
       {/* Content */}
       <div className="space-y-4">
