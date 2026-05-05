@@ -1,17 +1,14 @@
 "use client";
 
 /**
- * Commit Card Component
- * Display individual commit dengan author, message, timestamp
+ * Commit Card Component - Changelog Style
+ * Display individual commit dalam format timeline changelog
  */
 
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, Copy } from "lucide-react";
 import { Commit } from "@/lib/commit-types";
 import { useCallback, useState } from "react";
+import { ExternalLink } from "lucide-react";
 
 interface CommitCardProps {
   commit: Commit;
@@ -28,79 +25,49 @@ export function CommitCard({ commit }: CommitCardProps) {
 
   // Format commit message - ambil baris pertama saja
   const commitTitle = commit.message.split("\n")[0];
-  const commitBody = commit.message.split("\n").slice(1).join("\n").trim();
-
-  // Format relative time
   const relativeTime = getRelativeTime(commit.date);
 
   return (
-    <div className="rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors p-4">
-      <div className="flex gap-3">
-        {/* Avatar */}
-        <Avatar className="h-10 w-10 flex-shrink-0">
-          <AvatarImage
-            src={commit.author.avatarUrl}
-            alt={commit.author.name}
-          />
-          <AvatarFallback>
-            {commit.author.name
-              .split(" ")
-              .map((n) => n[0])
-              .join("")
-              .toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+    <Link
+      href={commit.htmlUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group flex gap-3 py-3 px-3 rounded-md hover:bg-accent/50 transition-colors cursor-pointer"
+    >
+      {/* Timeline Dot */}
+      <div className="flex-shrink-0 pt-1">
+        <div className="h-2 w-2 rounded-full bg-muted-foreground/60 group-hover:bg-foreground transition-colors" />
+      </div>
 
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          {/* Author & Timestamp */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-semibold text-sm">{commit.author.name}</span>
-            <span className="text-xs text-muted-foreground">{relativeTime}</span>
-          </div>
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        {/* Timestamp */}
+        <p className="text-xs text-muted-foreground mb-1">{relativeTime}</p>
 
-          {/* Commit message */}
-          <p className="text-sm font-mono text-foreground mt-2 break-words">
-            {commitTitle}
-          </p>
+        {/* Commit message */}
+        <p className="text-sm font-medium text-foreground break-words group-hover:text-primary transition-colors line-clamp-2">
+          {commitTitle}
+        </p>
 
-          {/* Commit body jika ada */}
-          {commitBody && (
-            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-              {commitBody}
-            </p>
-          )}
-
-          {/* Meta: SHA & Actions */}
-          <div className="flex items-center gap-2 mt-3 flex-wrap">
-            {/* SHA Badge (clickable untuk copy) */}
-            <Badge
-              variant="outline"
-              className="font-mono border-0 text-xs cursor-pointer hover:bg-accent"
-              onClick={handleCopySha}
-              title="Click untuk copy full SHA"
-            >
-              {commit.shortSha}
-              {copied && <Check className="ml-1 h-3 w-3" />}
-            </Badge>
-
-            
-
-            {/* GitHub Link */}
-            <Link href={commit.htmlUrl} target="_blank" rel="noopener noreferrer">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 px-2 text-xs gap-1"
-              >
-                View on GitHub
-                <ExternalLink className="h-3 w-3" />
-              </Button>
-            </Link>
-          </div>
+        {/* Author & SHA */}
+        <div className="flex items-center gap-2 mt-1 flex-wrap">
+          <span className="text-xs text-muted-foreground">
+            {commit.author.name}
+          </span>
+          <span
+            className="text-xs font-mono text-muted-foreground hover:text-foreground cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              handleCopySha();
+            }}
+            title={`Click to copy: ${commit.sha}`}
+          >
+            {commit.shortSha}
+            {copied && " ✓"}
+          </span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
