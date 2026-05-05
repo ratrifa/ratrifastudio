@@ -30,7 +30,8 @@ out/
 *.tsbuildinfo
 
 # Static files
-public/uploads/
+
+AZURE_VPS_SETUP.md
 
 # IDE & OS
 .vscode/
