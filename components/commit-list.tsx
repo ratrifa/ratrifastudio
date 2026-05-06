@@ -29,15 +29,13 @@ export function CommitList({ commits, showAll = false }: CommitListProps) {
 
   return (
     <div className="space-y-3">
-      {/* Hint text */}
-      <p className="text-xs text-muted-foreground text-center">
-        Scroll kebawah untuk menampilkan seluruh commit history
-      </p>
-
       {/* Scrollable container untuk semua commits */}
-      <div className="relative">
+      <div className="relative group">
+        {/* Gradient fade at top */}
+        <div className="absolute top-0 left-0 right-0 z-10 h-12 bg-gradient-to-b from-background to-transparent pointer-events-none " />
+
         <div
-          className="max-h-[600px] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden divide-y divide-border/30 rounded-md border border-border/50"
+          className="max-h-[600px] overflow-y-auto space-y-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden pt-2"
           style={{
             scrollBehavior: "smooth",
           }}
@@ -46,11 +44,14 @@ export function CommitList({ commits, showAll = false }: CommitListProps) {
             <CommitCard key={commit.sha} commit={commit} />
           ))}
         </div>
+
+        {/* Gradient fade at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 z-10 h-12 bg-gradient-to-t from-background to-transparent pointer-events-none " />
       </div>
 
-      {/* Commit count */}
+      {/* Info text */}
       <p className="text-xs text-muted-foreground text-center">
-        Menampilkan {commits.length} commit{commits.length !== 1 ? "s" : ""}
+        Scroll kebawah untuk menampilkan seluruh commit history
       </p>
     </div>
   );

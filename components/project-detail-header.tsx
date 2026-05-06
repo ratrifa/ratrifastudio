@@ -8,6 +8,7 @@
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { ImageZoom } from "./animate-ui/primitives/effects/image-zoom";
 
 interface ProjectDetailHeaderProps {
   title: string;
@@ -34,6 +35,7 @@ export function ProjectDetailHeader({
       {/* Project Image */}
       {imageUrl && (
         <div className="relative w-full h-96 rounded-lg overflow-hidden bg-muted">
+          <ImageZoom>
           <Image
             src={imageUrl}
             alt={title}
@@ -42,6 +44,8 @@ export function ProjectDetailHeader({
             priority
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 80vw"
           />
+          </ImageZoom>
+          
         </div>
       )}
 
