@@ -88,8 +88,8 @@ export function Navbar({ domainLabel = defaultHeroContent.domainLabel, domainLog
   };
 
   return (
-    <header className={cn("fixed top-0 left-0 right-0 z-50 transition-all duration-300", scrolled ? "bg-background/90 backdrop-blur-md border-b border-border shadow-sm" : "bg-transparent")}>
-      <nav className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4" aria-label="Main navigation">
+    <header className={cn("fixed top-0 mx-auto max-w-6xl left-0 right-0 z-50 transition-all rounded-md  duration-400 ease-in-out", scrolled ? "bg-background/5 top-4 backdrop-blur-xs border rounded-4xl border-border shadow-sm" : "bg-transparent")}>
+      <nav className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3" aria-label="Main navigation">
         {/* Logo */}
         <a
           href="#home"

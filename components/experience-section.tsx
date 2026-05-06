@@ -64,7 +64,7 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
         {timelineItems.length > 0 ? (
           <div className="relative">
             {/* Vertical timeline line */}
-            <div className="absolute left-0 md:left-54 top-0 bottom-0 w-px bg-border hidden md:block" aria-hidden="true" />
+            <div className="absolute left-0 md:left-63.5 top-0 bottom-0 w-px bg-border hidden md:block" aria-hidden="true" />
 
             <div className="flex flex-col gap-10">
               {timelineItems.map((exp, idx) => {
@@ -83,12 +83,12 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
                     </div>
 
                     {/* Dot on timeline */}
-                    <div className="hidden md:flex items-start justify-center w-7 shrink-0 pt-0.5" aria-hidden="true">
+                    <div className="hidden md:flex items-start justify-center w-7 shrink-0 pt-0.5 relative z-10" aria-hidden="true">
                       <span className={`w-3 h-3 rounded-full border-2 border-primary ${idx === 0 && !exp.period_end ? "bg-primary animate-pulse" : "bg-background"}`} />
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 bg-card rounded-xl border border-border p-5 hover:border-primary/30 transition-colors">
+                    <div className="flex-1 bg-card/20 backdrop-blur-xs rounded-xl border border-border p-5 hover:border-primary/30 transition-colors">
                       <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
                         <div>
                           <h3 className="font-semibold text-foreground text-base">{exp.role}</h3>

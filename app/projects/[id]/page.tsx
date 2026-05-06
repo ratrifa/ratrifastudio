@@ -101,8 +101,8 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     }
 
     return (
-      <div className="min-h-screen py-8 sm:py-10 lg:h-screen lg:overflow-hidden lg:py-8">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl h-full flex flex-col">
+      <div className="min-h-screen py-8 sm:py-10 lg:py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
           {/* Back link */}
           <div className="mb-6 sm:mb-8">
             <a
@@ -113,7 +113,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             </a>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px] xl:gap-10 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px] xl:gap-10">
             <div className="space-y-8 min-w-0">
               {/* Header Section */}
               <section>
