@@ -9,6 +9,7 @@ import { Particles } from "@/components/ui/particles";
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "@/components/theme-provider";
 import { defaultHeroContent, type HeroSectionContent } from "@/lib/hero-content";
+import { Tilt, TiltContent } from "./animate-ui/primitives/effects/tilt";
 
 interface HeroSectionProps {
   content?: HeroSectionContent;
@@ -185,12 +186,16 @@ export function HeroSection({ content = defaultHeroContent, previewAsBanner = fa
           <div className={avatarColumnClasses}>
             <div className="relative">
               {/* Decorative ring */}
-              <div className="absolute inset-0 rounded-full scale-105 opacity-20 blur-md" style={{ background: "var(--color-primary)" }} aria-hidden="true" />
-              <Backlight className="rounded-full" blur={22}>
-                <div className={avatarClasses}>
-                  <Image src={content.avatarUrl ?? defaultHeroContent.avatarUrl ?? "/images/hero-avatar.jpg"} alt={content.avatarAlt} fill className="object-cover" priority />
-                </div>
-              </Backlight>
+              <Tilt>
+                <TiltContent>
+                  <div className="absolute inset-0 rounded-full scale-105 opacity-100 blur-md" style={{ background: "var(--color-primary)" }} aria-hidden="true" />
+                  <Backlight className="rounded-full" blur={22}>
+                    <div className={avatarClasses}>
+                      <Image src={content.avatarUrl ?? defaultHeroContent.avatarUrl ?? "/images/hero-avatar.jpg"} alt={content.avatarAlt} fill className="object-cover" priority />
+                    </div>
+                  </Backlight>
+                </TiltContent>
+              </Tilt>
 
               {/* Floating badge */}
               <div className="absolute -bottom-4 -right-4 bg-card border border-border rounded-xl px-4 py-2 shadow-lg">
