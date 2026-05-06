@@ -110,7 +110,7 @@ export function AboutSection({ content = defaultAboutContent, previewAsBanner = 
                 const Icon = SKILL_ICONS[icon ?? ABOUT_SKILL_ICON_DEFAULT] ?? SKILL_ICONS[ABOUT_SKILL_ICON_DEFAULT];
 
                 return (
-                  <div key={`${title}-${index}`} className="bg-card border border-border rounded-xl p-5 hover:border-primary/30 transition-colors">
+                  <div key={`${title}-${index}`} className="bg-card/0 backdrop-blur-xs border border-border rounded-xl p-5 hover:border-primary/30 transition-colors">
                     <div className="flex items-center gap-2 mb-4">
                       <span className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/10 text-primary border border-primary/20">
                         <Icon size={15} />
