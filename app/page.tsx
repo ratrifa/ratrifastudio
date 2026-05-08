@@ -43,6 +43,11 @@ export default async function Home() {
             orderBy: { createdAt: "desc" },
           }),
           prisma.experience.findMany({
+            include: {
+              photos: {
+                orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+              },
+            },
             orderBy: { periodStart: "desc" },
           }),
           prisma.certificate.findMany({
@@ -96,6 +101,7 @@ export default async function Home() {
           })
         : null,
       description: experience.description,
+      photos: experience.photos ?? [],
     }));
 
     const certificates: Certificate[] = certificatesDb.map((certificate) => ({

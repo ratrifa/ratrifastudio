@@ -5,6 +5,7 @@ import { useActionState, useState } from "react";
 import { PresentEndDateField } from "@/components/admin/present-end-date-field";
 import { FormStateAlert } from "@/components/admin/form-state-alert";
 import { FormSubmitButton } from "@/components/admin/form-submit-button";
+import { MultiFileDropInput } from "@/components/admin/multi-file-drop-input";
 import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -60,6 +61,7 @@ export function CreateExperienceForm({ action }: CreateExperienceFormProps) {
         <Label htmlFor="description">Description</Label>
         <Textarea id="description" name="description" required />
       </div>
+      <MultiFileDropInput name="imageFiles" label="Dokumentasi Foto (Opsional)" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB per file, max 10 files" maxFiles={10} className="md:col-span-2" />
       <FormSubmitButton pendingLabel="Creating..." className="w-full sm:w-fit md:col-span-2">
         Create
       </FormSubmitButton>

@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { deleteLocalUploads, saveImageUpload } from "@/lib/storage";
 import { cleanupPrisma, prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/server-auth";
 import { toDbExperienceType } from "@/lib/experience-types";
@@ -44,8 +45,20 @@ function toExperienceActionError(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback;
 }
 
+function extractExperienceImageFiles(formData: FormData) {
+  const candidates = [...formData.getAll("imageFiles"), ...formData.getAll("imageFile")];
+  return candidates.filter((entry): entry is File => entry instanceof File && entry.size > 0);
+}
+
+async function uploadExperienceImages(files: File[]) {
+  const uploaded = await Promise.all(files.map((file) => saveImageUpload(file, "experiences")));
+  return uploaded.filter((path): path is string => Boolean(path));
+}
+
 async function createExperienceAction(_state: FormState, formData: FormData): Promise<FormState> {
   "use server";
+
+  let uploadedImagePaths: string[] = [];
 
   try {
     await requireAdmin();
@@ -67,22 +80,37 @@ async function createExperienceAction(_state: FormState, formData: FormData): Pr
     }
 
     const { title, company, experienceType, periodStart, periodEnd, description } = parsed.data;
+    const imageFiles = extractExperienceImageFiles(formData);
+    uploadedImagePaths = await uploadExperienceImages(imageFiles);
 
-    await prisma.experience.create({
-      data: {
-        title,
-        company,
-        experienceType: toDbExperienceType(experienceType),
-        periodStart: safeDate(periodStart),
-        periodEnd: periodEnd ? safeDate(periodEnd) : null,
-        description,
-      },
+    await prisma.$transaction(async (tx) => {
+      const experience = await tx.experience.create({
+        data: {
+          title,
+          company,
+          experienceType: toDbExperienceType(experienceType),
+          periodStart: safeDate(periodStart),
+          periodEnd: periodEnd ? safeDate(periodEnd) : null,
+          description,
+        },
+      });
+
+      if (uploadedImagePaths.length > 0) {
+        await tx.experiencePhoto.createMany({
+          data: uploadedImagePaths.map((imageUrl, index) => ({
+            experienceId: experience.id,
+            imageUrl,
+            sortOrder: index,
+          })),
+        });
+      }
     });
 
     revalidatePath("/");
     revalidatePath("/admin/experiences");
     return successState("Experience created successfully.");
   } catch (error) {
+    await deleteLocalUploads(uploadedImagePaths);
     const message = toExperienceActionError(error, "Failed to create experience.");
     return errorState(message);
   } finally {
@@ -92,6 +120,8 @@ async function createExperienceAction(_state: FormState, formData: FormData): Pr
 
 async function updateExperienceAction(_state: FormState, formData: FormData): Promise<FormState> {
   "use server";
+
+  let uploadedImagePaths: string[] = [];
 
   try {
     await requireAdmin();
@@ -114,23 +144,46 @@ async function updateExperienceAction(_state: FormState, formData: FormData): Pr
     }
 
     const { id, title, company, experienceType, periodStart, periodEnd, description } = parsed.data;
+    const imageFiles = extractExperienceImageFiles(formData);
+    uploadedImagePaths = await uploadExperienceImages(imageFiles);
 
-    await prisma.experience.update({
-      where: { id },
-      data: {
-        title,
-        company,
-        experienceType: toDbExperienceType(experienceType),
-        periodStart: safeDate(periodStart),
-        periodEnd: periodEnd ? safeDate(periodEnd) : null,
-        description,
-      },
+    await prisma.$transaction(async (tx) => {
+      await tx.experience.update({
+        where: { id },
+        data: {
+          title,
+          company,
+          experienceType: toDbExperienceType(experienceType),
+          periodStart: safeDate(periodStart),
+          periodEnd: periodEnd ? safeDate(periodEnd) : null,
+          description,
+        },
+      });
+
+      if (uploadedImagePaths.length > 0) {
+        const latestPhoto = await tx.experiencePhoto.findFirst({
+          where: { experienceId: id },
+          orderBy: [{ sortOrder: "desc" }, { createdAt: "desc" }],
+          select: { sortOrder: true },
+        });
+
+        const sortOrderStart = (latestPhoto?.sortOrder ?? -1) + 1;
+
+        await tx.experiencePhoto.createMany({
+          data: uploadedImagePaths.map((imageUrl, index) => ({
+            experienceId: id,
+            imageUrl,
+            sortOrder: sortOrderStart + index,
+          })),
+        });
+      }
     });
 
     revalidatePath("/");
     revalidatePath("/admin/experiences");
     return successState("Experience berhasil diupdate.");
   } catch (error) {
+    await deleteLocalUploads(uploadedImagePaths);
     const message = toExperienceActionError(error, "Update experience gagal.");
     return errorState(message);
   } finally {
@@ -145,7 +198,22 @@ async function deleteExperienceAction(_state: FormState, formData: FormData): Pr
     await requireAdmin();
 
     const id = String(formData.get("id") ?? "");
+    const current = await prisma.experience.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        photos: {
+          select: { imageUrl: true },
+        },
+      },
+    });
+
+    if (!current) {
+      return errorState("Experience tidak ditemukan.");
+    }
+
     await prisma.experience.delete({ where: { id } });
+    await deleteLocalUploads(current.photos.map((photo) => photo.imageUrl));
 
     revalidatePath("/");
     revalidatePath("/admin/experiences");
@@ -167,6 +235,11 @@ export default async function AdminExperiencesPage() {
 
     try {
       experiences = await prisma.experience.findMany({
+        include: {
+          photos: {
+            orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+          },
+        },
         orderBy: { periodStart: "asc" },
       });
     } catch (error) {

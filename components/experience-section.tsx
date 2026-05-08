@@ -1,7 +1,13 @@
-import { Briefcase, MapPin } from "lucide-react";
+"use client";
+
+import { Briefcase, MapPin, ChevronDown, ImageIcon } from "lucide-react";
 import { BubbleBackground } from "@/components/animate-ui/components/backgrounds/bubble";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { EXPERIENCE_TYPE_LABELS, normalizeExperienceType, type ExperienceTypeValue } from "@/lib/experience-types";
+import { useState } from "react";
+import Image from "next/image";
+import { PhotoLightbox } from "@/components/photo-lightbox";
 
 export interface Experience {
   id: string;
@@ -12,6 +18,11 @@ export interface Experience {
   period_end: string | null;
   description: string;
   experienceType?: ExperienceTypeValue;
+  photos?: Array<{
+    id: string;
+    imageUrl: string;
+    caption?: string | null;
+  }>;
 }
 
 interface ExperienceSectionProps {
@@ -19,6 +30,11 @@ interface ExperienceSectionProps {
 }
 
 export function ExperienceSection({ experiences }: ExperienceSectionProps) {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxExpId, setLightboxExpId] = useState<string | null>(null);
+  const [lightboxPhotoIndex, setLightboxPhotoIndex] = useState(0);
+
   const timelineItems: Experience[] = [
     ...experiences,
     {
@@ -28,7 +44,7 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
       period_start: "1 Feb 2005",
       period_end: null,
       description: "oeekk oeekkk",
-      experienceType: "full-time"
+      experienceType: "full-time",
     },
   ];
 
@@ -84,32 +100,92 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
 
                     {/* Dot on timeline */}
                     <div className="hidden md:flex items-start justify-center w-7 shrink-0 pt-0.5 relative z-10" aria-hidden="true">
-                      <span className={`w-3 h-3 rounded-full border-2 border-primary ${idx === 0 && !exp.period_end ? "bg-primary animate-pulse" : "bg-background"}`} />
+                      <span className={`w-3 h-3 rounded-xl transition-all ease-in-out duration-500 border-2 border-primary ${idx === 0 && !exp.period_end ? "bg-primary animate-pulse" : "bg-background"} ${expandedId === exp.id ? "bg-primary animate-ping" : ""}`} />
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 bg-card/20 backdrop-blur-xs rounded-xl border border-border p-5 hover:border-primary/30 transition-colors">
-                      <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
-                        <div>
-                          <h3 className="font-semibold text-foreground text-base">{exp.role}</h3>
-                          <p className="text-muted-foreground text-sm flex items-center gap-1.5 mt-0.5">
-                            {exp.company}
-                            {exp.location && (
-                              <>
-                                <span aria-hidden="true">·</span>
-                                <MapPin size={12} />
-                                {exp.location}
-                              </>
+                    <div className="flex-1 bg-card/20 backdrop-blur-xs rounded-xl border border-border hover:border-primary/30 transition-colors overflow-hidden">
+                      <div className="w-full p-5 flex flex-col gap-3 transition-colors">
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-foreground text-base">{exp.role}</h3>
+                            <p className="text-muted-foreground text-sm flex items-center gap-1.5 mt-0.5">
+                              {exp.company}
+                              {exp.location && (
+                                <>
+                                  <span aria-hidden="true">·</span>
+                                  <MapPin size={12} />
+                                  {exp.location}
+                                </>
+                              )}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {resolvedType && (
+                              <Badge variant="secondary" className="text-xs font-mono bg-primary/15 text-muted-foreground border border-primary/35 dark:bg-primary/20 dark:border-primary/45">
+                                {EXPERIENCE_TYPE_LABELS[resolvedType] ?? resolvedType}
+                              </Badge>
                             )}
-                          </p>
+                            {(exp.photos ?? []).length > 0 && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setExpandedId(expandedId === exp.id ? null : exp.id);
+                                }}
+                                aria-expanded={expandedId === exp.id}
+                                aria-controls={`photos-${exp.id}`}
+                                className={`p-0.5 rounded-md transition-all duration-300 ease-in-out text-muted-foreground cursor-pointer hover:bg-primary/70`}
+                              >
+                                <ChevronDown size={18} className={`transition-all duration-300 ease-in-out ${expandedId === exp.id ? "rotate-180" : ""}`}></ChevronDown>
+                              </button>
+                            )}
+                          </div>
                         </div>
-                        {resolvedType && (
-                          <Badge variant="secondary" className="text-xs font-mono bg-primary/15 text-muted-foreground border border-primary/35 dark:bg-primary/20 dark:border-primary/45">
-                            {EXPERIENCE_TYPE_LABELS[resolvedType] ?? resolvedType}
-                          </Badge>
-                        )}
+                        <p className="text-muted-foreground text-sm leading-relaxed">{exp.description}</p>
                       </div>
-                      <p className="text-muted-foreground text-sm leading-relaxed">{exp.description}</p>
+
+                      {/* Photos gallery - animated container (controlled by chevron button) */}
+                      {(exp.photos ?? []).length > 0 && (
+                        <div
+                          id={`photos-${exp.id}`}
+                          aria-hidden={expandedId !== exp.id}
+                          className={`px-5 transition-all duration-300 ease-in-out overflow-hidden ${expandedId === exp.id ? "max-h-96 pb-5 opacity-100" : "max-h-0 py-0 opacity-0"}`}
+                        >
+                          <div className="flex items-center justify-between mb-3">
+                            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Dokumentasi Foto ({(exp.photos ?? []).length})</p>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setLightboxExpId(exp.id);
+                                setLightboxPhotoIndex(0);
+                                setLightboxOpen(true);
+                              }}
+                              className="text-xs text-primary hover:text-white hover:bg-primary/10"
+                            >
+                              <ImageIcon size={14} className="mr-1" />
+                              See Photos
+                            </Button>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+                            {(exp.photos ?? []).map((photo, photoIdx) => (
+                              <button
+                                key={photo.id}
+                                onClick={() => {
+                                  setLightboxExpId(exp.id);
+                                  setLightboxPhotoIndex(photoIdx);
+                                  setLightboxOpen(true);
+                                }}
+                                className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted cursor-pointer hover:border-primary/50 transition-all hover:shadow-lg hover:ring-2 hover:ring-primary/30"
+                                aria-label={`View photo ${photoIdx + 1} of ${(exp.photos ?? []).length}`}
+                              >
+                                <Image src={photo.imageUrl} alt={photo.caption || "Dokumentasi"} fill className="object-cover transition-transform group-hover:scale-105" sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw" />
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </article>
                 );
@@ -120,6 +196,9 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
           <p className="text-muted-foreground text-center py-16">No experience entries yet.</p>
         )}
       </div>
+
+      {/* Photo Lightbox */}
+      {lightboxExpId && <PhotoLightbox photos={timelineItems.find((e) => e.id === lightboxExpId)?.photos ?? []} initialIndex={lightboxPhotoIndex} isOpen={lightboxOpen} onClose={() => setLightboxOpen(false)} />}
     </section>
   );
 }
