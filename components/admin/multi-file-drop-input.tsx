@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { FileUp, Upload, X } from "lucide-react";
 
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,7 @@ interface MultiFileDropInputProps {
   accept?: string;
   helperText?: string;
   maxFiles?: number;
+  resetSignal?: number | string;
   className?: string;
 }
 
@@ -48,12 +49,26 @@ function matchesAccept(file: File, accept?: string) {
   });
 }
 
-export function MultiFileDropInput({ id, name, label, accept, helperText, maxFiles = 10, className }: MultiFileDropInputProps) {
+export function MultiFileDropInput({ id, name, label, accept, helperText, maxFiles = 10, resetSignal, className }: MultiFileDropInputProps) {
   const generatedId = useId();
   const inputId = id ?? generatedId;
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+  useEffect(() => {
+    if (resetSignal === undefined) {
+      return;
+    }
+
+    setSelectedFiles([]);
+
+    if (inputRef.current) {
+      const dataTransfer = new DataTransfer();
+      inputRef.current.files = dataTransfer.files;
+      inputRef.current.value = "";
+    }
+  }, [resetSignal]);
 
   const acceptHint = useMemo(() => {
     if (!accept) {
@@ -82,13 +97,16 @@ export function MultiFileDropInput({ id, name, label, accept, helperText, maxFil
       validFiles.push(file);
     }
 
-    const allFiles = [...selectedFiles, ...validFiles].slice(0, maxFiles);
-    setSelectedFiles(allFiles);
+    setSelectedFiles((prevSelectedFiles) => {
+      const allFiles = [...prevSelectedFiles, ...validFiles].slice(0, maxFiles);
 
-    const dataTransfer = new DataTransfer();
-    allFiles.forEach((file) => dataTransfer.items.add(file));
-    inputRef.current.files = dataTransfer.files;
-    inputRef.current.dispatchEvent(new Event("change", { bubbles: true }));
+      const dataTransfer = new DataTransfer();
+      allFiles.forEach((file) => dataTransfer.items.add(file));
+      inputRef.current!.files = dataTransfer.files;
+      inputRef.current!.dispatchEvent(new Event("change", { bubbles: true }));
+
+      return allFiles;
+    });
   };
 
   const removeFile = (index: number) => {
@@ -125,8 +143,17 @@ export function MultiFileDropInput({ id, name, label, accept, helperText, maxFil
             }
           }
 
-          const allFiles = [...selectedFiles, ...validFiles].slice(0, maxFiles);
-          setSelectedFiles(allFiles);
+          setSelectedFiles((prevSelectedFiles) => {
+            const allFiles = [...prevSelectedFiles, ...validFiles].slice(0, maxFiles);
+
+            if (inputRef.current) {
+              const dataTransfer = new DataTransfer();
+              allFiles.forEach((file) => dataTransfer.items.add(file));
+              inputRef.current.files = dataTransfer.files;
+            }
+
+            return allFiles;
+          });
         }}
       />
 

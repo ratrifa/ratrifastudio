@@ -21,6 +21,8 @@ interface PhotoLightboxProps {
 export function PhotoLightbox({ photos, initialIndex, isOpen, onClose }: PhotoLightboxProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
 
+  const hasPhotos = photos.length > 0;
+
   useEffect(() => {
     setCurrentIndex(initialIndex);
   }, [initialIndex]);
@@ -38,14 +40,16 @@ export function PhotoLightbox({ photos, initialIndex, isOpen, onClose }: PhotoLi
   }, [isOpen, currentIndex, photos.length]);
 
   const handlePrevious = () => {
+    if (!hasPhotos) return;
     setCurrentIndex((prev) => (prev === 0 ? photos.length - 1 : prev - 1));
   };
 
   const handleNext = () => {
+    if (!hasPhotos) return;
     setCurrentIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !hasPhotos) return null;
 
   const currentPhoto = photos[currentIndex];
 
@@ -58,18 +62,30 @@ export function PhotoLightbox({ photos, initialIndex, isOpen, onClose }: PhotoLi
 
       {/* Main image container */}
       <div className="relative w-full h-full flex items-center justify-center p-4 md:p-8">
-        <div className="relative w-full max-w-4xl aspect-auto">
+        <div className="relative w-full max-w-4xl h-[70vh]">
           <Image src={currentPhoto.imageUrl} alt={currentPhoto.caption || "Dokumentasi"} fill className="object-contain" sizes="(max-width: 768px) 100vw, 90vw" priority />
         </div>
 
         {/* Navigation arrows */}
         {photos.length > 1 && (
           <>
-            <Button variant="ghost" size="icon" onClick={handlePrevious} className="absolute left-4 text-white hover:bg-white/10 z-10" aria-label="Previous photo">
-              <ChevronLeft size={24} />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handlePrevious}
+              className="group absolute left-2 z-20 h-12 w-12 rounded-full border border-white/45 bg-black/60 text-white shadow-[0_0_0_1px_rgba(0,0,0,0.35),0_8px_20px_rgba(0,0,0,0.45)] backdrop-blur-sm transition-all duration-200 ease-out hover:scale-110 hover:bg-black/75 active:scale-95 md:left-4 md:h-10 md:w-10 md:border-white/30"
+              aria-label="Previous photo"
+            >
+              <ChevronLeft size={28} className="transition-transform duration-200 ease-out group-hover:-translate-x-0.5 group-active:-translate-x-1" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={handleNext} className="absolute right-4 text-white hover:bg-white/10 z-10" aria-label="Next photo">
-              <ChevronRight size={24} />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleNext}
+              className="group absolute right-2 z-20 h-12 w-12 rounded-full border border-white/45 bg-black/60 text-white shadow-[0_0_0_1px_rgba(0,0,0,0.35),0_8px_20px_rgba(0,0,0,0.45)] backdrop-blur-sm transition-all duration-200 ease-out hover:scale-110 hover:bg-black/75 active:scale-95 md:right-4 md:h-10 md:w-10 md:border-white/30"
+              aria-label="Next photo"
+            >
+              <ChevronRight size={28} className="transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-active:translate-x-1" />
             </Button>
           </>
         )}

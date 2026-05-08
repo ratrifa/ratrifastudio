@@ -8,6 +8,11 @@ const nextConfig = {
   turbopack: {
     root: projectRoot,
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "20mb",
+    },
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
