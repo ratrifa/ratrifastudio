@@ -150,13 +150,11 @@ export function Navbar({ domainLabel = defaultHeroContent.domainLabel, domainLog
               <Menu size={20} />
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="bg-card border-border w-72 flex flex-col pt-14">
+          <SheetContent side="right" className="bg-card border-border w-72 flex flex-col pt-12">
             <SheetClose className="absolute right-4 top-4 text-muted-foreground hover:text-foreground transition-colors">
-              <X size={20} />
-              <span className="sr-only">Close</span>
             </SheetClose>
 
-            <div className="flex items-center gap-2 mb-8">
+            <div className="flex mx-auto items-center gap-2 mb-5">
               {domainLogoUrl ? (
                 <span className="relative flex items-center justify-center w-8 h-8 rounded-md overflow-hidden bg-transparent">
                   <Image src={domainLogoUrl} alt={`${brandLabel} logo`} fill className="object-contain p-1" sizes="32px" />
@@ -169,7 +167,7 @@ export function Navbar({ domainLabel = defaultHeroContent.domainLabel, domainLog
               <span className="font-mono font-semibold text-sm leading-none">{renderBrandLabel()}</span>
             </div>
 
-            <ul className="flex flex-col gap-1" role="list">
+            <ul className="flex flex-col items-center gap-1" role="list">
               {NAV_LINKS.map((link) => {
                 const id = link.href.replace("#", "");
                 const isActive = activeSection === id;
@@ -177,18 +175,17 @@ export function Navbar({ domainLabel = defaultHeroContent.domainLabel, domainLog
                   <li key={link.href}>
                     <button
                       onClick={() => handleNavClick(link.href)}
-                      className={cn("w-full text-left px-4 py-3 rounded-md text-sm font-medium transition-colors", isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary")}
+                      className={cn("min-w-[200px] px-5 py-4 rounded-full text-md font-medium transition-colors", isActive ? "bg-primary/20 text-white" : "text-muted-foreground hover:text-foreground hover:bg-secondary")}
                     >
                       {link.label}
                     </button>
                   </li>
                 );
               })}
+              <li >
+                <ThemeToggle></ThemeToggle>
+              </li>
             </ul>
-
-            <div className="rounded-full mt-auto pt-8 space-y-3">
-              <ThemeToggle />
-            </div>
           </SheetContent>
         </Sheet>
       </nav>
