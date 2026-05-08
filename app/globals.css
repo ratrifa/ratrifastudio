@@ -3,6 +3,19 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Fix scrollbar layout shift */
+html {
+  /* Ensure vertical scrollbar gutter is always reserved to prevent layout shifts
+     when overlays or popovers appear and the browser may hide the scrollbar. */
+  overflow-y: scroll;
+  scrollbar-gutter: stable both-edges;
+}
+
+/* Also ensure body never causes horizontal layout shifts when scrollbars toggle */
+body {
+  overflow-y: scroll;
+}
+
 /* Light mode */
 :root {
   --background: oklch(0.985 0.002 264);

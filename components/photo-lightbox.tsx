@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ImageZoom } from "./animate-ui/primitives/effects/image-zoom";
 
 interface Photo {
   id: string;
@@ -62,9 +63,9 @@ export function PhotoLightbox({ photos, initialIndex, isOpen, onClose }: PhotoLi
 
       {/* Main image container */}
       <div className="relative w-full h-full flex items-center justify-center p-4 md:p-8">
-        <div className="relative w-full max-w-4xl h-[70vh]">
+        <ImageZoom className="w-full max-w-4xl aspect-video">
           <Image src={currentPhoto.imageUrl} alt={currentPhoto.caption || "Dokumentasi"} fill className="object-contain" sizes="(max-width: 768px) 100vw, 90vw" priority />
-        </div>
+        </ImageZoom>
 
         {/* Navigation arrows */}
         {photos.length > 1 && (
