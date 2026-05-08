@@ -4,9 +4,8 @@ import { AboutSection } from "@/components/about-section";
 import { ProjectsSection } from "@/components/projects-section";
 import { ExperienceSection } from "@/components/experience-section";
 import { CertificateSection } from "@/components/certificate-section";
-import { ContactSection } from "@/components/contact-section";
-import { BubbleBackground } from "@/components/animate-ui/components/backgrounds/bubble";
 import { Footer } from "@/components/footer";
+import { ContactSection } from "@/components/contact-section";
 import type { Project } from "@/components/project-card";
 import type { Experience } from "@/components/experience-section";
 import type { Certificate } from "@/components/certificate-section";
@@ -133,18 +132,16 @@ export default async function Home() {
         <Navbar domainLabel={hero.domainLabel} domainLogoUrl={hero.domainLogoUrl} />
         <HeroSection content={hero} />
         <AboutSection content={aboutWithDerivedStats} />
-        <BubbleBackground className="relative bg-background">
-          <ProjectsSection projects={projects} />
-          <ExperienceSection experiences={experiences} />
-          <CertificateSection certificates={certificates} />
-          <ContactSection
-            social={{
-              githubUrl: hero.githubUrl,
-              linkedinUrl: hero.linkedinUrl,
-              twitterUrl: hero.twitterUrl,
-            }}
-          />
-        </BubbleBackground>
+        <ProjectsSection projects={projects} />
+        <ExperienceSection experiences={experiences} />
+        <CertificateSection certificates={certificates} />
+        <ContactSection
+          social={{
+            githubUrl: hero.githubUrl,
+            linkedinUrl: hero.linkedinUrl,
+            twitterUrl: hero.twitterUrl,
+          }}
+        />
         <Footer
           social={{
             githubUrl: hero.githubUrl,
