@@ -100,7 +100,9 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
 
                     {/* Dot on timeline */}
                     <div className="hidden md:flex items-start justify-center w-7 shrink-0 pt-0.5 relative z-10" aria-hidden="true">
-                      <span className={`w-3 h-3 rounded-xl transition-all ease-in-out duration-500 border-2 border-primary ${idx === 0 && !exp.period_end ? "bg-primary animate-pulse" : "bg-background"} ${expandedId === exp.id ? "bg-primary animate-ping" : ""}`} />
+                      <span
+                        className={`w-3 h-3 rounded-xl transition-all ease-in-out duration-500 border-2 border-primary ${idx === 0 && !exp.period_end ? "bg-primary animate-pulse" : "bg-background"} ${expandedId === exp.id ? "bg-primary animate-ping" : ""}`}
+                      />
                     </div>
 
                     {/* Content */}
@@ -168,7 +170,7 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
                               See Photos
                             </Button>
                           </div>
-                          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+                          <div className="flex gap-2 overflow-x-auto pb-1 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                             {(exp.photos ?? []).map((photo, photoIdx) => (
                               <button
                                 key={photo.id}
@@ -177,7 +179,7 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
                                   setLightboxPhotoIndex(photoIdx);
                                   setLightboxOpen(true);
                                 }}
-                                className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted cursor-pointer hover:border-primary/50 transition-all hover:shadow-lg hover:ring-2 hover:ring-primary/30"
+                                className="group relative h-50 w-50 shrink-0 snap-start overflow-hidden rounded-lg border border-border bg-muted cursor-pointer transition-all hover:border-primary/50 hover:shadow-lg hover:ring-2 hover:ring-primary/30 sm:h-32 sm:w-32 md:h-36 md:w-36"
                                 aria-label={`View photo ${photoIdx + 1} of ${(exp.photos ?? []).length}`}
                               >
                                 <Image src={photo.imageUrl} alt={photo.caption || "Dokumentasi"} fill className="object-cover transition-transform group-hover:scale-105" sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw" />

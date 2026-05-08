@@ -23,6 +23,9 @@ const successState = (message: string): FormState => ({
   message,
 });
 
+const MAX_EXPERIENCE_UPLOAD_FILES = 10;
+const MAX_EXPERIENCE_UPLOAD_TOTAL_SIZE = 20 * 1024 * 1024;
+
 function isMaxConnectionError(error: unknown) {
   const message = error instanceof Error ? error.message : String(error ?? "");
   return message.includes("max_user_connections") || message.includes("exceeded the 'max_user_connections'");
@@ -48,6 +51,19 @@ function toExperienceActionError(error: unknown, fallback: string) {
 function extractExperienceImageFiles(formData: FormData) {
   const candidates = [...formData.getAll("imageFiles"), ...formData.getAll("imageFile")];
   return candidates.filter((entry): entry is File => entry instanceof File && entry.size > 0);
+}
+
+function validateExperienceImageFiles(files: File[]) {
+  if (files.length > MAX_EXPERIENCE_UPLOAD_FILES) {
+    return `Maksimal upload ${MAX_EXPERIENCE_UPLOAD_FILES} file per submit.`;
+  }
+
+  const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+  if (totalSize > MAX_EXPERIENCE_UPLOAD_TOTAL_SIZE) {
+    return "Total ukuran upload terlalu besar (maksimal 20MB per submit).";
+  }
+
+  return null;
 }
 
 async function uploadExperienceImages(files: File[]) {
@@ -81,6 +97,10 @@ async function createExperienceAction(_state: FormState, formData: FormData): Pr
 
     const { title, company, experienceType, periodStart, periodEnd, description } = parsed.data;
     const imageFiles = extractExperienceImageFiles(formData);
+    const fileValidationError = validateExperienceImageFiles(imageFiles);
+    if (fileValidationError) {
+      return errorState(fileValidationError);
+    }
     uploadedImagePaths = await uploadExperienceImages(imageFiles);
 
     await prisma.$transaction(async (tx) => {
@@ -145,6 +165,10 @@ async function updateExperienceAction(_state: FormState, formData: FormData): Pr
 
     const { id, title, company, experienceType, periodStart, periodEnd, description } = parsed.data;
     const imageFiles = extractExperienceImageFiles(formData);
+    const fileValidationError = validateExperienceImageFiles(imageFiles);
+    if (fileValidationError) {
+      return errorState(fileValidationError);
+    }
     uploadedImagePaths = await uploadExperienceImages(imageFiles);
 
     await prisma.$transaction(async (tx) => {

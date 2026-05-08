@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import Image from "next/image";
 import { Trash2 } from "lucide-react";
 
@@ -66,8 +66,15 @@ export function ExperienceEditItem({ experience, updateAction, deleteAction }: E
   const [deleteState, deleteFormAction] = useActionState(deleteAction, initialFormState);
   const [deletingPhotoId, setDeletingPhotoId] = useState<string | null>(null);
   const [photos, setPhotos] = useState(experience.photos ?? []);
+  const [uploadResetSignal, setUploadResetSignal] = useState(0);
   const defaultExperienceType = normalizeExperienceType(experience.experienceType) ?? "full-time";
   const [experienceType, setExperienceType] = useState<ExperienceTypeValue>(defaultExperienceType);
+
+  useEffect(() => {
+    if (updateState.status === "success") {
+      setUploadResetSignal((prev) => prev + 1);
+    }
+  }, [updateState.status]);
 
   const handleDeletePhoto = async (photoId: string) => {
     setDeletingPhotoId(photoId);
@@ -142,7 +149,15 @@ export function ExperienceEditItem({ experience, updateAction, deleteAction }: E
           <Label>Description</Label>
           <Textarea name="description" defaultValue={experience.description} required />
         </div>
-        <MultiFileDropInput name="imageFiles" label="Tambah Dokumentasi Foto (Opsional)" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB per file, max 10 files" maxFiles={10} className="md:col-span-2" />
+        <MultiFileDropInput
+          name="imageFiles"
+          label="Tambah Dokumentasi Foto (Opsional)"
+          accept="image/png,image/jpeg,image/webp"
+          helperText="PNG/JPG/WEBP, max 2MB per file, max 10 files"
+          maxFiles={10}
+          resetSignal={uploadResetSignal}
+          className="md:col-span-2"
+        />
         <div className="md:col-span-2 flex flex-row items-center gap-2">
           <FormSubmitButton pendingLabel="Updating..." variant="secondary" className="transition-all hover:-translate-y-0.5 hover:shadow-sm">
             Update
