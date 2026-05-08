@@ -1,24 +1,16 @@
 "use client";
 
-import { Mail, Phone, MapPin, Github, Linkedin, Twitter } from "lucide-react";
+import Image from "next/image";
+import { Mail, Phone, MapPin, Github, Linkedin, Twitter, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NeonGradientCard } from "@/components/ui/neon-gradient-card";
 import { Spinner } from "@/components/ui/spinner";
 import { defaultHeroContent } from "@/lib/hero-content";
 import { useState } from "react";
-import { ArrowUpRight } from "lucide-react";
 
 const CONTACT_EMAIL = "satriafebriandanu@gmail.com";
 
-interface ContactSectionProps {
-  social?: {
-    githubUrl?: string | null;
-    linkedinUrl?: string | null;
-    twitterUrl?: string | null;
-  };
-}
-
-const buildSocialLinks = (social?: ContactSectionProps["social"]) => {
+const buildSocialLinks = (social?: { githubUrl?: string | null; linkedinUrl?: string | null; twitterUrl?: string | null }) => {
   const source = social ?? defaultHeroContent;
 
   return [
@@ -28,7 +20,7 @@ const buildSocialLinks = (social?: ContactSectionProps["social"]) => {
   ].filter(Boolean) as Array<{ icon: typeof Github; href: string; label: string }>;
 };
 
-export function ContactSection({ social }: ContactSectionProps) {
+export function ContactSection({ social }: { social?: { githubUrl?: string | null; linkedinUrl?: string | null; twitterUrl?: string | null } }) {
   const socialLinks = buildSocialLinks(social);
   const [submitState, setSubmitState] = useState<{ status: "idle" | "loading" | "success" | "error"; message?: string }>({ status: "idle" });
 
@@ -58,7 +50,7 @@ export function ContactSection({ social }: ContactSectionProps) {
   };
 
   return (
-    <section id="contact" className="py-24">
+    <section id="contact" className="py-24 bg-background">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-16 items-start">
           {/* Left */}
@@ -184,3 +176,5 @@ export function ContactSection({ social }: ContactSectionProps) {
     </section>
   );
 }
+
+export default ContactSection;
