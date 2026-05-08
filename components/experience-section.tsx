@@ -49,7 +49,7 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
   ];
 
   return (
-    <section id="experience" className="relative overflow-hidden py-24 bg-background">
+    <section id="experience" className="relative overflow-hidden py-24">
       <BubbleBackground
         interactive={true}
         className="absolute inset-0 z-0 opacity-30 bg-transparent mask-[linear-gradient(to_bottom,transparent_0%,white_16%,white_84%,transparent_100%)]"
