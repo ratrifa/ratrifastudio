@@ -34,7 +34,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
           <Link
             href={`/projects/${project.id}`}
             aria-label={`View details of ${project.title}`}
-            className="flex items-center gap-1.5 pr-3 py-1.5 rounded-md text-primary-foreground text-sm sm:text-xs font-medium hover:text-primary transition-colors"
+            className="flex items-center gap-1.5 pr-3 py-1.5 rounded-md text-secondary-foreground text-sm sm:text-xs font-medium hover:text-primary transition-colors"
           >
             <Eye size={13} />
             View Detail
