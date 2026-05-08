@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { internalServerErrorResponse, validationErrorResponse } from "@/lib/api-error";
 import { cleanupPrisma, prisma } from "@/lib/prisma";
+import { requireAdminApi } from "@/lib/server-auth";
 import { projectFormSchema, toTechStack } from "@/lib/validation";
 
 export async function GET() {
@@ -11,6 +13,8 @@ export async function GET() {
     });
 
     return NextResponse.json(projects);
+  } catch {
+    return internalServerErrorResponse();
   } finally {
     await cleanupPrisma();
   }
@@ -18,6 +22,11 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireAdminApi();
+    if (!auth.ok) {
+      return auth.response;
+    }
+
     const body = await req.json();
     const parsed = projectFormSchema.safeParse({
       title: body?.title,
@@ -29,7 +38,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!parsed.success) {
-      return NextResponse.json({ message: "Payload tidak valid" }, { status: 400 });
+      return validationErrorResponse(parsed.error.flatten());
     }
 
     const { title, description, link, githubUrl, techStackRaw, isPublished } = parsed.data;
@@ -46,6 +55,8 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(project, { status: 201 });
+  } catch {
+    return internalServerErrorResponse();
   } finally {
     await cleanupPrisma();
   }

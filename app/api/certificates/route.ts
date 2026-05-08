@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { internalServerErrorResponse, validationErrorResponse } from "@/lib/api-error";
 import { cleanupPrisma, prisma } from "@/lib/prisma";
+import { requireAdminApi } from "@/lib/server-auth";
 import { certificateFormSchema } from "@/lib/validation";
 
 export async function GET() {
@@ -10,6 +12,8 @@ export async function GET() {
     });
 
     return NextResponse.json(certificates);
+  } catch {
+    return internalServerErrorResponse();
   } finally {
     await cleanupPrisma();
   }
@@ -17,6 +21,11 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireAdminApi();
+    if (!auth.ok) {
+      return auth.response;
+    }
+
     const body = await req.json();
     const parsed = certificateFormSchema.safeParse({
       title: body?.title,
@@ -28,7 +37,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!parsed.success) {
-      return NextResponse.json({ message: "Payload tidak valid", errors: parsed.error.errors }, { status: 400 });
+      return validationErrorResponse(parsed.error.flatten());
     }
 
     const { title, issuer, issueDate, imageUrl, credentialUrl, featured } = parsed.data;
@@ -49,6 +58,8 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(certificate, { status: 201 });
+  } catch {
+    return internalServerErrorResponse();
   } finally {
     await cleanupPrisma();
   }
