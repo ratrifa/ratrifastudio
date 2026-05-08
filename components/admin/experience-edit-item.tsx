@@ -1,18 +1,28 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import Image from "next/image";
+import { Trash2 } from "lucide-react";
 
 import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
 import { FormStateAlert } from "@/components/admin/form-state-alert";
 import { FormSubmitButton } from "@/components/admin/form-submit-button";
 import { PresentEndDateField } from "@/components/admin/present-end-date-field";
+import { MultiFileDropInput } from "@/components/admin/multi-file-drop-input";
 import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import { EXPERIENCE_TYPE_LABELS, EXPERIENCE_TYPE_OPTIONS, normalizeExperienceType, type ExperienceTypeValue } from "@/lib/experience-types";
 import type { FormState } from "@/lib/form-state";
 import { initialFormState } from "@/lib/form-state";
+
+interface ExperiencePhotoType {
+  id: string;
+  imageUrl: string;
+  caption?: string | null;
+}
 
 interface ExperienceEditItemProps {
   experience: {
@@ -23,6 +33,7 @@ interface ExperienceEditItemProps {
     periodStart: Date | string;
     periodEnd: Date | string | null;
     description: string;
+    photos?: ExperiencePhotoType[];
   };
   updateAction: (state: FormState, formData: FormData) => Promise<FormState>;
   deleteAction: (state: FormState, formData: FormData) => Promise<FormState>;
@@ -40,16 +51,60 @@ function toDateInputValue(value: Date | string | null) {
   return value.toISOString().slice(0, 10);
 }
 
+async function deleteExperiencePhoto(photoId: string) {
+  try {
+    const res = await fetch(`/api/experiences/photos/${photoId}`, { method: "DELETE" });
+    if (!res.ok) throw new Error("Gagal hapus foto");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function ExperienceEditItem({ experience, updateAction, deleteAction }: ExperienceEditItemProps) {
   const [updateState, updateFormAction] = useActionState(updateAction, initialFormState);
   const [deleteState, deleteFormAction] = useActionState(deleteAction, initialFormState);
+  const [deletingPhotoId, setDeletingPhotoId] = useState<string | null>(null);
+  const [photos, setPhotos] = useState(experience.photos ?? []);
   const defaultExperienceType = normalizeExperienceType(experience.experienceType) ?? "full-time";
   const [experienceType, setExperienceType] = useState<ExperienceTypeValue>(defaultExperienceType);
+
+  const handleDeletePhoto = async (photoId: string) => {
+    setDeletingPhotoId(photoId);
+    const success = await deleteExperiencePhoto(photoId);
+    if (success) {
+      setPhotos((prev) => prev.filter((p) => p.id !== photoId));
+    }
+    setDeletingPhotoId(null);
+  };
 
   return (
     <div className="space-y-3">
       <FormStateAlert state={updateState} title="Update experience" />
       <FormStateAlert state={deleteState} title="Delete experience" />
+
+      {/* Existing Photos Gallery */}
+      {photos.length > 0 && (
+        <div className="space-y-2 rounded-lg border border-border bg-card/30 p-3">
+          <p className="text-sm font-medium">Dokumentasi Foto ({photos.length})</p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+            {photos.map((photo) => (
+              <div key={photo.id} className="group relative aspect-square overflow-hidden rounded-lg border border-border">
+                <Image src={photo.imageUrl} alt="Dokumentasi" fill className="object-cover transition-opacity group-hover:opacity-70" />
+                <button
+                  type="button"
+                  onClick={() => handleDeletePhoto(photo.id)}
+                  disabled={deletingPhotoId === photo.id}
+                  className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100"
+                  title="Delete photo"
+                >
+                  <Trash2 size={16} className="text-white" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <form id={`update-experience-${experience.id}`} action={updateFormAction} className="grid gap-3 md:grid-cols-2">
         <input type="hidden" name="id" value={experience.id} />
@@ -87,6 +142,7 @@ export function ExperienceEditItem({ experience, updateAction, deleteAction }: E
           <Label>Description</Label>
           <Textarea name="description" defaultValue={experience.description} required />
         </div>
+        <MultiFileDropInput name="imageFiles" label="Tambah Dokumentasi Foto (Opsional)" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB per file, max 10 files" maxFiles={10} className="md:col-span-2" />
         <div className="md:col-span-2 flex flex-row items-center gap-2">
           <FormSubmitButton pendingLabel="Updating..." variant="secondary" className="transition-all hover:-translate-y-0.5 hover:shadow-sm">
             Update

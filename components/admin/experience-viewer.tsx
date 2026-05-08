@@ -4,6 +4,12 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { EXPERIENCE_TYPE_LABELS, normalizeExperienceType } from "@/lib/experience-types";
 import { useState } from "react";
+import { Image as ImageIcon } from "lucide-react";
+
+interface ExperiencePhoto {
+  id: string;
+  imageUrl: string;
+}
 
 interface ExperienceViewerProps {
   experiences: any[];
@@ -27,6 +33,7 @@ export function ExperienceViewer({ experiences }: ExperienceViewerProps) {
           filtered.map((exp) => {
             const isPresent = !exp.periodEnd;
             const experienceType = normalizeExperienceType(exp.experienceType);
+            const photoCount = (exp.photos ?? []).length;
             const startDate = new Date(exp.periodStart).toLocaleDateString("id-ID", {
               year: "numeric",
               month: "short",
@@ -53,6 +60,12 @@ export function ExperienceViewer({ experiences }: ExperienceViewerProps) {
                 <p className="text-xs text-muted-foreground">
                   {startDate} {endDate ? `- ${endDate}` : "- Present"}
                 </p>
+                {photoCount > 0 && (
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <ImageIcon size={12} />
+                    {photoCount} photo{photoCount !== 1 ? "s" : ""}
+                  </div>
+                )}
               </div>
             );
           })
@@ -69,12 +82,13 @@ export function ExperienceViewer({ experiences }: ExperienceViewerProps) {
                 <th className="px-4 py-3 text-left text-sm font-semibold">Type</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold">Period</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold">Status</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Photos</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
                     No experiences found
                   </td>
                 </tr>
@@ -82,6 +96,7 @@ export function ExperienceViewer({ experiences }: ExperienceViewerProps) {
                 filtered.map((exp) => {
                   const isPresent = !exp.periodEnd;
                   const experienceType = normalizeExperienceType(exp.experienceType);
+                  const photoCount = (exp.photos ?? []).length;
                   const startDate = new Date(exp.periodStart).toLocaleDateString("id-ID", {
                     year: "numeric",
                     month: "short",
@@ -111,6 +126,16 @@ export function ExperienceViewer({ experiences }: ExperienceViewerProps) {
                       </td>
                       <td className="px-4 py-3">
                         <Badge variant={isPresent ? "default" : "outline"}>{isPresent ? "Ongoing" : "Completed"}</Badge>
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        {photoCount > 0 ? (
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <ImageIcon size={14} />
+                            {photoCount}
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
                       </td>
                     </tr>
                   );

@@ -73,8 +73,22 @@ model Experience {
   periodStart DateTime
   periodEnd   DateTime?
   description String    @db.Text
+  photos      ExperiencePhoto[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+model ExperiencePhoto {
+  id           String     @id @default(uuid())
+  experienceId String
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  imageUrl     String
+  caption      String?
+  sortOrder    Int        @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([experienceId, sortOrder, createdAt])
 }
 
 model HeroSection {

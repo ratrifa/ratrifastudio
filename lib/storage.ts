@@ -23,7 +23,7 @@ function toAbsolutePath(publicPath: string) {
   return path.join(process.cwd(), "public", relative.replace(/^public[\\/]/, ""));
 }
 
-export async function saveImageUpload(fileLike: FormDataEntryValue | null, folder: "projects" | "certificates" | "hero") {
+export async function saveImageUpload(fileLike: FormDataEntryValue | null, folder: "projects" | "certificates" | "hero" | "experiences") {
   if (!(fileLike instanceof File) || fileLike.size === 0) {
     return null;
   }
@@ -86,4 +86,8 @@ export async function deleteLocalUpload(publicPath: string | null | undefined) {
   } catch {
     // Ignore missing files; database cleanup should still proceed.
   }
+}
+
+export async function deleteLocalUploads(publicPaths: Array<string | null | undefined>) {
+  await Promise.all(publicPaths.map((publicPath) => deleteLocalUpload(publicPath)));
 }
