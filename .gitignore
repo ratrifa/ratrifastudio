@@ -31,7 +31,11 @@ out/
 
 # Static files
 
+.claude
+IMPLEMENTATION_PLAN.md
 AZURE_VPS_SETUP.md
+PROJECT_OVERVIEW.md
+QUICK_REFERENCE.md
 
 # IDE & OS
 .vscode/
