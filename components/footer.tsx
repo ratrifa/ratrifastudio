@@ -69,7 +69,6 @@ export function Footer({ social, brand }: { social?: FooterSocialProps; brand?: 
 
   return (
     <>
-      <ContactSection social={social} />
       <footer className="bg-card border-t border-border py-10">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
