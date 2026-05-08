@@ -11,7 +11,7 @@ interface AnimatedThemeTogglerProps extends ComponentPropsWithoutRef<"button"> {
   duration?: number;
 }
 
-export const AnimatedThemeToggler = ({ className, duration = 400, ...props }: AnimatedThemeTogglerProps) => {
+export const AnimatedThemeToggler = ({ className, duration = 900, ...props }: AnimatedThemeTogglerProps) => {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
