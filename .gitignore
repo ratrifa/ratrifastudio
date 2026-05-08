@@ -36,6 +36,8 @@ IMPLEMENTATION_PLAN.md
 AZURE_VPS_SETUP.md
 PROJECT_OVERVIEW.md
 QUICK_REFERENCE.md
+public/uploads/**
+!public/uploads/.gitkeep
 
 # IDE & OS
 .vscode/
