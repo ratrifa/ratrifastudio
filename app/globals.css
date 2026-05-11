@@ -7,13 +7,19 @@
 html {
   /* Ensure vertical scrollbar gutter is always reserved to prevent layout shifts
      when overlays or popovers appear and the browser may hide the scrollbar. */
-  overflow-y: scroll;
-  scrollbar-gutter: stable both-edges;
+  /* overflow-y: scroll; */
+    /* Don't force scrollbar gutter here; let browser decide. */
+    /* scrollbar-gutter: stable; */
+  /* Prevent horizontal overflow from decorative absolute elements */
+  /* overflow-x: hidden; */
 }
 
 /* Also ensure body never causes horizontal layout shifts when scrollbars toggle */
 body {
-  overflow-y: scroll;
+  /* Let the root/html control the vertical scrollbar; avoid forcing a second one */
+  /* overflow-y: auto; */
+  /* Clip any horizontal overflow globally to avoid page-level gaps */
+  /* overflow-x: hidden; */
 }
 
 /* Light mode */
