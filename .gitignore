@@ -9,6 +9,7 @@ next.user-config.*
 
 # Environment variables (CONFIDENTIAL - NEVER COMMIT)
 .env
+.env*
 .env.local
 .env.*.local
 .env.development.local
