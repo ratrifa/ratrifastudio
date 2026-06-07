@@ -8,6 +8,7 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { apiGet } from "@/lib/api-server";
+import { PageTransition } from "@/components/page-transition";
 import { fetchRepositoryCommits } from "@/lib/github-api";
 import type { Commit } from "@/lib/commit-types";
 import { ProjectDetailHeader } from "@/components/project-detail-header";
@@ -79,6 +80,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   const techStack = Array.isArray(project.techStack) ? project.techStack : [];
 
   return (
+    <PageTransition>
     <div className="min-h-screen py-8 sm:py-10 lg:py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         {/* Back link */}
@@ -123,5 +125,6 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 }

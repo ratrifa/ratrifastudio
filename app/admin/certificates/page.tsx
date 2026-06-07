@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { apiFetch, apiGet, apiSubmit, toFormState } from "@/lib/api-server";
 import { requireAdmin } from "@/lib/server-auth";
+import { PageTransition } from "@/components/page-transition";
 import { CertificateViewer } from "@/components/admin/certificate-viewer";
 import { CreateCertificateForm } from "@/components/admin/create-certificate-form";
 import { CertificateEditItem } from "@/components/admin/certificate-edit-item";
@@ -71,6 +72,7 @@ export default async function AdminCertificatesPage() {
   const certificates = (await apiGet<CertificateRecord[]>("/api/certificates")) ?? [];
 
   return (
+    <PageTransition>
     <div className="space-y-6">
       <div>
         <h1 className="text-xl sm:text-2xl font-bold">Manage Certificates</h1>
@@ -111,5 +113,6 @@ export default async function AdminCertificatesPage() {
         ))}
       </Accordion>
     </div>
+    </PageTransition>
   );
 }

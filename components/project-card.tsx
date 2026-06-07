@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { ExternalLink, Github, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,7 +24,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
     <Card className="group bg-card border-border hover:border-primary/40 transition-all duration-300 overflow-hidden flex flex-col">
       {/* Image */}
       <div className="relative w-full h-48 overflow-hidden">
-        <Image src={project.image} alt={project.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
+        <ImageWithFallback src={project.image} alt={project.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
         {/* Actions removed from image overlay to avoid darkening image. */}
       </div>
 

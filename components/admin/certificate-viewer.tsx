@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -40,7 +40,7 @@ export function CertificateViewer({ certificates }: CertificateViewerProps) {
                 <p className="text-xs text-muted-foreground">{issueDate}</p>
                 {cert.imageUrl ? (
                   <div className="relative w-12 h-12 rounded overflow-hidden bg-muted">
-                    <Image src={cert.imageUrl} alt={cert.title} fill className="object-cover" />
+                    <ImageWithFallback src={cert.imageUrl} alt={cert.title} fill className="object-cover" />
                   </div>
                 ) : null}
               </div>
@@ -86,7 +86,7 @@ export function CertificateViewer({ certificates }: CertificateViewerProps) {
                       <td className="px-4 py-3">
                         {cert.imageUrl ? (
                           <div className="relative w-12 h-12 rounded overflow-hidden bg-muted">
-                            <Image src={cert.imageUrl} alt={cert.title} fill className="object-cover" />
+                            <ImageWithFallback src={cert.imageUrl} alt={cert.title} fill className="object-cover" />
                           </div>
                         ) : (
                           <span className="text-xs text-muted-foreground">No image</span>

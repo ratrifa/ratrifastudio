@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EXPERIENCE_TYPE_LABELS, normalizeExperienceType, type ExperienceTypeValue } from "@/lib/experience-types";
 import { useState } from "react";
-import Image from "next/image";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { PhotoLightbox } from "@/components/photo-lightbox";
 
 export interface Experience {
@@ -182,7 +182,7 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
                                 className="group relative h-50 w-50 shrink-0 snap-start overflow-hidden rounded-lg border border-border bg-muted cursor-pointer transition-all hover:border-primary/50 hover:shadow-lg hover:ring-2 hover:ring-primary/30 sm:h-32 sm:w-32 md:h-36 md:w-36"
                                 aria-label={`View photo ${photoIdx + 1} of ${(exp.photos ?? []).length}`}
                               >
-                                <Image src={photo.imageUrl} alt={photo.caption || "Dokumentasi"} fill className="object-cover transition-transform group-hover:scale-105" sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw" />
+                                <ImageWithFallback src={photo.imageUrl} alt={photo.caption || "Dokumentasi"} fill className="object-cover transition-transform group-hover:scale-105" sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw" />
                               </button>
                             ))}
                           </div>

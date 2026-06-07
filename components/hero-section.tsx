@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { ArrowDown, Github, Linkedin, Twitter } from "lucide-react";
 import { Backlight } from "@/components/ui/backlight";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
@@ -191,7 +191,7 @@ export function HeroSection({ content = defaultHeroContent, previewAsBanner = fa
                   <div className="absolute inset-0 rounded-full scale-105 opacity-100 blur-md" style={{ background: "var(--color-primary)" }} aria-hidden="true" />
                   <Backlight className="rounded-full" blur={22}>
                     <div className={avatarClasses}>
-                      <Image src={content.avatarUrl ?? defaultHeroContent.avatarUrl ?? "/images/hero-avatar.jpg"} alt={content.avatarAlt} fill className="object-cover" priority />
+                      <ImageWithFallback src={content.avatarUrl ?? defaultHeroContent.avatarUrl ?? "/images/hero-avatar.jpg"} alt={content.avatarAlt} fill className="object-cover" priority />
                     </div>
                   </Backlight>
                 </TiltContent>

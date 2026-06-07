@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { apiFetch, apiGet, apiSubmit, toFormState } from "@/lib/api-server";
 import { requireAdmin } from "@/lib/server-auth";
+import { PageTransition } from "@/components/page-transition";
 import { ProjectViewer } from "@/components/admin/project-viewer";
 import { CreateProjectForm } from "@/components/admin/create-project-form";
 import { ProjectEditItem } from "@/components/admin/project-edit-item";
@@ -72,6 +73,7 @@ export default async function AdminProjectsPage() {
   const projects = (await apiGet<ProjectRecord[]>("/api/admin/projects")) ?? [];
 
   return (
+    <PageTransition>
     <div className="space-y-6">
       <div>
         <h1 className="text-xl sm:text-2xl font-bold">Manage Projects</h1>
@@ -112,5 +114,6 @@ export default async function AdminProjectsPage() {
         ))}
       </Accordion>
     </div>
+    </PageTransition>
   );
 }

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { Award, ExternalLink, CalendarDays, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -52,7 +52,7 @@ export function CertificateSection({ certificates }: CertificateSectionProps) {
         <div className="grid md:grid-cols-2 gap-10 items-center mb-16 p-6 md:p-10 rounded-2xl bg-card border border-border hover:border-primary/30 transition-colors">
           {/* Image */}
           <div className="relative w-full aspect-4/3 rounded-xl overflow-hidden border border-border shadow-xl">
-            <Image src={heroCertificate.image} alt={heroCertificate.title} fill className="object-cover" />
+            <ImageWithFallback src={heroCertificate.image} alt={heroCertificate.title} fill className="object-cover" />
             {featured ? (
               <div className="absolute top-3 left-3">
                 <Badge className="bg-primary text-primary-foreground text-xs font-mono">Featured</Badge>
@@ -103,7 +103,7 @@ export function CertificateSection({ certificates }: CertificateSectionProps) {
                 const content = (
                   <>
                     <div className="relative w-full h-40 overflow-hidden">
-                      <Image src={cert.image} alt={cert.title} fill className={cardImageClassName} />
+                      <ImageWithFallback src={cert.image} alt={cert.title} fill className={cardImageClassName} />
                     </div>
                     <div className="p-4 flex flex-col gap-1.5 flex-1">
                       <h4 className="font-semibold text-foreground text-sm leading-snug line-clamp-2">{cert.title}</h4>

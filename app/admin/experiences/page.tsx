@@ -5,6 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { apiFetch, apiGet, apiSubmit, toFormState } from "@/lib/api-server";
 import { requireAdmin } from "@/lib/server-auth";
 import type { ExperienceTypeValue } from "@/lib/experience-types";
+import { PageTransition } from "@/components/page-transition";
 import { ExperienceViewer } from "@/components/admin/experience-viewer";
 import { CreateExperienceForm } from "@/components/admin/create-experience-form";
 import { ExperienceEditItem } from "@/components/admin/experience-edit-item";
@@ -86,6 +87,7 @@ export default async function AdminExperiencesPage() {
   const experiences = (await apiGet<ExperienceRecord[]>("/api/experiences")) ?? [];
 
   return (
+    <PageTransition>
     <div className="space-y-6">
       <div>
         <h1 className="text-xl sm:text-2xl font-bold">Manage Experiences</h1>
@@ -126,5 +128,6 @@ export default async function AdminExperiencesPage() {
         ))}
       </Accordion>
     </div>
+    </PageTransition>
   );
 }

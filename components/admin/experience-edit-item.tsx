@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import Image from "next/image";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { Trash2 } from "lucide-react";
 
 import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
@@ -101,7 +101,7 @@ export function ExperienceEditItem({ experience, updateAction, deleteAction }: E
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
             {photos.map((photo) => (
               <div key={photo.id} className="group relative aspect-square overflow-hidden rounded-lg border border-border">
-                <Image src={photo.imageUrl} alt="Dokumentasi" fill className="object-cover transition-opacity group-hover:opacity-70" />
+                <ImageWithFallback src={photo.imageUrl} alt="Dokumentasi" fill className="object-cover transition-opacity group-hover:opacity-70" />
                 <button
                   type="button"
                   onClick={() => handleDeletePhoto(photo.id)}

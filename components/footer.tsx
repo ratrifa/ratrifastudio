@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { Mail, Phone, MapPin, Github, Linkedin, Twitter, Code2, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NeonGradientCard } from "@/components/ui/neon-gradient-card";
@@ -85,7 +85,7 @@ export function Footer({ social, brand }: { social?: FooterSocialProps; brand?: 
               >
                 {domainLogoUrl ? (
                   <span className="relative flex items-center justify-center w-8 h-8 rounded-md overflow-hidden bg-transparent">
-                    <Image src={domainLogoUrl} alt={`${brandLabel} logo`} fill className="object-contain p-1" sizes="32px" />
+                    <ImageWithFallback src={domainLogoUrl} alt={`${brandLabel} logo`} fill className="object-contain p-1" sizes="32px" />
                   </span>
                 ) : (
                   <span className="flex items-center justify-center w-8 h-8 rounded-md bg-primary text-primary-foreground">

@@ -5,7 +5,7 @@
  * Display project image, title, description, metadata
  */
 
-import Image from "next/image";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ImageZoom } from "./animate-ui/primitives/effects/image-zoom";
@@ -36,7 +36,7 @@ export function ProjectDetailHeader({
       {imageUrl && (
         <div className="relative w-full h-96 rounded-lg overflow-hidden bg-muted">
           <ImageZoom>
-          <Image
+          <ImageWithFallback
             src={imageUrl}
             alt={title}
             fill

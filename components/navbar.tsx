@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Menu, X, Code2 } from "lucide-react";
-import Image from "next/image";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
@@ -103,7 +103,7 @@ export function Navbar({ domainLabel = defaultHeroContent.domainLabel, domainLog
           <Backlight className="rounded-md" blur={7}>
             {domainLogoUrl ? (
               <span className="relative flex items-center justify-center w-8 h-8 rounded-md overflow-hidden bg-transparent">
-                <Image src={domainLogoUrl} alt={`${brandLabel} logo`} fill className="object-contain p-1" sizes="32px" />
+                <ImageWithFallback src={domainLogoUrl} alt={`${brandLabel} logo`} fill className="object-contain p-1" sizes="32px" />
               </span>
             ) : (
               <span className="flex items-center justify-center w-8 h-8 rounded-md bg-primary text-primary-foreground">
@@ -157,7 +157,7 @@ export function Navbar({ domainLabel = defaultHeroContent.domainLabel, domainLog
             <div className="flex mx-auto items-center gap-2 mb-5">
               {domainLogoUrl ? (
                 <span className="relative flex items-center justify-center w-8 h-8 rounded-md overflow-hidden bg-transparent">
-                  <Image src={domainLogoUrl} alt={`${brandLabel} logo`} fill className="object-contain p-1" sizes="32px" />
+                  <ImageWithFallback src={domainLogoUrl} alt={`${brandLabel} logo`} fill className="object-contain p-1" sizes="32px" />
                 </span>
               ) : (
                 <span className="flex items-center justify-center w-8 h-8 rounded-md bg-primary text-primary-foreground">

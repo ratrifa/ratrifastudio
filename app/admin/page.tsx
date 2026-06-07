@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageTransition } from "@/components/page-transition";
 import Link from "next/link";
 import { apiGet } from "@/lib/api-server";
 import { requireAdmin } from "@/lib/server-auth";
@@ -17,6 +18,7 @@ export default async function AdminDashboardPage() {
   const certificateCount = certificates?.length ?? 0;
 
   return (
+    <PageTransition>
     <div className="space-y-6">
       <div>
         <h1 className="text-xl sm:text-2xl font-bold">Dashboard Overview</h1>
@@ -72,5 +74,6 @@ export default async function AdminDashboardPage() {
         </Card>
       </div>
     </div>
+    </PageTransition>
   );
 }

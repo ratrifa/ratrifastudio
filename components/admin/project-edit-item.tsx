@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { useActionState } from "react";
 
 import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
@@ -53,7 +53,7 @@ export function ProjectEditItem({ project, updateAction, deleteAction }: Project
             <div className="space-y-1">
               <Label>Current Image</Label>
               <div className="relative h-28 w-full overflow-hidden rounded-md border border-border bg-muted">
-                <Image src={project.imageUrl} alt={project.title} fill className="object-cover" sizes="400px" unoptimized />
+                <ImageWithFallback src={project.imageUrl} alt={project.title} fill className="object-cover" sizes="400px" unoptimized />
               </div>
             </div>
           ) : (

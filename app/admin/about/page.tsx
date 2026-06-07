@@ -1,6 +1,7 @@
 import { revalidatePath } from "next/cache";
 
 import { AboutSectionManager } from "@/components/admin/about-section-manager";
+import { PageTransition } from "@/components/page-transition";
 import type { FormState } from "@/lib/form-state";
 import { apiFetch, apiGet, toFormState } from "@/lib/api-server";
 import { requireAdmin } from "@/lib/server-auth";
@@ -60,6 +61,7 @@ export default async function AdminAboutPage() {
   const derivedMetrics = content?.derivedMetrics ?? FALLBACK_METRICS;
 
   return (
+    <PageTransition>
     <div className="space-y-6">
       <div>
         <h1 className="text-xl sm:text-2xl font-bold">About Section Manager</h1>
@@ -68,5 +70,6 @@ export default async function AdminAboutPage() {
 
       <AboutSectionManager action={saveAboutSectionAction} initialValues={initialValues} derivedMetrics={derivedMetrics} />
     </div>
+    </PageTransition>
   );
 }
