@@ -1,6 +1,7 @@
 "use client";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { SessionExpiredDialog } from "@/components/admin/session-expired-dialog";
 import type { FormState } from "@/lib/form-state";
 
 interface FormStateAlertProps {
@@ -9,6 +10,10 @@ interface FormStateAlertProps {
 }
 
 export function FormStateAlert({ state, title }: FormStateAlertProps) {
+  if (state.status === "session_expired") {
+    return <SessionExpiredDialog open />;
+  }
+
   if (state.status === "idle" || !state.message) {
     return null;
   }

@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { EXPERIENCE_TYPE_LABELS, EXPERIENCE_TYPE_OPTIONS, normalizeExperienceType, type ExperienceTypeValue } from "@/lib/experience-types";
 import type { FormState } from "@/lib/form-state";
 import { initialFormState } from "@/lib/form-state";
+import { apiUrl } from "@/lib/api";
 
 interface ExperiencePhotoType {
   id: string;
@@ -53,7 +54,10 @@ function toDateInputValue(value: Date | string | null) {
 
 async function deleteExperiencePhoto(photoId: string) {
   try {
-    const res = await fetch(`/api/experiences/photos/${photoId}`, { method: "DELETE" });
+    const res = await fetch(apiUrl(`/api/experiences/photos/${photoId}`), {
+      method: "DELETE",
+      credentials: "include",
+    });
     if (!res.ok) throw new Error("Gagal hapus foto");
     return true;
   } catch {

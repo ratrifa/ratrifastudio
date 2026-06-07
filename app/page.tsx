@@ -9,153 +9,122 @@ import { ContactSection } from "@/components/contact-section";
 import type { Project } from "@/components/project-card";
 import type { Experience } from "@/components/experience-section";
 import type { Certificate } from "@/components/certificate-section";
-import { cleanupPrisma, prisma } from "@/lib/prisma";
-import { normalizeHeroContent } from "@/lib/hero-content";
-import { normalizeAboutContent } from "@/lib/about-content";
-import { applyDerivedStats, getExperienceValue, getProjectValue } from "@/lib/about-stats";
+import { apiGet } from "@/lib/api-server";
+import { defaultHeroContent, type HeroSectionContent } from "@/lib/hero-content";
+import { defaultAboutContent, type AboutSectionContent } from "@/lib/about-content";
 import { normalizeExperienceType } from "@/lib/experience-types";
 
 export const dynamic = "force-dynamic";
 
+interface ProjectApi {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string | null;
+  techStack: string[];
+  link: string | null;
+  githubUrl: string | null;
+}
+
+interface ExperienceApi {
+  id: string;
+  title: string;
+  company: string;
+  experienceType: string | null;
+  periodStart: string;
+  periodEnd: string | null;
+  description: string;
+  photos: { id: string; imageUrl: string; caption?: string | null }[];
+}
+
+interface CertificateApi {
+  id: string;
+  title: string;
+  issuer: string;
+  issueDate: string;
+  imageUrl: string | null;
+  credentialUrl: string | null;
+  featured: boolean;
+}
+
+function monthYear(iso: string, month: "short" | "long") {
+  return new Date(iso).toLocaleDateString("en-US", { month, year: "numeric" });
+}
+
 export default async function Home() {
-  try {
-    let projectsDb: Awaited<ReturnType<typeof prisma.project.findMany>> = [];
-    let experiencesDb: Awaited<ReturnType<typeof prisma.experience.findMany>> = [];
-    let certificatesDb: Awaited<ReturnType<typeof prisma.certificate.findMany>> = [];
-    let heroDb: Parameters<typeof normalizeHeroContent>[0] = null;
-    let aboutDb: Parameters<typeof normalizeAboutContent>[0] = null;
-    let totalProjects = 0;
-    const heroClient = prisma as typeof prisma & {
-      heroSection: {
-        findUnique: (args: { where: { id: string } }) => Promise<Parameters<typeof normalizeHeroContent>[0]>;
-      };
-    };
-    const aboutClient = prisma as typeof prisma & {
-      aboutSection: {
-        findUnique: (args: { where: { id: string } }) => Promise<Parameters<typeof normalizeAboutContent>[0]>;
-      };
-    };
+  const [projectsData, experiencesData, certificatesData, hero, about] = await Promise.all([
+    apiGet<ProjectApi[]>("/api/projects"),
+    apiGet<ExperienceApi[]>("/api/experiences"),
+    apiGet<CertificateApi[]>("/api/certificates"),
+    apiGet<HeroSectionContent>("/api/hero"),
+    apiGet<AboutSectionContent>("/api/about"),
+  ]);
 
-    if (process.env.DATABASE_URL) {
-      try {
-        [projectsDb, experiencesDb, certificatesDb, totalProjects] = await prisma.$transaction([
-          prisma.project.findMany({
-            where: { isPublished: true },
-            orderBy: { createdAt: "desc" },
-          }),
-          prisma.experience.findMany({
-            include: {
-              photos: {
-                orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-              },
-            },
-            orderBy: { periodStart: "desc" },
-          }),
-          prisma.certificate.findMany({
-            orderBy: [{ featured: "desc" }, { issueDate: "desc" }],
-          }),
-          prisma.project.count(),
-        ]);
-      } catch {
-        projectsDb = [];
-        experiencesDb = [];
-        certificatesDb = [];
-        totalProjects = 0;
-      }
+  const projects: Project[] = (projectsData ?? []).map((project) => ({
+    id: project.id,
+    title: project.title,
+    description: project.description,
+    image: project.imageUrl ?? "/images/project-1.jpg",
+    tech_stack: Array.isArray(project.techStack) ? project.techStack.map(String) : [],
+    demo_url: project.link ?? undefined,
+    repo_url: project.githubUrl ?? undefined,
+  }));
 
-      try {
-        heroDb = await heroClient.heroSection.findUnique({ where: { id: "home" } });
-      } catch {
-        heroDb = null;
-      }
-
-      try {
-        aboutDb = await aboutClient.aboutSection.findUnique({ where: { id: "home" } });
-      } catch {
-        aboutDb = null;
-      }
-    }
-
-    const projects: Project[] = projectsDb.map((project) => ({
-      id: project.id,
-      title: project.title,
-      description: project.description,
-      image: project.imageUrl ?? "/images/project-1.jpg",
-      tech_stack: Array.isArray(project.techStack) ? project.techStack.map(String) : [],
-      demo_url: project.link ?? undefined,
-      repo_url: project.githubUrl ?? undefined,
-    }));
-
-    const experiences: Experience[] = experiencesDb.map((experience) => ({
+  // The API returns experiences oldest-first; the landing page shows newest-first.
+  const experiences: Experience[] = (experiencesData ?? [])
+    .map((experience) => ({
       id: experience.id,
       role: experience.title,
       company: experience.company,
       experienceType: normalizeExperienceType(experience.experienceType),
-      period_start: experience.periodStart.toLocaleDateString("en-US", {
-        month: "short",
-        year: "numeric",
-      }),
-      period_end: experience.periodEnd
-        ? experience.periodEnd.toLocaleDateString("en-US", {
-            month: "short",
-            year: "numeric",
-          })
-        : null,
+      period_start: monthYear(experience.periodStart, "short"),
+      period_end: experience.periodEnd ? monthYear(experience.periodEnd, "short") : null,
       description: experience.description,
       photos: experience.photos ?? [],
-    }));
+    }))
+    .reverse();
 
-    const certificates: Certificate[] = certificatesDb.map((certificate) => ({
-      id: certificate.id,
-      title: certificate.title,
-      issuer: certificate.issuer,
-      issued_at: certificate.issueDate.toLocaleDateString("en-US", {
-        month: "long",
-        year: "numeric",
-      }),
-      image: certificate.imageUrl ?? "/images/certificate-featured.jpg",
-      credential_url: certificate.credentialUrl ?? undefined,
-      featured: certificate.featured,
-    }));
-    const hero = normalizeHeroContent(heroDb);
-    const about = normalizeAboutContent(aboutDb);
-    const aboutWithDerivedStats = {
-      ...about,
-      stats: applyDerivedStats(about.stats, {
-        experienceValue: getExperienceValue(experiencesDb),
-        projectValue: getProjectValue(totalProjects),
-      }),
-    };
+  const certificates: Certificate[] = (certificatesData ?? []).map((certificate) => ({
+    id: certificate.id,
+    title: certificate.title,
+    issuer: certificate.issuer,
+    issued_at: monthYear(certificate.issueDate, "long"),
+    image: certificate.imageUrl ?? "/images/certificate-featured.jpg",
+    credential_url: certificate.credentialUrl ?? undefined,
+    featured: certificate.featured,
+  }));
 
-    return (
-      <main className="min-h-screen bg-background text-foreground">
-        <Navbar domainLabel={hero.domainLabel} domainLogoUrl={hero.domainLogoUrl} />
-        <HeroSection content={hero} />
-        <AboutSection content={aboutWithDerivedStats} />
-        <ProjectsSection projects={projects} />
-        <ExperienceSection experiences={experiences} />
-        <CertificateSection certificates={certificates} />
-        <ContactSection
-          social={{
-            githubUrl: hero.githubUrl,
-            linkedinUrl: hero.linkedinUrl,
-            twitterUrl: hero.twitterUrl,
-          }}
-        />
-        <Footer
-          social={{
-            githubUrl: hero.githubUrl,
-            linkedinUrl: hero.linkedinUrl,
-            twitterUrl: hero.twitterUrl,
-          }}
-          brand={{
-            domainLabel: hero.domainLabel,
-            domainLogoUrl: hero.domainLogoUrl,
-          }}
-        />
-      </main>
-    );
-  } finally {
-    await cleanupPrisma();
-  }
+  // The /api/hero and /api/about endpoints already return normalised content
+  // (about with its live-derived stats applied).
+  const heroContent = hero ?? defaultHeroContent;
+  const aboutContent = about ?? defaultAboutContent;
+
+  return (
+    <main className="min-h-screen bg-background text-foreground">
+      <Navbar domainLabel={heroContent.domainLabel} domainLogoUrl={heroContent.domainLogoUrl} />
+      <HeroSection content={heroContent} />
+      <AboutSection content={aboutContent} />
+      <ProjectsSection projects={projects} />
+      <ExperienceSection experiences={experiences} />
+      <CertificateSection certificates={certificates} />
+      <ContactSection
+        social={{
+          githubUrl: heroContent.githubUrl,
+          linkedinUrl: heroContent.linkedinUrl,
+          twitterUrl: heroContent.twitterUrl,
+        }}
+      />
+      <Footer
+        social={{
+          githubUrl: heroContent.githubUrl,
+          linkedinUrl: heroContent.linkedinUrl,
+          twitterUrl: heroContent.twitterUrl,
+        }}
+        brand={{
+          domainLabel: heroContent.domainLabel,
+          domainLogoUrl: heroContent.domainLogoUrl,
+        }}
+      />
+    </main>
+  );
 }

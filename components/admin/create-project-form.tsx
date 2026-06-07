@@ -32,7 +32,7 @@ export function CreateProjectForm({ action }: CreateProjectFormProps) {
         <Label htmlFor="description">Description</Label>
         <Textarea id="description" name="description" required />
       </div>
-      <FileDropInput id="imageFile" name="imageFile" label="Image Upload" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" />
+      <FileDropInput id="imageFile" name="imageFile" label="Image Upload" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" maxBytes={2 * 1024 * 1024} />
       <div className="space-y-2">
         <Label htmlFor="link">Demo Link</Label>
         <Input id="link" name="link" placeholder="https://..." />

@@ -94,7 +94,7 @@ export function CreateHeroForm({ action, values, onValuesChange }: CreateHeroFor
 
       <div className="md:col-span-2 grid gap-4 md:grid-cols-2 rounded-lg border border-border p-4">
         <div className="space-y-2">
-          <FileDropInput id="avatarFile" name="avatarFile" label="Profile photo upload" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" />
+          <FileDropInput id="avatarFile" name="avatarFile" label="Profile photo upload" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" maxBytes={2 * 1024 * 1024} />
         </div>
         <div className="space-y-2 md:col-span-2">
           <Label htmlFor="avatarAlt">Profile photo alt text</Label>
@@ -107,6 +107,7 @@ export function CreateHeroForm({ action, values, onValuesChange }: CreateHeroFor
             label="Upload CV file (optional)"
             accept="application/pdf,.pdf,application/msword,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx"
             helperText="PDF, DOC, DOCX (max 5MB)"
+            maxBytes={5 * 1024 * 1024}
           />
         </div>
       </div>

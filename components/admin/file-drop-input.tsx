@@ -13,6 +13,7 @@ interface FileDropInputProps {
   accept?: string;
   helperText?: string;
   className?: string;
+  maxBytes?: number;
 }
 
 function matchesAccept(file: File, accept?: string) {
@@ -46,7 +47,7 @@ function matchesAccept(file: File, accept?: string) {
   });
 }
 
-export function FileDropInput({ id, name, label, accept, helperText, className }: FileDropInputProps) {
+export function FileDropInput({ id, name, label, accept, helperText, className, maxBytes }: FileDropInputProps) {
   const generatedId = useId();
   const inputId = id ?? generatedId;
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -76,6 +77,12 @@ export function FileDropInput({ id, name, label, accept, helperText, className }
       return;
     }
 
+    if (maxBytes !== undefined && file.size > maxBytes) {
+      const mb = (maxBytes / (1024 * 1024)).toFixed(0);
+      setSelectedFileName(`File terlalu besar (maks ${mb}MB)`);
+      return;
+    }
+
     const dataTransfer = new DataTransfer();
     dataTransfer.items.add(file);
     inputRef.current.files = dataTransfer.files;
@@ -95,6 +102,12 @@ export function FileDropInput({ id, name, label, accept, helperText, className }
         className="sr-only"
         onChange={(event) => {
           const file = event.target.files?.[0];
+          if (file && maxBytes !== undefined && file.size > maxBytes) {
+            const mb = (maxBytes / (1024 * 1024)).toFixed(0);
+            setSelectedFileName(`File terlalu besar (maks ${mb}MB)`);
+            event.target.value = "";
+            return;
+          }
           setSelectedFileName(file ? file.name : "");
         }}
       />

@@ -2,26 +2,25 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { AdminNavbar } from "@/components/admin/admin-navbar";
-import { revokeAdminSession } from "@/lib/admin-session";
-import { AUTH_COOKIE_NAME, verifyAdminToken } from "@/lib/auth";
+import { apiFetch } from "@/lib/api-server";
+import { AUTH_COOKIE_NAME } from "@/lib/auth";
 import { requireAdmin } from "@/lib/server-auth";
 
 async function logoutAction() {
   "use server";
 
-  const cookieStore = await cookies();
-  const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
-
-  if (token) {
-    try {
-      const payload = await verifyAdminToken(token);
-      await revokeAdminSession(payload.sid);
-    } catch {
-      // Ignore invalid or expired tokens and continue logout cleanup.
-    }
+  // Revoke the session in Laravel (best-effort), then delete the cookie on this
+  // origin. The cookie is host-only `localhost`, shared across ports, so this
+  // reliably clears it without depending on cross-origin Set-Cookie handling.
+  try {
+    await apiFetch("/api/auth/logout", { method: "POST", headers: { Accept: "application/json" } });
+  } catch {
+    // Ignore network errors and continue clearing the local session.
   }
 
+  const cookieStore = await cookies();
   cookieStore.delete(AUTH_COOKIE_NAME);
+
   redirect("/backdoor-entry");
 }
 

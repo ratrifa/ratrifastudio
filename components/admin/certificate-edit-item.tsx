@@ -57,7 +57,7 @@ export function CertificateEditItem({ certificate, updateAction, deleteAction }:
           <Label>Issue Date</Label>
           <Input name="issueDate" type="date" defaultValue={toDateInputValue(certificate.issueDate)} required />
         </div>
-        <FileDropInput name="imageFile" label="Replace Image (optional)" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" />
+        <FileDropInput name="imageFile" label="Replace Image (optional)" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" maxBytes={2 * 1024 * 1024} />
         <div className="space-y-2 md:col-span-2">
           <Label>Credential URL</Label>
           <Input name="credentialUrl" defaultValue={certificate.credentialUrl ?? ""} />

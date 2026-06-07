@@ -2,10 +2,18 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
 
-import { isAdminSessionActive, touchAdminSession } from "@/lib/admin-session";
 import { apiErrorResponse } from "@/lib/api-error";
 import { AUTH_COOKIE_NAME, AUTH_LOGIN_PATH, verifyAdminToken } from "@/lib/auth";
 
+/**
+ * Resolve the current admin from the `rf_admin_token` cookie.
+ *
+ * The backend now lives in the Laravel API (`ratrifastudio-api`), so this app
+ * holds no database. Authentication is established by verifying the JWT
+ * signature and expiry locally with the shared `AUTH_SECRET` — purely to gate
+ * which UI is rendered. Every state-changing action is independently
+ * authorised by the Laravel API, which checks the session is still active.
+ */
 export async function getCurrentAdmin() {
   try {
     const cookieStore = await cookies();
@@ -15,20 +23,9 @@ export async function getCurrentAdmin() {
     }
 
     const payload = await verifyAdminToken(token);
-    if (payload.role !== "ADMIN") {
+    if (payload.role !== "ADMIN" || !payload.sid) {
       return null;
     }
-
-    if (!payload.sid) {
-      return null;
-    }
-
-    const hasActiveSession = await isAdminSessionActive(payload.sid);
-    if (!hasActiveSession) {
-      return null;
-    }
-
-    await touchAdminSession(payload.sid);
 
     return payload;
   } catch {
@@ -49,48 +46,14 @@ type ApiAdminAuthResult =
   | { ok: false; response: NextResponse };
 
 export async function requireAdminApi(): Promise<ApiAdminAuthResult> {
-  try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
+  const admin = await getCurrentAdmin();
 
-    if (!token) {
-      return {
-        ok: false,
-        response: apiErrorResponse({ code: "AUTH_UNAUTHORIZED", message: "Unauthorized", status: 401 }),
-      };
-    }
-
-    const payload = await verifyAdminToken(token);
-
-    if (payload.role !== "ADMIN") {
-      return {
-        ok: false,
-        response: apiErrorResponse({ code: "AUTH_FORBIDDEN", message: "Forbidden", status: 403 }),
-      };
-    }
-
-    if (!payload.sid) {
-      return {
-        ok: false,
-        response: apiErrorResponse({ code: "AUTH_UNAUTHORIZED", message: "Unauthorized", status: 401 }),
-      };
-    }
-
-    const hasActiveSession = await isAdminSessionActive(payload.sid);
-    if (!hasActiveSession) {
-      return {
-        ok: false,
-        response: apiErrorResponse({ code: "AUTH_UNAUTHORIZED", message: "Unauthorized", status: 401 }),
-      };
-    }
-
-    await touchAdminSession(payload.sid);
-
-    return { ok: true, admin: payload };
-  } catch {
+  if (!admin) {
     return {
       ok: false,
       response: apiErrorResponse({ code: "AUTH_UNAUTHORIZED", message: "Unauthorized", status: 401 }),
     };
   }
+
+  return { ok: true, admin };
 }

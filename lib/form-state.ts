@@ -1,4 +1,4 @@
-export type FormStatus = "idle" | "success" | "error";
+export type FormStatus = "idle" | "success" | "error" | "session_expired";
 
 export interface FormState {
   status: FormStatus;

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useActionState } from "react";
 
 import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
@@ -47,7 +48,19 @@ export function ProjectEditItem({ project, updateAction, deleteAction }: Project
           <Label>Description</Label>
           <Textarea name="description" defaultValue={project.description} required />
         </div>
-        <FileDropInput name="imageFile" label="Replace Image (optional)" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" />
+        <div className="space-y-2">
+          {project.imageUrl ? (
+            <div className="space-y-1">
+              <Label>Current Image</Label>
+              <div className="relative h-28 w-full overflow-hidden rounded-md border border-border bg-muted">
+                <Image src={project.imageUrl} alt={project.title} fill className="object-cover" sizes="400px" unoptimized />
+              </div>
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">Belum ada gambar.</p>
+          )}
+          <FileDropInput name="imageFile" label={project.imageUrl ? "Ganti Image (opsional)" : "Upload Image (opsional)"} accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" maxBytes={2 * 1024 * 1024} />
+        </div>
         <div className="space-y-2">
           <Label>Demo Link</Label>
           <Input name="link" defaultValue={project.link ?? ""} />

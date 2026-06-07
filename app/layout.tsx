@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Fira_Code } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/theme-provider";
-import { cleanupPrisma, prisma } from "@/lib/prisma";
-import { normalizeHeroContent } from "@/lib/hero-content";
+import { apiGet } from "@/lib/api-server";
+import type { HeroSectionContent } from "@/lib/hero-content";
 import "./globals.css";
 
 const inter = Inter({
@@ -19,21 +19,8 @@ const firaCode = Fira_Code({
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 async function getSiteIcon() {
-  try {
-    const heroClient = prisma as typeof prisma & {
-      heroSection: {
-        findUnique: (args: { where: { id: string } }) => Promise<Parameters<typeof normalizeHeroContent>[0]>;
-      };
-    };
-
-    const hero = await heroClient.heroSection.findUnique({ where: { id: "home" } });
-    const normalized = normalizeHeroContent(hero);
-    return normalized.domainLogoUrl ?? normalized.avatarUrl ?? "/images/hero-avatar.jpg";
-  } catch {
-    return "/images/hero-avatar.jpg";
-  } finally {
-    await cleanupPrisma();
-  }
+  const hero = await apiGet<HeroSectionContent>("/api/hero");
+  return hero?.domainLogoUrl ?? hero?.avatarUrl ?? "/images/hero-avatar.jpg";
 }
 
 export async function generateMetadata(): Promise<Metadata> {
