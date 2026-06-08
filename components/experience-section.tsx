@@ -1,13 +1,20 @@
 "use client";
 
-import { Briefcase, MapPin, ChevronDown, ImageIcon } from "lucide-react";
-import { BubbleBackground } from "@/components/animate-ui/components/backgrounds/bubble";
-import { Badge } from "@/components/ui/badge";
+import { MapPin, ChevronDown, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EXPERIENCE_TYPE_LABELS, normalizeExperienceType, type ExperienceTypeValue } from "@/lib/experience-types";
 import { useState } from "react";
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { PhotoLightbox } from "@/components/photo-lightbox";
+
+function shortHash(seed: string) {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash << 5) - hash + seed.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(16).slice(0, 7).padEnd(7, "0");
+}
 
 export interface Experience {
   id: string;
@@ -50,143 +57,117 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
 
   return (
     <section id="experience" className="relative overflow-hidden py-24">
-      <BubbleBackground
-        interactive={true}
-        className="absolute inset-0 z-0 opacity-30 bg-transparent mask-[linear-gradient(to_bottom,transparent_0%,white_16%,white_84%,transparent_100%)]"
-        colors={{
-          first: "94,23,235",
-          second: "139,92,246",
-          third: "59,130,246",
-          fourth: "124,58,237",
-          fifth: "99,102,241",
-          sixth: "168,85,247",
-        }}
-      />
-
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         {/* Section header */}
-        <div className="flex flex-col gap-3 mb-14">
-          <div className="flex items-center gap-3">
-            <span className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/10 text-primary border border-primary/20">
-              <Briefcase size={16} />
-            </span>
-            <span className="text-primary font-mono text-sm tracking-widest uppercase">Experience</span>
-          </div>
+        <div className="flex flex-col gap-3 mb-10">
+          <p className="font-mono text-xs text-muted-foreground">{"// career.log"}</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground text-balance">Where I&apos;ve worked</h2>
           <p className="text-muted-foreground max-w-lg leading-relaxed">Perjalanan karir gue di dunia web development — dari masa belajar sampai terlibat dalam proyek-proyek nyata yang berdampak.</p>
         </div>
 
-        {/* Experience timeline */}
+        {/* Experience log — styled like `git log`, echoes the loading-screen terminal */}
         {timelineItems.length > 0 ? (
-          <div className="relative">
-            {/* Vertical timeline line */}
-            <div className="absolute left-0 md:left-63.5 top-0 bottom-0 w-px bg-border hidden md:block" aria-hidden="true" />
+          <div className="rounded-md border border-border overflow-hidden">
+            <div className="flex items-center gap-3 border-b border-border bg-muted/40 px-4 py-2.5">
+              <div className="flex gap-1.5">
+                <span className="size-2.5 rounded-full bg-[#ff5f57]" />
+                <span className="size-2.5 rounded-full bg-[#febc2e]" />
+                <span className="size-2.5 rounded-full bg-[#28c840]" />
+              </div>
+              <span className="flex-1 truncate text-center font-mono text-xs text-muted-foreground">git log --reverse career</span>
+              <span className="size-2.5" aria-hidden="true" />
+            </div>
 
-            <div className="flex flex-col gap-10">
+            <div className="flex flex-col font-mono">
               {timelineItems.map((exp, idx) => {
                 const legacyType = (exp as Experience & { type?: Experience["experienceType"] }).type;
                 const resolvedType = normalizeExperienceType(exp.experienceType ?? legacyType);
+                const isPresent = !exp.period_end;
+                const hasPhotos = (exp.photos ?? []).length > 0;
+                const isExpanded = expandedId === exp.id;
 
                 return (
-                  <article key={exp.id} className="flex flex-col md:flex-row gap-4 md:gap-8 relative">
-                    {/* Period - left column on desktop */}
-                    <div className="md:w-52 md:text-right shrink-0">
-                      <time className="font-mono text-sm text-muted-foreground leading-relaxed">
+                  <article key={exp.id} className={`px-4 sm:px-5 py-4 ${idx > 0 ? "border-t border-border" : ""}`}>
+                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs">
+                      <span className={isPresent ? "text-primary" : "text-muted-foreground/70"}>
+                        commit {shortHash(exp.id)}
+                        {isPresent && <span className="ml-1.5 text-primary">(HEAD)</span>}
+                      </span>
+                      <span className="text-foreground/80 font-medium">
                         {exp.period_start}
-                        {" — "}
-                        {exp.period_end ?? <span className="text-primary font-semibold">Present</span>}
-                      </time>
+                        {" → "}
+                        {exp.period_end ?? "present"}
+                      </span>
+                      {resolvedType && <span className="text-muted-foreground/70">[{(EXPERIENCE_TYPE_LABELS[resolvedType] ?? resolvedType).toLowerCase()}]</span>}
                     </div>
 
-                    {/* Dot on timeline */}
-                    <div className="hidden md:flex items-start justify-center w-7 shrink-0 pt-0.5 relative z-10" aria-hidden="true">
-                      <span
-                        className={`w-3 h-3 rounded-xl transition-all ease-in-out duration-500 border-2 border-primary ${idx === 0 && !exp.period_end ? "bg-primary animate-pulse" : "bg-background"} ${expandedId === exp.id ? "bg-primary animate-ping" : ""}`}
-                      />
-                    </div>
+                    <div className="mt-2.5 pl-4 border-l-2 border-border">
+                      <p className="text-sm text-foreground font-semibold">
+                        {exp.role} <span className="text-muted-foreground font-normal">@ {exp.company}</span>
+                      </p>
+                      {exp.location && (
+                        <p className="text-xs text-muted-foreground/70 flex items-center gap-1.5 mt-1">
+                          <MapPin size={11} />
+                          {exp.location}
+                        </p>
+                      )}
+                      <p className="text-sm text-muted-foreground leading-relaxed mt-2 max-w-2xl">{exp.description}</p>
 
-                    {/* Content */}
-                    <div className="flex-1 bg-card/20 backdrop-blur-xs rounded-xl border border-border hover:border-primary/30 transition-colors overflow-hidden">
-                      <div className="w-full p-5 flex flex-col gap-3 transition-colors">
-                        <div className="flex flex-wrap items-start justify-between gap-3">
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-foreground text-base">{exp.role}</h3>
-                            <p className="text-muted-foreground text-sm flex items-center gap-1.5 mt-0.5">
-                              {exp.company}
-                              {exp.location && (
-                                <>
-                                  <span aria-hidden="true">·</span>
-                                  <MapPin size={12} />
-                                  {exp.location}
-                                </>
-                              )}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {resolvedType && (
-                              <Badge variant="secondary" className="text-xs font-mono bg-primary/15 text-muted-foreground border border-primary/35 dark:bg-primary/20 dark:border-primary/45">
-                                {EXPERIENCE_TYPE_LABELS[resolvedType] ?? resolvedType}
-                              </Badge>
-                            )}
-                            {(exp.photos ?? []).length > 0 && (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setExpandedId(expandedId === exp.id ? null : exp.id);
-                                }}
-                                aria-expanded={expandedId === exp.id}
-                                aria-controls={`photos-${exp.id}`}
-                                className={`p-0.5 rounded-md transition-all duration-300 ease-in-out text-muted-foreground cursor-pointer hover:bg-primary/70`}
-                              >
-                                <ChevronDown size={18} className={`transition-all duration-300 ease-in-out ${expandedId === exp.id ? "rotate-180" : ""}`}></ChevronDown>
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                        <p className="text-muted-foreground text-sm leading-relaxed">{exp.description}</p>
-                      </div>
+                      {hasPhotos && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => setExpandedId(isExpanded ? null : exp.id)}
+                            aria-expanded={isExpanded}
+                            aria-controls={`photos-${exp.id}`}
+                            className={`flex items-center gap-1.5 text-xs font-medium transition-colors mt-3 cursor-pointer ${
+                              isExpanded ? "text-primary" : "text-primary/80 hover:text-primary"
+                            }`}
+                          >
+                            <ImageIcon size={14} />
+                            {(exp.photos ?? []).length} photo{(exp.photos ?? []).length > 1 ? "s" : ""} attached
+                            <ChevronDown size={14} className={`transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} />
+                          </button>
 
-                      {/* Photos gallery - animated container (controlled by chevron button) */}
-                      {(exp.photos ?? []).length > 0 && (
-                        <div
-                          id={`photos-${exp.id}`}
-                          aria-hidden={expandedId !== exp.id}
-                          className={`px-5 transition-all duration-300 ease-in-out overflow-hidden ${expandedId === exp.id ? "max-h-96 pb-5 opacity-100" : "max-h-0 py-0 opacity-0"}`}
-                        >
-                          <div className="flex items-center justify-between mb-3">
-                            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Dokumentasi Foto ({(exp.photos ?? []).length})</p>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setLightboxExpId(exp.id);
-                                setLightboxPhotoIndex(0);
-                                setLightboxOpen(true);
-                              }}
-                              className="text-xs text-primary hover:text-white hover:bg-primary/10"
-                            >
-                              <ImageIcon size={14} className="mr-1" />
-                              See Photos
-                            </Button>
-                          </div>
-                          <div className="flex gap-2 overflow-x-auto pb-1 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-                            {(exp.photos ?? []).map((photo, photoIdx) => (
-                              <button
-                                key={photo.id}
+                          <div
+                            id={`photos-${exp.id}`}
+                            aria-hidden={!isExpanded}
+                            className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? "max-h-44 opacity-100 mt-3" : "max-h-0 opacity-0"}`}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <p className="text-[11px] text-muted-foreground/70 uppercase tracking-wider">Dokumentasi</p>
+                              <Button
+                                variant="ghost"
+                                size="sm"
                                 onClick={() => {
                                   setLightboxExpId(exp.id);
-                                  setLightboxPhotoIndex(photoIdx);
+                                  setLightboxPhotoIndex(0);
                                   setLightboxOpen(true);
                                 }}
-                                className="group relative h-50 w-50 shrink-0 snap-start overflow-hidden rounded-lg border border-border bg-muted cursor-pointer transition-all hover:border-primary/50 hover:shadow-lg hover:ring-2 hover:ring-primary/30 sm:h-32 sm:w-32 md:h-36 md:w-36"
-                                aria-label={`View photo ${photoIdx + 1} of ${(exp.photos ?? []).length}`}
+                                className="h-auto py-1 text-xs text-primary hover:text-primary hover:bg-primary/10"
                               >
-                                <ImageWithFallback src={photo.imageUrl} alt={photo.caption || "Dokumentasi"} fill className="object-cover transition-transform group-hover:scale-105" sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw" />
-                              </button>
-                            ))}
+                                <ImageIcon size={13} className="mr-1" />
+                                See all
+                              </Button>
+                            </div>
+                            <div className="flex gap-2 overflow-x-auto pb-1 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                              {(exp.photos ?? []).map((photo, photoIdx) => (
+                                <button
+                                  key={photo.id}
+                                  onClick={() => {
+                                    setLightboxExpId(exp.id);
+                                    setLightboxPhotoIndex(photoIdx);
+                                    setLightboxOpen(true);
+                                  }}
+                                  className="group relative h-28 w-28 shrink-0 snap-start overflow-hidden rounded-md border border-border bg-muted cursor-pointer transition-all hover:border-primary/50"
+                                  aria-label={`View photo ${photoIdx + 1} of ${(exp.photos ?? []).length}`}
+                                >
+                                  <ImageWithFallback src={photo.imageUrl} alt={photo.caption || "Dokumentasi"} fill className="object-cover grayscale-[40%] transition-all duration-300 group-hover:grayscale-0 group-hover:scale-105" sizes="112px" />
+                                </button>
+                              ))}
+                            </div>
                           </div>
-                        </div>
+                        </>
                       )}
                     </div>
                   </article>

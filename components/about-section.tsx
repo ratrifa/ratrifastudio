@@ -1,135 +1,58 @@
-import { BrainCircuit, Briefcase, Code2, Database, Globe, Layers3, Monitor, Palette, Rocket, Shield, Smartphone, Sparkles, Server, Terminal, Users, Wrench } from "lucide-react";
-
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { DotPattern } from "@/components/ui/dot-pattern";
 import { defaultAboutContent, type AboutSectionContent } from "@/lib/about-content";
-import { ABOUT_SKILL_ICON_DEFAULT, type AboutSkillIconKey } from "@/lib/about-skill-icons";
-
-const SKILL_ICONS: Record<AboutSkillIconKey, typeof Code2> = {
-  code: Code2,
-  server: Server,
-  palette: Palette,
-  users: Users,
-  layers: Layers3,
-  wrench: Wrench,
-  sparkles: Sparkles,
-  globe: Globe,
-  database: Database,
-  monitor: Monitor,
-  smartphone: Smartphone,
-  terminal: Terminal,
-  shield: Shield,
-  rocket: Rocket,
-  brain: BrainCircuit,
-  briefcase: Briefcase,
-};
 
 interface AboutSectionProps {
   content?: AboutSectionContent;
   previewAsBanner?: boolean;
 }
 
-function chunkSkills<T>(items: T[], chunkSize: number) {
-  const chunks: T[][] = [];
-
-  for (let index = 0; index < items.length; index += chunkSize) {
-    chunks.push(items.slice(index, index + chunkSize));
-  }
-
-  return chunks;
-}
-
 export function AboutSection({ content = defaultAboutContent, previewAsBanner = false }: AboutSectionProps) {
   const sectionClasses = previewAsBanner ? "relative overflow-hidden py-16 bg-background" : "relative overflow-hidden py-24 bg-background";
-  const shouldUseSkillCarousel = content.skills.length > 5;
-  const skillSlides = chunkSkills(content.skills, 1);
 
   return (
     <section id={previewAsBanner ? undefined : "about"} className={sectionClasses}>
-      <DotPattern className="text-primary/40 mask-[radial-gradient(ellipse_at_center,white_45%,transparent_85%)]" width={20} height={20} cx={1.2} cy={1.2} cr={1.2} glow={false} />
       <div className="relative z-10 max-w-6xl mx-auto px-6">
-        <div className="grid md:grid-cols-2 gap-16 items-start">
+        <div className="grid md:grid-cols-[minmax(0,1fr)_320px] gap-16 items-start">
+          {/* Left: narrative */}
           <div className="flex flex-col gap-6">
-            <div className="flex items-center gap-3">
-              <span className="h-px w-8 bg-primary" />
-              <span className="text-primary font-mono text-sm tracking-widest uppercase">About Me</span>
-            </div>
+            <p className="font-mono text-sm text-muted-foreground">
+              <span className="text-primary">{"//"}</span> About me
+            </p>
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground text-balance">{content.headline}</h2>
-            <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{content.paragraph}</p>
+            <p className="text-muted-foreground leading-relaxed whitespace-pre-line max-w-xl">{content.paragraph}</p>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 pt-4">
+            <dl className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-6 pt-6 mt-2 border-t border-border max-w-xl">
               {content.stats.map((stat, index) => (
-                <div key={`${stat.label}-${index}`} className="text-center p-4 rounded-xl bg-card border border-border">
-                  <p className="text-2xl font-bold text-primary">{stat.value}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
+                <div key={`${stat.label}-${index}`}>
+                  <dt className="text-xs text-muted-foreground">{stat.label}</dt>
+                  <dd className="text-2xl font-bold text-foreground font-mono mt-1">{stat.value}</dd>
                 </div>
               ))}
-            </div>
+            </dl>
           </div>
 
-          {shouldUseSkillCarousel ? (
-            <div className="relative h-full flex items-center justify-center md:min-h-105">
-              <Carousel opts={{ align: "start" }} className="w-full max-w-85">
-                <CarouselContent className="ml-0">
-                  {skillSlides.map((skillsGroup, groupIndex) => (
-                    <CarouselItem key={`skills-slide-${groupIndex}`} className="pl-0 flex items-center justify-center">
-                      <div className="grid grid-cols-1 gap-4 py-2 w-full">
-                        {skillsGroup.map(({ title, items, icon }, index) => {
-                          const Icon = SKILL_ICONS[icon ?? ABOUT_SKILL_ICON_DEFAULT] ?? SKILL_ICONS[ABOUT_SKILL_ICON_DEFAULT];
-
-                          return (
-                            <div key={`${title}-${groupIndex}-${index}`} className="mx-auto my-2 w-3/4 bg-card border border-border rounded-xl p-5 hover:border-primary/30 transition-colors">
-                              <div className="flex items-center gap-2 mb-4">
-                                <span className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/10 text-primary border border-primary/20">
-                                  <Icon size={15} />
-                                </span>
-                                <h3 className="font-semibold text-sm text-foreground">{title}</h3>
-                              </div>
-                              <ul className="flex flex-col gap-2">
-                                {items.map((item, itemIndex) => (
-                                  <li key={`${item}-${itemIndex}`} className="text-xs text-muted-foreground flex items-center gap-2">
-                                    <span className="w-1 h-1 rounded-full bg-primary shrink-0" />
-                                    {item}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious className="left-0" />
-                <CarouselNext className="right-0" />
-              </Carousel>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-4">
-              {content.skills.map(({ title, items, icon }, index) => {
-                const Icon = SKILL_ICONS[icon ?? ABOUT_SKILL_ICON_DEFAULT] ?? SKILL_ICONS[ABOUT_SKILL_ICON_DEFAULT];
-
-                return (
-                  <div key={`${title}-${index}`} className="bg-card/0 backdrop-blur-xs border border-border rounded-xl p-5 hover:border-primary/30 transition-colors">
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/10 text-primary border border-primary/20">
-                        <Icon size={15} />
+          {/* Right: skill manifest, styled like a config/log readout */}
+          <div className="font-mono text-sm">
+            <p className="text-xs text-muted-foreground mb-4">{"// stack.toml"}</p>
+            <ul className="flex flex-col">
+              {content.skills.map(({ title, items }, index) => (
+                <li key={`${title}-${index}`} className={`py-4 ${index > 0 ? "border-t border-border" : ""}`}>
+                  <p className="text-foreground text-xs uppercase tracking-wider">
+                    <span className="text-primary">{"["}</span>
+                    {title}
+                    <span className="text-primary">{"]"}</span>
+                  </p>
+                  <p className="text-muted-foreground text-xs leading-relaxed mt-2">
+                    {items.map((item, itemIndex) => (
+                      <span key={`${item}-${itemIndex}`}>
+                        {itemIndex > 0 && <span className="text-border"> · </span>}
+                        {item}
                       </span>
-                      <h3 className="font-semibold text-sm text-foreground">{title}</h3>
-                    </div>
-                    <ul className="flex flex-col gap-2">
-                      {items.map((item, itemIndex) => (
-                        <li key={`${item}-${itemIndex}`} className="text-xs text-muted-foreground flex items-center gap-2">
-                          <span className="w-1 h-1 rounded-full bg-primary shrink-0" />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+                    ))}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </section>

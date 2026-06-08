@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { Mail, Phone, MapPin, Github, Linkedin, Twitter, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { NeonGradientCard } from "@/components/ui/neon-gradient-card";
 import { Spinner } from "@/components/ui/spinner";
 import { defaultHeroContent } from "@/lib/hero-content";
 import { useState } from "react";
@@ -55,35 +54,28 @@ export function ContactSection({ social }: { social?: { githubUrl?: string | nul
         <div className="grid md:grid-cols-2 gap-16 items-start">
           {/* Left */}
           <div className="flex flex-col gap-6">
-            <div className="flex items-center gap-3">
-              <span className="h-px w-8 bg-primary" />
-              <span className="text-primary font-mono text-sm tracking-widest uppercase">Contact</span>
-            </div>
+            <p className="font-mono text-sm text-muted-foreground">
+              <span className="text-primary">{"//"}</span> Contact
+            </p>
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground text-balance">Let&apos;s work together</h2>
             <p className="text-muted-foreground leading-relaxed">Gue selalu terbuka untuk kesempatan baru, kolaborasi project, atau sekadar ngobrol soal teknologi. Feel free to reach out!</p>
 
-            <div className="flex flex-col gap-4 mt-2">
-              <a href={`mailto:${CONTACT_EMAIL}`} className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors group">
-                <span className="flex items-center justify-center w-9 h-9 rounded-md bg-secondary border border-border group-hover:border-primary/40 transition-colors">
-                  <Mail size={15} className="text-primary" />
-                </span>
+            <div className="flex flex-col gap-3.5 mt-2 font-mono text-sm">
+              <a href={`mailto:${CONTACT_EMAIL}`} className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
+                <Mail size={15} className="text-primary shrink-0" strokeWidth={1.75} />
                 {CONTACT_EMAIL}
               </a>
-              <a href="tel:+6281234567890" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors group">
-                <span className="flex items-center justify-center w-9 h-9 rounded-md bg-secondary border border-border group-hover:border-primary/40 transition-colors">
-                  <Phone size={15} className="text-primary" />
-                </span>
+              <a href="tel:+6281234567890" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
+                <Phone size={15} className="text-primary shrink-0" strokeWidth={1.75} />
                 +62 821-7721-3800
               </a>
               <div className="flex items-center gap-3 text-muted-foreground">
-                <span className="flex items-center justify-center w-9 h-9 rounded-md bg-secondary border border-border">
-                  <MapPin size={15} className="text-primary" />
-                </span>
+                <MapPin size={15} className="text-primary shrink-0" strokeWidth={1.75} />
                 Bandung, Indonesia
               </div>
             </div>
 
-            <div className="flex items-center gap-4 pt-4">
+            <div className="flex items-center gap-5 pt-2">
               {socialLinks.map(({ icon: Icon, href, label }) => (
                 <a
                   key={label}
@@ -91,17 +83,28 @@ export function ContactSection({ social }: { social?: { githubUrl?: string | nul
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="flex items-center justify-center w-9 h-9 rounded-md bg-secondary border border-border text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors"
+                  className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  <Icon size={16} />
+                  <Icon size={18} strokeWidth={1.75} />
                 </a>
               ))}
             </div>
           </div>
 
           {/* Right: Form */}
-          <NeonGradientCard borderSize={2} borderRadius={20} neonColors={{ firstColor: "#5e17eb", secondColor: "#38bdf8" }} className="w-full">
-            <form onSubmit={handleContactSubmit} className="flex flex-col gap-4">
+          <div className="w-full overflow-hidden rounded-xl border border-border bg-card shadow-xl shadow-black/5">
+            {/* macOS-style title bar, echoes the splash terminal */}
+            <div className="flex items-center gap-3 border-b border-border bg-muted/40 px-4 py-2.5">
+              <div className="flex gap-1.5">
+                <span className="size-2.5 rounded-full bg-[#ff5f57]" />
+                <span className="size-2.5 rounded-full bg-[#febc2e]" />
+                <span className="size-2.5 rounded-full bg-[#28c840]" />
+              </div>
+              <span className="flex-1 truncate text-center font-mono text-xs text-muted-foreground">new-message.tsx</span>
+              <span className="size-2.5" aria-hidden="true" />
+            </div>
+
+            <form onSubmit={handleContactSubmit} className="flex flex-col gap-4 p-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="contact-name" className="text-xs font-medium text-muted-foreground">
@@ -170,7 +173,7 @@ export function ContactSection({ social }: { social?: { githubUrl?: string | nul
               </Button>
               {submitState.message ? <p className={`text-xs ${submitState.status === "error" ? "text-destructive" : "text-muted-foreground"}`}>{submitState.message}</p> : null}
             </form>
-          </NeonGradientCard>
+          </div>
         </div>
       </div>
     </section>

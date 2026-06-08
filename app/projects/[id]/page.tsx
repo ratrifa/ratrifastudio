@@ -5,6 +5,7 @@
  * dari GitHub API (stateless, pakai server token — tidak menyentuh database).
  */
 
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { apiGet } from "@/lib/api-server";
@@ -85,9 +86,9 @@ export default async function ProjectDetailPage({ params }: PageProps) {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         {/* Back link */}
         <div className="mb-6 sm:mb-8">
-          <a href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
             ← Back to Projects
-          </a>
+          </Link>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px] xl:gap-10">
