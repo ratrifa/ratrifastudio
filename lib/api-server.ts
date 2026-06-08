@@ -26,17 +26,37 @@ export async function apiFetch(path: string, init: RequestInit = {}): Promise<Re
 /**
  * GET JSON from the API. Returns `null` on any failure so server components can
  * degrade gracefully instead of throwing.
+ *
+ * Transient failures (network errors, timeouts, 5xx) get one retry before
+ * giving up — a single blip from the API shouldn't surface as a placeholder.
+ * Client errors (4xx) return immediately since retrying won't change them.
  */
+const GET_TIMEOUT_MS = 5000;
+const GET_RETRIES = 1;
+
 export async function apiGet<T>(path: string): Promise<T | null> {
-  try {
-    const res = await apiFetch(path, { method: "GET", headers: { Accept: "application/json" } });
-    if (!res.ok) {
-      return null;
+  for (let attempt = 0; attempt <= GET_RETRIES; attempt++) {
+    try {
+      const res = await apiFetch(path, {
+        method: "GET",
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(GET_TIMEOUT_MS),
+      });
+
+      if (res.ok) {
+        return (await res.json()) as T;
+      }
+
+      console.error(`[apiGet] ${path} responded ${res.status} (attempt ${attempt + 1}/${GET_RETRIES + 1})`);
+      if (res.status < 500) {
+        return null;
+      }
+    } catch (err) {
+      console.error(`[apiGet] ${path} failed (attempt ${attempt + 1}/${GET_RETRIES + 1}):`, err);
     }
-    return (await res.json()) as T;
-  } catch {
-    return null;
   }
+
+  return null;
 }
 
 /**

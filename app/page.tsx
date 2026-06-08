@@ -10,6 +10,7 @@ import type { Project } from "@/components/project-card";
 import type { Experience } from "@/components/experience-section";
 import type { Certificate } from "@/components/certificate-section";
 import { PageTransition } from "@/components/page-transition";
+import { SplashGate } from "@/components/splash-gate";
 import { apiGet } from "@/lib/api-server";
 import { defaultHeroContent, type HeroSectionContent } from "@/lib/hero-content";
 import { defaultAboutContent, type AboutSectionContent } from "@/lib/about-content";
@@ -101,33 +102,35 @@ export default async function Home() {
   const aboutContent = about ?? defaultAboutContent;
 
   return (
-    <PageTransition>
-      <main className="min-h-screen bg-background text-foreground">
-        <Navbar domainLabel={heroContent.domainLabel} domainLogoUrl={heroContent.domainLogoUrl} />
-        <HeroSection content={heroContent} />
-        <AboutSection content={aboutContent} />
-        <ProjectsSection projects={projects} />
-        <ExperienceSection experiences={experiences} />
-        <CertificateSection certificates={certificates} />
-        <ContactSection
-          social={{
-            githubUrl: heroContent.githubUrl,
-            linkedinUrl: heroContent.linkedinUrl,
-            twitterUrl: heroContent.twitterUrl,
-          }}
-        />
-        <Footer
-          social={{
-            githubUrl: heroContent.githubUrl,
-            linkedinUrl: heroContent.linkedinUrl,
-            twitterUrl: heroContent.twitterUrl,
-          }}
-          brand={{
-            domainLabel: heroContent.domainLabel,
-            domainLogoUrl: heroContent.domainLogoUrl,
-          }}
-        />
-      </main>
-    </PageTransition>
+    <SplashGate>
+      <PageTransition>
+        <main className="min-h-screen bg-background text-foreground">
+          <Navbar domainLabel={heroContent.domainLabel} domainLogoUrl={heroContent.domainLogoUrl} />
+          <HeroSection content={heroContent} />
+          <AboutSection content={aboutContent} />
+          <ProjectsSection projects={projects} />
+          <ExperienceSection experiences={experiences} />
+          <CertificateSection certificates={certificates} />
+          <ContactSection
+            social={{
+              githubUrl: heroContent.githubUrl,
+              linkedinUrl: heroContent.linkedinUrl,
+              twitterUrl: heroContent.twitterUrl,
+            }}
+          />
+          <Footer
+            social={{
+              githubUrl: heroContent.githubUrl,
+              linkedinUrl: heroContent.linkedinUrl,
+              twitterUrl: heroContent.twitterUrl,
+            }}
+            brand={{
+              domainLabel: heroContent.domainLabel,
+              domainLogoUrl: heroContent.domainLogoUrl,
+            }}
+          />
+        </main>
+      </PageTransition>
+    </SplashGate>
   );
 }
