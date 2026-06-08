@@ -127,7 +127,7 @@ export function MultiFileDropInput({ id, name, label, accept, helperText, maxFil
       <input
         ref={inputRef}
         id={inputId}
-        name={name}
+        name={`${name}[]`}
         type="file"
         accept={accept}
         multiple
