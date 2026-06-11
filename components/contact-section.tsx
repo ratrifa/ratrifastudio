@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
-import { Mail, Phone, MapPin, Github, Linkedin, Twitter, ArrowUpRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Phone, MapPin, Github, Linkedin, Twitter, ArrowUpRight } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
+import { SectionHeading, AccentWords } from "@/components/section-heading";
+import { Reveal } from "@/components/ui/reveal";
 import { defaultHeroContent } from "@/lib/hero-content";
 import { useState } from "react";
 
@@ -18,6 +18,11 @@ const buildSocialLinks = (social?: { githubUrl?: string | null; linkedinUrl?: st
     source.twitterUrl ? { icon: Twitter, href: source.twitterUrl, label: "Twitter" } : null,
   ].filter(Boolean) as Array<{ icon: typeof Github; href: string; label: string }>;
 };
+
+const fieldClass =
+  "w-full rounded-none border-0 border-b border-border bg-transparent px-0 py-3 text-base text-foreground placeholder:text-muted-foreground/50 transition-colors focus:border-primary focus:outline-none";
+
+const labelClass = "font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground";
 
 export function ContactSection({ social }: { social?: { githubUrl?: string | null; linkedinUrl?: string | null; twitterUrl?: string | null } }) {
   const socialLinks = buildSocialLinks(social);
@@ -49,104 +54,77 @@ export function ContactSection({ social }: { social?: { githubUrl?: string | nul
   };
 
   return (
-    <section id="contact" className="py-24 bg-background">
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="grid md:grid-cols-2 gap-16 items-start">
-          {/* Left */}
-          <div className="flex flex-col gap-6">
-            <p className="font-mono text-sm text-muted-foreground">
-              <span className="text-primary">{"//"}</span> Contact
-            </p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground text-balance">Let&apos;s work together</h2>
-            <p className="text-muted-foreground leading-relaxed">Gue selalu terbuka untuk kesempatan baru, kolaborasi project, atau sekadar ngobrol soal teknologi. Feel free to reach out!</p>
+    <section id="contact" className="bg-background py-24 sm:py-32">
+      <div className="mx-auto max-w-6xl px-6">
+        <SectionHeading
+          index="05"
+          label="Contact"
+          title={<AccentWords text="Let's work together" />}
+          description="Gue selalu terbuka untuk kesempatan baru, kolaborasi project, atau sekadar ngobrol soal teknologi. Feel free to reach out!"
+        />
 
-            <div className="flex flex-col gap-3.5 mt-2 font-mono text-sm">
-              <a href={`mailto:${CONTACT_EMAIL}`} className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
-                <Mail size={15} className="text-primary shrink-0" strokeWidth={1.75} />
-                {CONTACT_EMAIL}
-              </a>
-              <a href="tel:+6281234567890" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
-                <Phone size={15} className="text-primary shrink-0" strokeWidth={1.75} />
+        <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
+          {/* Left */}
+          <Reveal className="lg:col-span-5">
+            <a
+              href={`mailto:${CONTACT_EMAIL}`}
+              className="font-display text-2xl font-semibold tracking-tight text-foreground underline decoration-primary/40 decoration-2 underline-offset-8 transition-colors break-all hover:decoration-primary sm:text-3xl"
+            >
+              {CONTACT_EMAIL}
+            </a>
+
+            <div className="mt-8 space-y-3 font-mono text-sm text-muted-foreground">
+              <a href="tel:+6282177213800" className="flex items-center gap-3 transition-colors hover:text-primary">
+                <Phone className="size-4 shrink-0 text-primary" strokeWidth={1.75} />
                 +62 821-7721-3800
               </a>
-              <div className="flex items-center gap-3 text-muted-foreground">
-                <MapPin size={15} className="text-primary shrink-0" strokeWidth={1.75} />
+              <div className="flex items-center gap-3">
+                <MapPin className="size-4 shrink-0 text-primary" strokeWidth={1.75} />
                 Bandung, Indonesia
               </div>
             </div>
 
-            <div className="flex items-center gap-5 pt-2">
+            <div className="mt-8 flex flex-wrap gap-3">
               {socialLinks.map(({ icon: Icon, href, label }) => (
                 <a
                   key={label}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={label}
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
                 >
-                  <Icon size={18} strokeWidth={1.75} />
+                  <Icon className="size-4" strokeWidth={1.75} />
+                  {label}
                 </a>
               ))}
             </div>
-          </div>
+          </Reveal>
 
           {/* Right: Form */}
-          <div className="w-full overflow-hidden rounded-xl border border-border bg-card shadow-xl shadow-black/5">
-            {/* macOS-style title bar, echoes the splash terminal */}
-            <div className="flex items-center gap-3 border-b border-border bg-muted/40 px-4 py-2.5">
-              <div className="flex gap-1.5">
-                <span className="size-2.5 rounded-full bg-[#ff5f57]" />
-                <span className="size-2.5 rounded-full bg-[#febc2e]" />
-                <span className="size-2.5 rounded-full bg-[#28c840]" />
-              </div>
-              <span className="flex-1 truncate text-center font-mono text-xs text-muted-foreground">new-message.tsx</span>
-              <span className="size-2.5" aria-hidden="true" />
-            </div>
-
-            <form onSubmit={handleContactSubmit} className="flex flex-col gap-4 p-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="contact-name" className="text-xs font-medium text-muted-foreground">
+          <Reveal delay={0.1} className="lg:col-span-7">
+            <form onSubmit={handleContactSubmit} className="space-y-8">
+              <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="contact-name" className={labelClass}>
                     Name
                   </label>
-                  <input
-                    id="contact-name"
-                    name="name"
-                    type="text"
-                    placeholder="Your Name"
-                    required
-                    className="bg-secondary border border-border rounded-md px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-colors"
-                  />
+                  <input id="contact-name" name="name" type="text" placeholder="Your Name" required className={fieldClass} />
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="contact-email" className="text-xs font-medium text-muted-foreground">
+                <div>
+                  <label htmlFor="contact-email" className={labelClass}>
                     Email
                   </label>
-                  <input
-                    id="contact-email"
-                    name="email"
-                    type="email"
-                    placeholder="you@email.com"
-                    required
-                    className="bg-secondary border border-border rounded-md px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-colors"
-                  />
+                  <input id="contact-email" name="email" type="email" placeholder="you@email.com" required className={fieldClass} />
                 </div>
               </div>
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="contact-subject" className="text-xs font-medium text-muted-foreground">
+              <div>
+                <label htmlFor="contact-subject" className={labelClass}>
                   Subject
                 </label>
-                <input
-                  id="contact-subject"
-                  name="subject"
-                  type="text"
-                  placeholder="What's this about?"
-                  className="bg-secondary border border-border rounded-md px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-colors"
-                />
+                <input id="contact-subject" name="subject" type="text" placeholder="What's this about?" className={fieldClass} />
               </div>
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="contact-message" className="text-xs font-medium text-muted-foreground">
+              <div>
+                <label htmlFor="contact-message" className={labelClass}>
                   Message
                 </label>
                 <textarea
@@ -155,25 +133,33 @@ export function ContactSection({ social }: { social?: { githubUrl?: string | nul
                   rows={5}
                   placeholder="Tell me about your project or idea..."
                   required
-                  className="bg-secondary border border-border rounded-md px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-colors resize-none"
+                  className={`${fieldClass} resize-none`}
                 />
               </div>
-              <Button type="submit" disabled={submitState.status === "loading"} className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 mt-2">
-                {submitState.status === "loading" ? (
-                  <span className="inline-flex items-center gap-2">
-                    <Spinner className="size-4" />
-                    Sending...
-                  </span>
-                ) : (
-                  <>
-                    Send Message
-                    <ArrowUpRight size={15} />
-                  </>
-                )}
-              </Button>
-              {submitState.message ? <p className={`text-xs ${submitState.status === "error" ? "text-destructive" : "text-muted-foreground"}`}>{submitState.message}</p> : null}
+              <div>
+                <button
+                  type="submit"
+                  disabled={submitState.status === "loading"}
+                  className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition-all hover:gap-3 hover:opacity-90 disabled:pointer-events-none disabled:opacity-60"
+                >
+                  {submitState.status === "loading" ? (
+                    <span className="inline-flex items-center gap-2">
+                      <Spinner className="size-4" />
+                      Sending...
+                    </span>
+                  ) : (
+                    <>
+                      Send Message
+                      <ArrowUpRight className="size-4" />
+                    </>
+                  )}
+                </button>
+                {submitState.message ? (
+                  <p className={`mt-3 text-xs ${submitState.status === "error" ? "text-destructive" : "text-muted-foreground"}`}>{submitState.message}</p>
+                ) : null}
+              </div>
             </form>
-          </div>
+          </Reveal>
         </div>
       </div>
     </section>

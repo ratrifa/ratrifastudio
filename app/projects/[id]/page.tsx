@@ -6,6 +6,7 @@
  */
 
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { apiGet } from "@/lib/api-server";
@@ -82,12 +83,16 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
   return (
     <PageTransition>
-    <div className="min-h-screen py-8 sm:py-10 lg:py-12">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+    <div className="min-h-screen py-12 sm:py-16">
+      <div className="mx-auto max-w-6xl px-6">
         {/* Back link */}
         <div className="mb-6 sm:mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-            ← Back to Projects
+          <Link
+            href="/"
+            className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-full border border-border px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          >
+            <ArrowLeft className="size-4" aria-hidden />
+            Back
           </Link>
         </div>
 
@@ -118,7 +123,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             {project.githubUrl && <CommitHistoryViewer commits={commits} error={commitError} repoUrl={project.githubUrl} totalCommits={totalCommits} />}
 
             {!project.githubUrl && (
-              <div className="rounded-lg border-2 border-dashed border-border bg-muted/50 p-6 sm:p-8 text-center">
+              <div className="rounded-xl border border-dashed border-border bg-muted/50 p-6 sm:p-8 text-center">
                 <p className="text-sm text-muted-foreground">GitHub repository tidak dikonfigurasi untuk project ini.</p>
               </div>
             )}

@@ -2,10 +2,8 @@
 
 /**
  * Project Detail Techstack Component
- * Display technology stack sebagai badges
+ * Display technology stack sebagai chips
  */
-
-import { Badge } from "@/components/ui/badge";
 
 interface ProjectDetailTechstackProps {
   techStack: string[];
@@ -19,13 +17,18 @@ export function ProjectDetailTechstack({
   }
 
   return (
-    <div className="space-y-3">
-      <h2 className="text-lg font-semibold">Tech Stack</h2>
+    <div className="space-y-4">
+      <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
+        Tech Stack
+      </h2>
       <div className="flex flex-wrap gap-2">
         {techStack.map((tech) => (
-          <Badge key={tech} variant="outline" className="text-sm">
+          <span
+            key={tech}
+            className="rounded-full border border-border px-3 py-1 font-mono text-xs text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
+          >
             {tech}
-          </Badge>
+          </span>
         ))}
       </div>
     </div>

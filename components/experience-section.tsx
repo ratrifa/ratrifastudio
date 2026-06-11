@@ -6,15 +6,8 @@ import { EXPERIENCE_TYPE_LABELS, normalizeExperienceType, type ExperienceTypeVal
 import { useState } from "react";
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { PhotoLightbox } from "@/components/photo-lightbox";
-
-function shortHash(seed: string) {
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    hash = (hash << 5) - hash + seed.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash).toString(16).slice(0, 7).padEnd(7, "0");
-}
+import { SectionHeading, AccentWords } from "@/components/section-heading";
+import { Reveal } from "@/components/ui/reveal";
 
 export interface Experience {
   id: string;
@@ -56,62 +49,50 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
   ];
 
   return (
-    <section id="experience" className="relative overflow-hidden py-24">
-      <div className="relative z-10 max-w-6xl mx-auto px-6">
-        {/* Section header */}
-        <div className="flex flex-col gap-3 mb-10">
-          <p className="font-mono text-xs text-muted-foreground">{"// career.log"}</p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground text-balance">Where I&apos;ve worked</h2>
-          <p className="text-muted-foreground max-w-lg leading-relaxed">Perjalanan karir gue di dunia web development — dari masa belajar sampai terlibat dalam proyek-proyek nyata yang berdampak.</p>
-        </div>
+    <section id="experience" className="py-24 sm:py-32">
+      <div className="mx-auto max-w-6xl px-6">
+        <SectionHeading
+          index="03"
+          label="Experience"
+          title={<AccentWords text="Where I've been" />}
+          description="Rekam jejak gua, mulai dari organisasi dan volunteer semasa kuliah sampai pengalaman kerja nyata di industri."
+        />
 
-        {/* Experience log — styled like `git log`, echoes the loading-screen terminal */}
         {timelineItems.length > 0 ? (
-          <div className="rounded-md border border-border overflow-hidden">
-            <div className="flex items-center gap-3 border-b border-border bg-muted/40 px-4 py-2.5">
-              <div className="flex gap-1.5">
-                <span className="size-2.5 rounded-full bg-[#ff5f57]" />
-                <span className="size-2.5 rounded-full bg-[#febc2e]" />
-                <span className="size-2.5 rounded-full bg-[#28c840]" />
-              </div>
-              <span className="flex-1 truncate text-center font-mono text-xs text-muted-foreground">git log --reverse career</span>
-              <span className="size-2.5" aria-hidden="true" />
-            </div>
+          <ol>
+            {timelineItems.map((exp, idx) => {
+              const legacyType = (exp as Experience & { type?: Experience["experienceType"] }).type;
+              const resolvedType = normalizeExperienceType(exp.experienceType ?? legacyType);
+              const isPresent = !exp.period_end;
+              const hasPhotos = (exp.photos ?? []).length > 0;
+              const isExpanded = expandedId === exp.id;
 
-            <div className="flex flex-col font-mono">
-              {timelineItems.map((exp, idx) => {
-                const legacyType = (exp as Experience & { type?: Experience["experienceType"] }).type;
-                const resolvedType = normalizeExperienceType(exp.experienceType ?? legacyType);
-                const isPresent = !exp.period_end;
-                const hasPhotos = (exp.photos ?? []).length > 0;
-                const isExpanded = expandedId === exp.id;
-
-                return (
-                  <article key={exp.id} className={`px-4 sm:px-5 py-4 ${idx > 0 ? "border-t border-border" : ""}`}>
-                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs">
-                      <span className={isPresent ? "text-primary" : "text-muted-foreground/70"}>
-                        commit {shortHash(exp.id)}
-                        {isPresent && <span className="ml-1.5 text-primary">(HEAD)</span>}
-                      </span>
-                      <span className="text-foreground/80 font-medium">
-                        {exp.period_start}
-                        {" → "}
-                        {exp.period_end ?? "present"}
-                      </span>
-                      {resolvedType && <span className="text-muted-foreground/70">[{(EXPERIENCE_TYPE_LABELS[resolvedType] ?? resolvedType).toLowerCase()}]</span>}
+              return (
+                <li key={exp.id} className="border-t border-border">
+                  <Reveal delay={Math.min(idx * 0.06, 0.3)} className="grid gap-3 py-10 sm:grid-cols-[200px_1fr] sm:gap-10">
+                    {/* Period + type */}
+                    <div>
+                      <p className="font-mono text-sm text-muted-foreground">
+                        {exp.period_start} — {isPresent ? <span className="font-medium text-primary">Now</span> : exp.period_end}
+                      </p>
+                      {resolvedType && (
+                        <p className="mt-2 w-fit rounded-full border border-border px-2.5 py-0.5 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                          {EXPERIENCE_TYPE_LABELS[resolvedType] ?? resolvedType}
+                        </p>
+                      )}
                     </div>
 
-                    <div className="mt-2.5 pl-4 border-l-2 border-border">
-                      <p className="text-sm text-foreground font-semibold">
-                        {exp.role} <span className="text-muted-foreground font-normal">@ {exp.company}</span>
-                      </p>
+                    {/* Role + details */}
+                    <div>
+                      <h3 className="font-display text-xl font-semibold tracking-tight text-foreground sm:text-2xl">{exp.role}</h3>
+                      <p className="mt-1 text-sm text-muted-foreground">{exp.company}</p>
                       {exp.location && (
-                        <p className="text-xs text-muted-foreground/70 flex items-center gap-1.5 mt-1">
-                          <MapPin size={11} />
+                        <p className="mt-2 flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
+                          <MapPin className="size-3.5" />
                           {exp.location}
                         </p>
                       )}
-                      <p className="text-sm text-muted-foreground leading-relaxed mt-2 max-w-2xl">{exp.description}</p>
+                      <p className="mt-3 max-w-2xl leading-relaxed text-muted-foreground">{exp.description}</p>
 
                       {hasPhotos && (
                         <>
@@ -120,22 +101,23 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
                             onClick={() => setExpandedId(isExpanded ? null : exp.id)}
                             aria-expanded={isExpanded}
                             aria-controls={`photos-${exp.id}`}
-                            className={`flex items-center gap-1.5 text-xs font-medium transition-colors mt-3 cursor-pointer ${
-                              isExpanded ? "text-primary" : "text-primary/80 hover:text-primary"
+                            className={`group mt-4 inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium transition-colors ${
+                              isExpanded ? "text-primary" : "text-muted-foreground hover:text-primary"
                             }`}
                           >
-                            <ImageIcon size={14} />
+                            <ImageIcon className="size-4" />
                             {(exp.photos ?? []).length} photo{(exp.photos ?? []).length > 1 ? "s" : ""} attached
-                            <ChevronDown size={14} className={`transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} />
+                            <ChevronDown className={`size-4 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} />
                           </button>
 
                           <div
                             id={`photos-${exp.id}`}
                             aria-hidden={!isExpanded}
-                            className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? "max-h-44 opacity-100 mt-3" : "max-h-0 opacity-0"}`}
+                            inert={!isExpanded}
+                            className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? "mt-4 max-h-44 opacity-100" : "max-h-0 opacity-0"}`}
                           >
-                            <div className="flex items-center justify-between mb-2">
-                              <p className="text-[11px] text-muted-foreground/70 uppercase tracking-wider">Dokumentasi</p>
+                            <div className="mb-2 flex items-center justify-between">
+                              <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Dokumentasi</p>
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -144,9 +126,9 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
                                   setLightboxPhotoIndex(0);
                                   setLightboxOpen(true);
                                 }}
-                                className="h-auto py-1 text-xs text-primary hover:text-primary hover:bg-primary/10"
+                                className="h-auto cursor-pointer py-1 text-xs text-primary hover:bg-primary/10 hover:text-primary"
                               >
-                                <ImageIcon size={13} className="mr-1" />
+                                <ImageIcon className="size-3.5" />
                                 See all
                               </Button>
                             </div>
@@ -159,10 +141,10 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
                                     setLightboxPhotoIndex(photoIdx);
                                     setLightboxOpen(true);
                                   }}
-                                  className="group relative h-28 w-28 shrink-0 snap-start overflow-hidden rounded-md border border-border bg-muted cursor-pointer transition-all hover:border-primary/50"
+                                  className="group relative h-24 w-32 shrink-0 cursor-pointer snap-start overflow-hidden rounded-lg border border-border bg-muted transition-colors hover:border-primary/50"
                                   aria-label={`View photo ${photoIdx + 1} of ${(exp.photos ?? []).length}`}
                                 >
-                                  <ImageWithFallback src={photo.imageUrl} alt={photo.caption || "Dokumentasi"} fill className="object-cover grayscale-[40%] transition-all duration-300 group-hover:grayscale-0 group-hover:scale-105" sizes="112px" />
+                                  <ImageWithFallback src={photo.imageUrl} alt={photo.caption || "Dokumentasi"} fill className="object-cover grayscale-[30%] transition-all duration-700 group-hover:scale-[1.03] group-hover:grayscale-0" sizes="128px" />
                                 </button>
                               ))}
                             </div>
@@ -170,13 +152,13 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
                         </>
                       )}
                     </div>
-                  </article>
-                );
-              })}
-            </div>
-          </div>
+                  </Reveal>
+                </li>
+              );
+            })}
+          </ol>
         ) : (
-          <p className="text-muted-foreground text-center py-16">No experience entries yet.</p>
+          <p className="py-16 text-center text-muted-foreground">No experience entries yet.</p>
         )}
       </div>
 

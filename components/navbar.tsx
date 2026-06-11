@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Menu, X, Code2 } from "lucide-react";
+import { motion } from "motion/react";
+import { Menu, Code2 } from "lucide-react";
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { defaultHeroContent } from "@/lib/hero-content";
-import { Backlight } from "./ui/backlight";
 
 const NAV_LINKS = [
   { label: "Home", href: "#home" },
@@ -87,35 +87,41 @@ export function Navbar({ domainLabel = defaultHeroContent.domainLabel, domainLog
     return brandLabel;
   };
 
+  const brandLogo = domainLogoUrl ? (
+    <span className="relative flex size-8 items-center justify-center overflow-hidden rounded-full bg-transparent">
+      <ImageWithFallback src={domainLogoUrl} alt={`${brandLabel} logo`} fill className="object-contain p-1" sizes="32px" />
+    </span>
+  ) : (
+    <span className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+      <Code2 size={16} />
+    </span>
+  );
+
   return (
-    <header className={cn("fixed top-0 mx-auto max-w-6xl left-0 right-0 z-50 transition-all rounded-md  duration-400 ease-in-out", scrolled ? "bg-background/5 top-4 backdrop-blur-xs border rounded-4xl border-background/15 shadow-sm" : "bg-transparent")}>
-      <nav className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3" aria-label="Main navigation">
-        {/* Logo */}
+    <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4">
+      <nav
+        className={cn(
+          "flex items-center gap-1 rounded-full border px-2 py-1.5 transition-all duration-300",
+          scrolled ? "border-border bg-background/75 shadow-lg shadow-black/5 backdrop-blur-md" : "border-transparent bg-transparent"
+        )}
+        aria-label="Main navigation"
+      >
+        {/* Brand */}
         <a
           href="#home"
           onClick={(e) => {
             e.preventDefault();
             handleNavClick("#home");
           }}
-          className="flex items-center gap-2 group"
+          className="flex cursor-pointer items-center gap-2 pl-1 pr-2"
           aria-label="Go to home"
         >
-          <Backlight className="rounded-md" blur={7}>
-            {domainLogoUrl ? (
-              <span className="relative flex items-center justify-center w-8 h-8 rounded-md overflow-hidden bg-transparent">
-                <ImageWithFallback src={domainLogoUrl} alt={`${brandLabel} logo`} fill className="object-contain p-1" sizes="32px" />
-              </span>
-            ) : (
-              <span className="flex items-center justify-center w-8 h-8 rounded-md bg-primary text-primary-foreground">
-                <Code2 size={16} />
-              </span>
-            )}
-          </Backlight>
-          <span className="font-mono font-semibold text-foreground text-sm tracking-tight leading-none">{renderBrandLabel()}</span>
+          {brandLogo}
+          <span className="font-mono text-sm font-semibold leading-none tracking-tight text-foreground">{renderBrandLabel()}</span>
         </a>
 
-        {/* Desktop nav */}
-        <ul className="hidden md:flex items-center gap-1" role="list">
+        {/* Desktop links */}
+        <ul className="hidden items-center md:flex" role="list">
           {NAV_LINKS.map((link) => {
             const id = link.href.replace("#", "");
             const isActive = activeSection === id;
@@ -127,47 +133,41 @@ export function Navbar({ domainLabel = defaultHeroContent.domainLabel, domainLog
                     e.preventDefault();
                     handleNavClick(link.href);
                   }}
-                  className={cn("relative px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-150", isActive ? "text-primary" : "text-muted-foreground hover:text-foreground")}
+                  className={cn(
+                    "relative block cursor-pointer rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors",
+                    isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                  )}
                   aria-current={isActive ? "page" : undefined}
                 >
-                  {link.label}
-                  {isActive && <span className="absolute bottom-0.5 left-3 right-3 h-px bg-primary rounded-full" />}
+                  {isActive && <motion.span layoutId="nav-pill" className="absolute inset-0 rounded-full bg-secondary" />}
+                  <span className="relative z-10">{link.label}</span>
                 </a>
               </li>
             );
           })}
         </ul>
 
-        {/* CTA Desktop */}
-        <div className="hidden md:flex items-center gap-2">
+        {/* Divider */}
+        <span aria-hidden className="mx-1 hidden h-5 w-px bg-border md:block" />
+
+        <div className="hidden items-center md:flex">
           <ThemeToggle />
         </div>
 
-        {/* Mobile hamburger */}
+        {/* Mobile menu */}
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="md:hidden text-foreground" aria-label="Open mobile menu">
+            <Button variant="ghost" size="icon" className="rounded-full text-foreground md:hidden" aria-label="Open mobile menu">
               <Menu size={20} />
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="bg-card border-border w-72 flex flex-col pt-12">
-            <SheetClose className="absolute right-4 top-4 text-muted-foreground hover:text-foreground transition-colors">
-            </SheetClose>
-
-            <div className="flex mx-auto items-center gap-2 mb-5">
-              {domainLogoUrl ? (
-                <span className="relative flex items-center justify-center w-8 h-8 rounded-md overflow-hidden bg-transparent">
-                  <ImageWithFallback src={domainLogoUrl} alt={`${brandLabel} logo`} fill className="object-contain p-1" sizes="32px" />
-                </span>
-              ) : (
-                <span className="flex items-center justify-center w-8 h-8 rounded-md bg-primary text-primary-foreground">
-                  <Code2 size={16} />
-                </span>
-              )}
-              <span className="font-mono font-semibold text-sm leading-none">{renderBrandLabel()}</span>
+          <SheetContent side="right" className="flex w-72 flex-col border-border bg-background px-6 pt-12">
+            <div className="flex items-center gap-2">
+              {brandLogo}
+              <span className="font-mono text-sm font-semibold leading-none tracking-tight">{renderBrandLabel()}</span>
             </div>
 
-            <ul className="flex flex-col items-center gap-1" role="list">
+            <ul className="mt-10 flex flex-1 flex-col gap-2" role="list">
               {NAV_LINKS.map((link) => {
                 const id = link.href.replace("#", "");
                 const isActive = activeSection === id;
@@ -175,17 +175,22 @@ export function Navbar({ domainLabel = defaultHeroContent.domainLabel, domainLog
                   <li key={link.href}>
                     <button
                       onClick={() => handleNavClick(link.href)}
-                      className={cn("min-w-[200px] px-5 py-4 rounded-full text-md font-medium transition-colors", isActive ? "bg-primary/20 text-white" : "text-muted-foreground hover:text-foreground hover:bg-secondary")}
+                      className={cn(
+                        "cursor-pointer font-display text-2xl font-semibold tracking-tight transition-colors",
+                        isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                      )}
+                      aria-current={isActive ? "page" : undefined}
                     >
                       {link.label}
                     </button>
                   </li>
                 );
               })}
-              <li >
-                <ThemeToggle></ThemeToggle>
-              </li>
             </ul>
+
+            <div className="mb-6 border-t border-border pt-6">
+              <ThemeToggle />
+            </div>
           </SheetContent>
         </Sheet>
       </nav>

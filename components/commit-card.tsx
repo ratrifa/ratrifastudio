@@ -7,9 +7,7 @@
 
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, Copy } from "lucide-react";
+import { ArrowUpRight, Check } from "lucide-react";
 import { Commit } from "@/lib/commit-types";
 import { useCallback, useState } from "react";
 
@@ -34,7 +32,7 @@ export function CommitCard({ commit }: CommitCardProps) {
   const relativeTime = getRelativeTime(commit.date);
 
   return (
-    <div className="rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors p-4">
+    <div className="p-4 transition-colors hover:bg-secondary/40">
       <div className="flex gap-3">
         {/* Avatar */}
         <Avatar className="h-10 w-10 flex-shrink-0">
@@ -56,7 +54,7 @@ export function CommitCard({ commit }: CommitCardProps) {
           {/* Author & Timestamp */}
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-semibold text-sm">{commit.author.name}</span>
-            <span className="text-xs text-muted-foreground">{relativeTime}</span>
+            <span className="font-mono text-xs text-muted-foreground">{relativeTime}</span>
           </div>
 
           {/* Commit message */}
@@ -72,30 +70,27 @@ export function CommitCard({ commit }: CommitCardProps) {
           )}
 
           {/* Meta: SHA & Actions */}
-          <div className="flex items-center gap-2 mt-3 flex-wrap">
-            {/* SHA Badge (clickable untuk copy) */}
-            <Badge
-              variant="outline"
-              className="font-mono border-0 text-xs cursor-pointer hover:bg-accent"
+          <div className="flex items-center gap-3 mt-3 flex-wrap">
+            {/* SHA chip (clickable untuk copy) */}
+            <button
+              type="button"
               onClick={handleCopySha}
               title="Click untuk copy full SHA"
+              className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-border px-2.5 py-0.5 font-mono text-[11px] text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
             >
               {commit.shortSha}
-              {copied && <Check className="ml-1 h-3 w-3" />}
-            </Badge>
-
-            
+              {copied && <Check className="size-3" aria-hidden />}
+            </button>
 
             {/* GitHub Link */}
-            <Link href={commit.htmlUrl} target="_blank" rel="noopener noreferrer">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 px-2 text-xs gap-1"
-              >
-                View on GitHub
-                <ExternalLink className="h-3 w-3" />
-              </Button>
+            <Link
+              href={commit.htmlUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
+            >
+              View on GitHub
+              <ArrowUpRight className="size-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
             </Link>
           </div>
         </div>
@@ -125,22 +120,4 @@ function getRelativeTime(date: Date): string {
     month: "short",
     day: "numeric",
   });
-}
-
-// Icon untuk check mark saat copy
-function Check(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  );
 }

@@ -1,15 +1,8 @@
 "use client";
 
-import { ImageWithFallback } from "@/components/ui/image-with-fallback";
-import { Mail, Phone, MapPin, Github, Linkedin, Twitter, Code2, ArrowUpRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { NeonGradientCard } from "@/components/ui/neon-gradient-card";
-import { Spinner } from "@/components/ui/spinner";
+import { Github, Linkedin, Twitter, ArrowUp } from "lucide-react";
+import { Reveal } from "@/components/ui/reveal";
 import { defaultHeroContent } from "@/lib/hero-content";
-import { useState } from "react";
-import { ContactSection } from "@/components/contact-section";
-
-const CONTACT_EMAIL = "satriafebriandanu@gmail.com";
 
 const buildSocialLinks = (social?: { githubUrl?: string | null; linkedinUrl?: string | null; twitterUrl?: string | null }) => {
   const source = social ?? defaultHeroContent;
@@ -46,7 +39,6 @@ interface FooterBrandProps {
 export function Footer({ social, brand }: { social?: FooterSocialProps; brand?: FooterBrandProps }) {
   const socialLinks = buildSocialLinks(social);
   const brandLabel = brand?.domainLabel?.trim() || defaultHeroContent.domainLabel;
-  const domainLogoUrl = brand?.domainLogoUrl ?? defaultHeroContent.domainLogoUrl;
 
   const renderBrandLabel = () => {
     const dotIndex = brandLabel.lastIndexOf(".");
@@ -68,38 +60,27 @@ export function Footer({ social, brand }: { social?: FooterSocialProps; brand?: 
   };
 
   return (
-    <>
-      <footer className="bg-card border-t border-border py-10">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
-            {/* Brand */}
-            <div className="col-span-2 md:col-span-1 flex flex-col gap-3">
-              <a
-                href="#home"
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollTo("#home");
-                }}
-                className="flex items-center gap-2"
-                aria-label="Go to home"
-              >
-                {domainLogoUrl ? (
-                  <span className="relative flex items-center justify-center w-8 h-8 rounded-md overflow-hidden bg-transparent">
-                    <ImageWithFallback src={domainLogoUrl} alt={`${brandLabel} logo`} fill className="object-contain p-1" sizes="32px" />
-                  </span>
-                ) : (
-                  <span className="flex items-center justify-center w-8 h-8 rounded-md bg-primary text-primary-foreground">
-                    <Code2 size={16} />
-                  </span>
-                )}
-                <span className="font-mono font-semibold text-sm text-foreground">{renderBrandLabel()}</span>
-              </a>
-              <p className="text-xs text-muted-foreground leading-relaxed">Building modern web experiences with passion and precision.</p>
-            </div>
+    <footer className="border-t border-border pt-16 pb-8">
+      <div className="mx-auto max-w-6xl px-6">
+        {/* Blok 1 — wordmark raksasa */}
+        <Reveal>
+          <a
+            href="#home"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollTo("#home");
+            }}
+            aria-label="Go to home"
+            className="block w-fit font-display font-semibold tracking-[-0.04em] leading-[0.95] text-[clamp(2.75rem,11vw,8.5rem)] text-foreground select-none"
+          >
+            {renderBrandLabel()}
+          </a>
+        </Reveal>
 
-            {/* Quick links */}
-            <nav aria-label="Footer navigation" className="flex flex-col gap-2">
-              <p className="text-xs font-semibold text-foreground uppercase tracking-widest mb-1">Quick Links</p>
+        {/* Blok 2 — quick links + social */}
+        <Reveal delay={0.1}>
+          <div className="mt-12 flex flex-wrap items-center justify-between gap-6">
+            <nav aria-label="Footer navigation" className="flex flex-wrap gap-x-6 gap-y-2">
               {QUICK_LINKS.map((link) => (
                 <a
                   key={link.label}
@@ -108,44 +89,46 @@ export function Footer({ social, brand }: { social?: FooterSocialProps; brand?: 
                     e.preventDefault();
                     scrollTo(link.href);
                   }}
-                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {link.label}
                 </a>
               ))}
             </nav>
 
-            {/* Social */}
-            <div className="flex flex-col gap-2">
-              <p className="text-xs font-semibold text-foreground uppercase tracking-widest mb-1">Social</p>
+            <div className="flex items-center gap-3">
               {socialLinks.map(({ icon: Icon, href, label }) => (
-                <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
-                  <Icon size={13} />
-                  {label}
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="flex size-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
+                >
+                  <Icon className="size-4" />
                 </a>
               ))}
             </div>
-
-            {/* Contact short */}
-            <div className="flex flex-col gap-2">
-              <p className="text-xs font-semibold text-foreground uppercase tracking-widest mb-1">Get In Touch</p>
-              <a href={`mailto:${CONTACT_EMAIL}`} className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5">
-                <Mail size={11} />
-                {CONTACT_EMAIL}
-              </a>
-              <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <MapPin size={11} />
-                Bandung, Indonesia
-              </span>
-            </div>
           </div>
+        </Reveal>
 
-          <div className="pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()} ratrifa. All rights reserved.</p>
-            <p className="text-xs text-muted-foreground font-mono">Built with React &amp; Tailwind CSS</p>
+        {/* Blok 3 — legal */}
+        <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6">
+          <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()} ratrifa &mdash; Bandung, Indonesia</p>
+          <div className="flex items-center gap-4">
+            <p className="font-mono text-xs text-muted-foreground">Built with Next.js &amp; Tailwind</p>
+            <button
+              type="button"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              aria-label="Back to top"
+              className="flex size-9 cursor-pointer items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
+            >
+              <ArrowUp className="size-4" />
+            </button>
           </div>
         </div>
-      </footer>
-    </>
+      </div>
+    </footer>
   );
 }

@@ -6,7 +6,6 @@
  */
 
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
-import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ImageZoom } from "./animate-ui/primitives/effects/image-zoom";
 
@@ -34,45 +33,45 @@ export function ProjectDetailHeader({
     <div className="space-y-6">
       {/* Project Image */}
       {imageUrl && (
-        <div className="relative w-full h-96 rounded-lg overflow-hidden bg-muted">
+        <div className="relative h-96 w-full overflow-hidden rounded-xl border border-border bg-muted">
           <ImageZoom>
-          <ImageWithFallback
-            src={imageUrl}
-            alt={title}
-            fill
-            className="object-cover w-full h-full"
-            priority
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 80vw"
-          />
+            <ImageWithFallback
+              src={imageUrl}
+              alt={title}
+              fill
+              className="h-full w-full object-cover"
+              priority
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 80vw"
+            />
           </ImageZoom>
-          
         </div>
       )}
 
       {/* Content */}
       <div className="space-y-4">
         {/* Title */}
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+        <h1 className="font-display text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl">
           {title}
         </h1>
 
         {/* Description */}
-        <p className="text-lg text-muted-foreground leading-relaxed">
+        <p className="text-lg leading-relaxed text-muted-foreground">
           {description}
         </p>
 
-        {/* Metadata Badges */}
-        <div className="flex items-center gap-2 flex-wrap pt-2">
-          <Badge variant="secondary" className="text-xs">
-            Created: {formattedCreatedDate}
-          </Badge>
+        {/* Metadata */}
+        <p className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-2 font-mono text-xs text-muted-foreground">
+          <span>Created: {formattedCreatedDate}</span>
 
           {formattedUpdatedDate && (
-            <Badge variant="secondary" className="text-xs">
-              Updated: {formattedUpdatedDate}
-            </Badge>
+            <>
+              <span aria-hidden className="text-border">
+                ·
+              </span>
+              <span>Updated: {formattedUpdatedDate}</span>
+            </>
           )}
-        </div>
+        </p>
       </div>
     </div>
   );

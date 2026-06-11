@@ -6,8 +6,6 @@
  */
 
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Github, ExternalLink } from "lucide-react";
 
 interface ProjectDetailLinksProps {
@@ -25,30 +23,32 @@ export function ProjectDetailLinks({
     <div className="flex flex-wrap items-center gap-4">
       {/* Live Demo Button */}
       {demoUrl && (
-        <Link href={demoUrl} target="_blank" rel="noopener noreferrer">
-          <Button size="lg" className="gap-2">
-            <ExternalLink className="h-5 w-5" />
-            Live Demo
-          </Button>
+        <Link
+          href={demoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition-all hover:gap-3 hover:opacity-90"
+        >
+          <ExternalLink className="size-4" />
+          Live Demo
         </Link>
       )}
 
       {/* GitHub Repository Button */}
       {githubUrl && (
-        <Link href={githubUrl} target="_blank" rel="noopener noreferrer">
-          <Button
-            variant="outline"
-            size="lg"
-            className="gap-2"
-          >
-            <Github className="h-5 w-5" />
-            View Repository
-            {isPrivateRepo && (
-              <Badge variant="secondary" className="ml-2 text-xs">
-                Private
-              </Badge>
-            )}
-          </Button>
+        <Link
+          href={githubUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-full border border-border bg-transparent px-6 text-sm font-medium text-foreground transition-all hover:gap-3 hover:bg-secondary"
+        >
+          <Github className="size-4" />
+          View Repository
+          {isPrivateRepo && (
+            <span className="rounded-full bg-secondary px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Private
+            </span>
+          )}
         </Link>
       )}
     </div>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
-import { ExternalLink, Github, Eye } from "lucide-react";
+import { ArrowUpRight, ExternalLink, Github } from "lucide-react";
 
 export interface Project {
   id: string;
@@ -15,69 +15,149 @@ export interface Project {
 interface ProjectCardProps {
   project: Project;
   index?: number;
+  /** Layout featured lebar untuk projects[0] — index global tetap lewat `index`. */
+  featured?: boolean;
 }
 
-export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
+const MAX_VISIBLE_TECH = 5;
+
+function ProjectLinks({ project, className }: { project: Project; className?: string }) {
+  if (!project.demo_url && !project.repo_url) return null;
+
   return (
-    <article className="group flex flex-col">
-      {/* Image */}
-      <div className="relative w-full h-48 overflow-hidden rounded-md border border-border">
-        <ImageWithFallback src={project.image} alt={project.title} fill className="object-cover grayscale-[55%] transition-all duration-500 group-hover:grayscale-0 group-hover:scale-[1.02]" />
-        <span className="absolute top-3 left-3 font-mono text-xs text-background bg-foreground/70 backdrop-blur-sm rounded px-1.5 py-0.5">
-          {String(index + 1).padStart(2, "0")}
+    <div className={className}>
+      {project.demo_url && (
+        <a
+          href={project.demo_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Live demo of ${project.title}`}
+          className="group/link inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+        >
+          <ExternalLink className="size-4 transition-transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" />
+          Demo
+        </a>
+      )}
+      {project.repo_url && (
+        <a
+          href={project.repo_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Source code of ${project.title}`}
+          className="group/link inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+        >
+          <Github className="size-4" />
+          Code
+        </a>
+      )}
+    </div>
+  );
+}
+
+export function ProjectCard({ project, index = 0, featured = false }: ProjectCardProps) {
+  const indexLabel = String(index + 1).padStart(2, "0");
+  const detailHref = `/projects/${project.id}`;
+
+  if (featured) {
+    return (
+      <article className="group mb-20 grid items-center gap-8 lg:grid-cols-12 lg:gap-12">
+        <Link
+          href={detailHref}
+          aria-label={`View details of ${project.title}`}
+          className="relative block aspect-[16/10] overflow-hidden rounded-2xl border border-border lg:col-span-7"
+        >
+          <ImageWithFallback
+            src={project.image}
+            alt={project.title}
+            fill
+            className="object-cover grayscale-[30%] transition-all duration-700 group-hover:scale-[1.03] group-hover:grayscale-0"
+          />
+        </Link>
+
+        <div className="lg:col-span-5">
+          <p className="font-mono text-xs text-primary">{indexLabel}</p>
+          <h3 className="mt-3 font-display text-2xl font-semibold tracking-tight text-balance text-foreground sm:text-3xl">
+            <Link href={detailHref} className="transition-colors hover:text-primary">
+              {project.title}
+            </Link>
+          </h3>
+          <p className="mt-3 leading-relaxed text-muted-foreground line-clamp-3">{project.description}</p>
+
+          <ul className="mt-5 flex flex-wrap gap-2">
+            {project.tech_stack.map((tech) => (
+              <li
+                key={tech}
+                className="rounded-full border border-border px-3 py-1 font-mono text-xs text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
+              >
+                {tech}
+              </li>
+            ))}
+          </ul>
+
+          <ProjectLinks project={project} className="mt-6 flex gap-5" />
+        </div>
+      </article>
+    );
+  }
+
+  const visibleTech = project.tech_stack.slice(0, MAX_VISIBLE_TECH);
+  const extraTech = project.tech_stack.length - visibleTech.length;
+
+  return (
+    <article className="flex flex-col">
+      <Link
+        href={detailHref}
+        aria-label={`View details of ${project.title}`}
+        className="group relative block aspect-[16/11] overflow-hidden rounded-xl border border-border"
+      >
+        <ImageWithFallback
+          src={project.image}
+          alt={project.title}
+          fill
+          className="object-cover grayscale-[30%] transition-all duration-700 group-hover:scale-[1.03] group-hover:grayscale-0"
+        />
+        <span className="absolute left-3 top-3 rounded-full bg-background/70 px-2.5 py-1 font-mono text-[11px] text-foreground backdrop-blur">
+          {indexLabel}
         </span>
-      </div>
+        <span
+          aria-hidden="true"
+          className="absolute right-3 top-3 flex size-9 items-center justify-center rounded-full bg-background/80 text-foreground opacity-0 backdrop-blur transition-opacity group-hover:opacity-100"
+        >
+          <ArrowUpRight className="size-4" />
+        </span>
+      </Link>
 
-      {/* Content */}
-      <div className="flex flex-col gap-2.5 pt-4">
-        <h3 className="font-semibold text-foreground text-base leading-snug text-balance">{project.title}</h3>
-        <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3">{project.description}</p>
+      <div className="mt-5">
+        <h3 className="font-display text-xl font-semibold tracking-tight text-foreground">
+          <Link href={detailHref} className="group inline-flex items-start gap-1.5 transition-colors hover:text-primary">
+            <span className="text-balance">{project.title}</span>
+            <ArrowUpRight className="mt-1 size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </Link>
+        </h3>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-2">{project.description}</p>
 
-        {/* Tech stack */}
-        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 font-mono text-xs text-muted-foreground">
-          {project.tech_stack.map((tech, techIndex) => (
+        <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs text-muted-foreground">
+          {visibleTech.map((tech, techIndex) => (
             <span key={tech} className="flex items-center gap-2">
-              {techIndex > 0 && <span className="text-border" aria-hidden="true">/</span>}
+              {techIndex > 0 && (
+                <span className="text-border" aria-hidden="true">
+                  ·
+                </span>
+              )}
               {tech}
             </span>
           ))}
+          {extraTech > 0 && (
+            <span className="flex items-center gap-2">
+              <span className="text-border" aria-hidden="true">
+                ·
+              </span>
+              +{extraTech}
+            </span>
+          )}
         </p>
 
-        {/* Links */}
-        <div className="flex items-center gap-4 pt-2 mt-1 border-t border-border">
-          <Link
-            href={`/projects/${project.id}`}
-            aria-label={`View details of ${project.title}`}
-            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-primary transition-colors mt-3"
-          >
-            <Eye size={13} />
-            Detail
-          </Link>
-          {project.demo_url && (
-            <a
-              href={project.demo_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`Live demo of ${project.title}`}
-              className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-primary transition-colors mt-3"
-            >
-              <ExternalLink size={13} />
-              Demo
-            </a>
-          )}
-          {project.repo_url && (
-            <a
-              href={project.repo_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`Source code of ${project.title}`}
-              className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-primary transition-colors mt-3"
-            >
-              <Github size={13} />
-              Code
-            </a>
-          )}
-        </div>
+        <ProjectLinks project={project} className="mt-4 flex gap-5" />
       </div>
     </article>
   );

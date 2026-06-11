@@ -16,7 +16,7 @@ interface CommitListProps {
 export function CommitList({ commits, showAll = false }: CommitListProps) {
   if (!commits || commits.length === 0) {
     return (
-      <div className="rounded-lg border-2 border-dashed border-border bg-muted/50 p-8 text-center">
+      <div className="rounded-lg border border-dashed border-border bg-muted/50 p-8 text-center">
         <p className="text-sm text-muted-foreground">
           No commits found for this repository.
         </p>
@@ -32,10 +32,10 @@ export function CommitList({ commits, showAll = false }: CommitListProps) {
       {/* Scrollable container untuk semua commits */}
       <div className="relative group">
         {/* Gradient fade at top */}
-        <div className="absolute top-0 left-0 right-0 z-10 h-12 bg-gradient-to-b from-background to-transparent pointer-events-none " />
+        <div className="absolute top-0 left-0 right-0 z-10 h-12 bg-gradient-to-b from-card to-transparent pointer-events-none " />
 
         <div
-          className="max-h-[600px] overflow-y-auto space-y-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden pt-2"
+          className="max-h-[600px] overflow-y-auto divide-y divide-border [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden pt-2"
           style={{
             scrollBehavior: "smooth",
           }}
@@ -46,7 +46,7 @@ export function CommitList({ commits, showAll = false }: CommitListProps) {
         </div>
 
         {/* Gradient fade at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 z-10 h-12 bg-gradient-to-t from-background to-transparent pointer-events-none " />
+        <div className="absolute bottom-0 left-0 right-0 z-10 h-12 bg-gradient-to-t from-card to-transparent pointer-events-none " />
       </div>
 
       {/* Info text */}

@@ -6,9 +6,7 @@
  */
 
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ExternalLink, AlertCircle } from "lucide-react";
+import { ExternalLink, AlertCircle, ArrowUpRight } from "lucide-react";
 import { Commit } from "@/lib/commit-types";
 import { CommitList } from "./commit-list";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -32,27 +30,26 @@ export function CommitHistoryViewer({
   const githubRepoLink = repoUrl;
 
   return (
-    <Card className="w-full">
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex-1">
-            <CardTitle className="text-xl">Commit History</CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">
-              Recent commits dari repository
-            </p>
-          </div>
-
-          {/* Link ke GitHub */}
-          <Link href={githubRepoLink} target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" size="sm" className="gap-2">
-              View on GitHub
-              <ExternalLink className="h-4 w-4" />
-            </Button>
-          </Link>
+    <div className="w-full overflow-hidden rounded-xl border border-border bg-card">
+      <div className="flex items-center justify-between gap-4 border-b border-border px-5 py-4">
+        <div className="min-w-0 flex-1">
+          <h2 className="font-display text-lg font-semibold tracking-tight text-foreground">Commit History</h2>
+          <p className="mt-0.5 font-mono text-xs text-muted-foreground">Recent commits dari repository</p>
         </div>
-      </CardHeader>
 
-      <CardContent className="space-y-4">
+        {/* Link ke GitHub */}
+        <Link
+          href={githubRepoLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex h-9 shrink-0 cursor-pointer items-center gap-2 rounded-full border border-border px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+        >
+          GitHub
+          <ExternalLink className="size-4" aria-hidden />
+        </Link>
+      </div>
+
+      <div className="space-y-4 p-5">
         {/* Error State */}
         {error && (
           <Alert variant="destructive">
@@ -80,18 +77,16 @@ export function CommitHistoryViewer({
 
             {/* Info tentang total commits */}
             {totalCommits !== undefined && totalCommits > 5 && (
-              <div className="pt-2 text-center border-t border-border">
-                <p className="text-xs text-muted-foreground">
-                  Menampilkan {totalCommits} commits
-                </p>
-                <Link href={githubRepoLink} target="_blank">
-                  <Button
-                    variant="link"
-                    size="sm"
-                    className="text-xs h-6 px-0 mt-1"
-                  >
-                    View all commits on GitHub →
-                  </Button>
+              <div className="border-t border-border pt-3 text-center">
+                <p className="font-mono text-xs text-muted-foreground">Menampilkan {totalCommits} commits</p>
+                <Link
+                  href={githubRepoLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group mt-1.5 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
+                >
+                  View all commits on GitHub
+                  <ArrowUpRight className="size-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
                 </Link>
               </div>
             )}
@@ -100,13 +95,13 @@ export function CommitHistoryViewer({
 
         {/* Empty State */}
         {!isLoading && !error && commits.length === 0 && (
-          <div className="rounded-lg border-2 border-dashed border-border bg-muted/50 p-8 text-center">
+          <div className="rounded-xl border border-dashed border-border bg-muted/50 p-8 text-center">
             <p className="text-sm text-muted-foreground">
               No commits found atau repository mungkin private tanpa akses.
             </p>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

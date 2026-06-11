@@ -21,7 +21,7 @@ export interface AboutSectionContent {
 export const defaultAboutContent: AboutSectionContent = {
   headline: "Passionate about the web, obsessed with craft",
   paragraph:
-    "Gue adalah seorang web developer yang passionate dalam membangun aplikasi web modern yang tidak hanya fungsional, tapi juga memiliki user experience yang luar biasa. Gue percaya bahwa kode yang bagus adalah kode yang bisa dibaca, dimengerti, dan di-maintain.\n\nPerjalanan gue di dunia web development dimulai dari rasa penasaran terhadap bagaimana sebuah website bisa terlihat semenarik itu. Dari sana, gue terus belajar, bereksperimen, dan akhirnya bikin produk nyata yang dipakai orang beneran.\n\nDi luar coding, gue suka ngulik desain UI, baca artikel tech, dan sesekali nulis tentang pengalaman gue di blog.",
+    "Gua adalah seorang web developer yang passionate dalam membangun aplikasi web modern yang tidak hanya fungsional, tapi juga memiliki user experience yang luar biasa. Gua percaya bahwa kode yang bagus adalah kode yang bisa dibaca, dimengerti, dan di-maintain.\n\nPerjalanan gua di dunia web development dimulai dari rasa penasaran terhadap bagaimana sebuah website bisa terlihat semenarik itu. Dari sana, gua terus belajar, bereksperimen, dan akhirnya bikin produk nyata yang dipakai orang beneran.\n\nDi luar coding, gua suka ngulik desain UI, baca artikel tech, dan sesekali nulis tentang pengalaman gua di blog.",
   stats: [
     { value: "3+", label: "Years Exp." },
     { value: "20+", label: "Projects" },

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Fira_Code } from "next/font/google";
+import { Inter, JetBrains_Mono, Bricolage_Grotesque, Instrument_Serif } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/theme-provider";
 import { apiGet } from "@/lib/api-server";
@@ -11,9 +11,21 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const firaCode = Fira_Code({
+const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
-  variable: "--font-fira-code",
+  variable: "--font-jetbrains-mono",
+});
+
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-bricolage",
+});
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: "--font-instrument-serif",
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -44,7 +56,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
-      <body className={`${inter.variable} ${firaCode.variable} font-sans antialiased bg-background text-foreground`}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} ${bricolage.variable} ${instrumentSerif.variable} font-sans antialiased bg-background text-foreground`}>
         <ThemeProvider defaultTheme="dark">{children}</ThemeProvider>
         <Analytics />
       </body>
