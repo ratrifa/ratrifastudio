@@ -7,6 +7,7 @@ import { FormStateAlert } from "@/components/admin/form-state-alert";
 import { FormSubmitButton } from "@/components/admin/form-submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import type { HeroSectionContent } from "@/lib/hero-content";
@@ -46,96 +47,121 @@ export function CreateHeroForm({ action, values, onValuesChange }: CreateHeroFor
   };
 
   return (
-    <form action={formAction} className="grid gap-6 md:grid-cols-2">
-      <div className="md:col-span-2">
-        <FormStateAlert state={state} title="Save hero section" />
-      </div>
+    <form action={formAction} className="space-y-5">
+      <FormStateAlert state={state} title="Save hero section" />
 
-      <div className="md:col-span-2 rounded-lg border border-border p-4 space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="font-medium">Availability</p>
-            <p className="text-sm text-muted-foreground">Toggle status open to work di hero frontend.</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">{safeValues.openToWork ? "Open" : "Closed"}</span>
-            <Switch checked={safeValues.openToWork} onCheckedChange={(checked) => updateField("openToWork", checked)} />
-          </div>
+      {/* Availability */}
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="text-sm font-medium">Open to work</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Ditampilkan sebagai status availability di hero.</p>
         </div>
-        <input type="hidden" name="openToWork" value={safeValues.openToWork ? "true" : "false"} />
-        <input type="hidden" name="statusBadgeDetail" value={safeValues.statusBadgeDetail} />
+        <div className="flex items-center gap-2.5 shrink-0">
+          <span className="text-xs text-muted-foreground">{safeValues.openToWork ? "Open" : "Closed"}</span>
+          <Switch checked={safeValues.openToWork} onCheckedChange={(checked) => updateField("openToWork", checked)} />
+        </div>
       </div>
+      <input type="hidden" name="openToWork" value={safeValues.openToWork ? "true" : "false"} />
+      <input type="hidden" name="statusBadgeDetail" value={safeValues.statusBadgeDetail} />
 
-      <div className="md:col-span-2 grid gap-4 md:grid-cols-2 rounded-lg border border-border p-4">
-        <div className="space-y-2 md:col-span-2">
+      <Separator />
+
+      {/* Identity */}
+      <div className="space-y-3">
+        <div className="space-y-2">
           <Label htmlFor="headline">Headline</Label>
-          <Input id="headline" name="headline" value={safeValues.headline} onChange={(event) => updateField("headline", event.target.value)} required />
+          <Input id="headline" name="headline" value={safeValues.headline} onChange={(e) => updateField("headline", e.target.value)} required />
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input id="name" name="name" value={safeValues.name} onChange={(e) => updateField("name", e.target.value)} required />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="role">Role</Label>
+            <Input id="role" name="role" value={safeValues.role} onChange={(e) => updateField("role", e.target.value)} required />
+          </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="name">Name</Label>
-          <Input id="name" name="name" value={safeValues.name} onChange={(event) => updateField("name", event.target.value)} required />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="role">Role</Label>
-          <Input id="role" name="role" value={safeValues.role} onChange={(event) => updateField("role", event.target.value)} required />
-        </div>
-        <div className="space-y-2 md:col-span-2">
           <Label htmlFor="description">Description</Label>
-          <Textarea id="description" name="description" value={safeValues.description} onChange={(event) => updateField("description", event.target.value)} rows={5} required />
+          <Textarea id="description" name="description" value={safeValues.description} onChange={(e) => updateField("description", e.target.value)} rows={4} required />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="domainLabel">Domain label</Label>
-          <Input id="domainLabel" name="domainLabel" value={safeValues.domainLabel} onChange={(event) => updateField("domainLabel", event.target.value)} placeholder="yourname.dev" required />
+          <Label htmlFor="domainLabel">Domain</Label>
+          <Input id="domainLabel" name="domainLabel" value={safeValues.domainLabel} onChange={(e) => updateField("domainLabel", e.target.value)} placeholder="yourname.dev" required />
         </div>
-        <div className="space-y-2">
-          <FileDropInput id="domainLogoFile" name="domainLogoFile" label="Logo domain upload" accept="image/png,image/jpeg,image/webp,image/svg+xml" helperText="PNG/JPG/WEBP/SVG" />
-        </div>
-      </div>
-
-      <div className="md:col-span-2 grid gap-4 md:grid-cols-2 rounded-lg border border-border p-4">
-        <div className="space-y-2">
-          <FileDropInput id="avatarFile" name="avatarFile" label="Profile photo upload" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" maxBytes={2 * 1024 * 1024} />
-        </div>
-        <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="avatarAlt">Profile photo alt text</Label>
-          <Input id="avatarAlt" name="avatarAlt" value={safeValues.avatarAlt} onChange={(event) => updateField("avatarAlt", event.target.value)} required />
-        </div>
-        <div className="space-y-2 md:col-span-2">
+        <div className="flex justify-center">
           <FileDropInput
-            id="cvFile"
-            name="cvFile"
-            label="Upload CV file (optional)"
-            accept="application/pdf,.pdf,application/msword,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx"
-            helperText="PDF, DOC, DOCX (max 5MB)"
-            maxBytes={5 * 1024 * 1024}
+            id="domainLogoFile"
+            name="domainLogoFile"
+            label="Logo domain"
+            accept="image/png,image/jpeg,image/webp,image/svg+xml"
+            helperText="PNG/JPG/WEBP/SVG"
+            currentImageUrl={values.domainLogoUrl ?? undefined}
+            aspectRatio="1/1"
+            className="w-32"
           />
         </div>
       </div>
 
-      <div className="md:col-span-2 grid gap-4 md:grid-cols-2 rounded-lg border border-border p-4">
-        <div className="space-y-2 md:col-span-2">
+      <Separator />
+
+      {/* Media */}
+      <div className="space-y-3">
+        <div className="flex justify-center">
+          <FileDropInput
+            id="avatarFile"
+            name="avatarFile"
+            label="Foto profil"
+            accept="image/png,image/jpeg,image/webp"
+            helperText="PNG/JPG/WEBP, max 2MB"
+            maxBytes={2 * 1024 * 1024}
+            currentImageUrl={values.avatarUrl ?? undefined}
+            aspectRatio="4/5"
+            className="w-40"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="avatarAlt">Alt text foto profil</Label>
+          <Input id="avatarAlt" name="avatarAlt" value={safeValues.avatarAlt} onChange={(e) => updateField("avatarAlt", e.target.value)} required />
+        </div>
+        <FileDropInput
+          id="cvFile"
+          name="cvFile"
+          label="CV (opsional)"
+          accept="application/pdf,.pdf,application/msword,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx"
+          helperText="PDF, DOC, DOCX (max 5MB)"
+          maxBytes={5 * 1024 * 1024}
+        />
+      </div>
+
+      <Separator />
+
+      {/* Links & Tech */}
+      <div className="space-y-3">
+        <div className="space-y-2">
           <Label htmlFor="techTagsRaw">Tech tags</Label>
-          <Input id="techTagsRaw" name="techTagsRaw" value={safeValues.techTagsRaw} onChange={(event) => updateField("techTagsRaw", event.target.value)} placeholder="React, Next.js, TypeScript" required />
+          <Input id="techTagsRaw" name="techTagsRaw" value={safeValues.techTagsRaw} onChange={(e) => updateField("techTagsRaw", e.target.value)} placeholder="React, Next.js, TypeScript" required />
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="githubUrl">GitHub URL</Label>
-          <Input id="githubUrl" name="githubUrl" value={safeValues.githubUrl} onChange={(event) => updateField("githubUrl", event.target.value)} placeholder="https://github.com/..." />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="linkedinUrl">LinkedIn URL</Label>
-          <Input id="linkedinUrl" name="linkedinUrl" value={safeValues.linkedinUrl} onChange={(event) => updateField("linkedinUrl", event.target.value)} placeholder="https://linkedin.com/..." />
-        </div>
-        <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="twitterUrl">Twitter / X URL</Label>
-          <Input id="twitterUrl" name="twitterUrl" value={safeValues.twitterUrl} onChange={(event) => updateField("twitterUrl", event.target.value)} placeholder="https://x.com/..." />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="githubUrl">GitHub</Label>
+            <Input id="githubUrl" name="githubUrl" value={safeValues.githubUrl} onChange={(e) => updateField("githubUrl", e.target.value)} placeholder="https://github.com/..." />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="linkedinUrl">LinkedIn</Label>
+            <Input id="linkedinUrl" name="linkedinUrl" value={safeValues.linkedinUrl} onChange={(e) => updateField("linkedinUrl", e.target.value)} placeholder="https://linkedin.com/..." />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="twitterUrl">Twitter / X</Label>
+            <Input id="twitterUrl" name="twitterUrl" value={safeValues.twitterUrl} onChange={(e) => updateField("twitterUrl", e.target.value)} placeholder="https://x.com/..." />
+          </div>
         </div>
       </div>
 
-      <div className="md:col-span-2">
-        <FormSubmitButton pendingLabel="Saving hero..." className="w-full sm:w-fit">
-          Save Hero Section
-        </FormSubmitButton>
-      </div>
+      <FormSubmitButton pendingLabel="Saving hero..." className="w-full sm:w-fit">
+        Save Hero Section
+      </FormSubmitButton>
     </form>
   );
 }

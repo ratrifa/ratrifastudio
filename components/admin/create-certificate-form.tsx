@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { FormState } from "@/lib/form-state";
 import { initialFormState } from "@/lib/form-state";
+import { useFormToast } from "@/lib/use-form-toast";
 
 interface CreateCertificateFormProps {
   action: (state: FormState, formData: FormData) => Promise<FormState>;
@@ -17,6 +18,7 @@ interface CreateCertificateFormProps {
 
 export function CreateCertificateForm({ action }: CreateCertificateFormProps) {
   const [state, formAction] = useActionState(action, initialFormState);
+  useFormToast(state);
 
   return (
     <form action={formAction} className="grid gap-3 md:grid-cols-2">
@@ -35,7 +37,7 @@ export function CreateCertificateForm({ action }: CreateCertificateFormProps) {
         <Label htmlFor="issueDate">Issue Date</Label>
         <Input id="issueDate" name="issueDate" type="date" required />
       </div>
-      <FileDropInput id="imageFile" name="imageFile" label="Image Upload" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" maxBytes={2 * 1024 * 1024} />
+      <FileDropInput id="imageFile" name="imageFile" label="Image" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" maxBytes={2 * 1024 * 1024} className="md:col-span-2" aspectRatio="1/1" />
       <div className="space-y-2 md:col-span-2">
         <Label htmlFor="credentialUrl">Credential URL</Label>
         <Input id="credentialUrl" name="credentialUrl" placeholder="https://..." />

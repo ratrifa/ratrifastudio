@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { ABOUT_SKILL_ICON_OPTIONS, ABOUT_SKILL_ICON_DEFAULT, type AboutSkillIconKey } from "@/lib/about-skill-icons";
 import type { FormState } from "@/lib/form-state";
@@ -65,190 +66,187 @@ export function CreateAboutForm({ action, values, onValuesChange }: CreateAboutF
   };
 
   const updateStat = (index: number, key: keyof AboutStatFormItem, nextValue: string) => {
-    const nextStats = values.stats.map((stat, statIndex) => {
-      if (statIndex !== index) {
-        return stat;
-      }
-
-      return { ...stat, [key]: nextValue };
+    onValuesChange({
+      ...values,
+      stats: values.stats.map((stat, i) => i === index ? { ...stat, [key]: nextValue } : stat),
     });
-
-    onValuesChange({ ...values, stats: nextStats });
   };
 
   const addStat = () => {
-    if (values.stats.length >= 6) {
-      return;
-    }
-
-    onValuesChange({
-      ...values,
-      stats: [...values.stats, { value: "", label: "" }],
-    });
+    if (values.stats.length >= 6) return;
+    onValuesChange({ ...values, stats: [...values.stats, { value: "", label: "" }] });
   };
 
   const removeStat = (index: number) => {
-    onValuesChange({
-      ...values,
-      stats: values.stats.filter((_, statIndex) => statIndex !== index),
-    });
+    onValuesChange({ ...values, stats: values.stats.filter((_, i) => i !== index) });
   };
 
   const updateSkill = (index: number, key: keyof AboutSkillFormItem, nextValue: string) => {
-    const nextSkills = values.skills.map((skill, skillIndex) => {
-      if (skillIndex !== index) {
-        return skill;
-      }
-
-      return { ...skill, [key]: nextValue };
+    onValuesChange({
+      ...values,
+      skills: values.skills.map((skill, i) => i === index ? { ...skill, [key]: nextValue } : skill),
     });
-
-    onValuesChange({ ...values, skills: nextSkills });
   };
 
   const addSkill = () => {
-    if (values.skills.length >= 8) {
-      return;
-    }
-
-    onValuesChange({
-      ...values,
-      skills: [...values.skills, { title: "", icon: ABOUT_SKILL_ICON_DEFAULT, itemsRaw: "" }],
-    });
+    if (values.skills.length >= 8) return;
+    onValuesChange({ ...values, skills: [...values.skills, { title: "", icon: ABOUT_SKILL_ICON_DEFAULT, itemsRaw: "" }] });
   };
 
   const removeSkill = (index: number) => {
-    onValuesChange({
-      ...values,
-      skills: values.skills.filter((_, skillIndex) => skillIndex !== index),
-    });
+    onValuesChange({ ...values, skills: values.skills.filter((_, i) => i !== index) });
   };
 
   return (
-    <form action={formAction} className="grid gap-6 md:grid-cols-2">
-      <div className="md:col-span-2">
-        <FormStateAlert state={state} title="Save about section" />
-      </div>
+    <form action={formAction} className="space-y-5">
+      <FormStateAlert state={state} title="Save about section" />
 
-      <div className="md:col-span-2 grid gap-4 rounded-lg border border-border p-4">
+      {/* Text content */}
+      <div className="space-y-3">
         <div className="space-y-2">
           <Label htmlFor="headline">Headline</Label>
           <Input id="headline" name="headline" value={values.headline} onChange={(event) => updateField("headline", event.target.value)} required />
         </div>
-        <div className="space-y-2 md:col-span-2">
+        <div className="space-y-2">
           <Label htmlFor="paragraph">Paragraph</Label>
           <Textarea id="paragraph" name="paragraph" rows={8} value={values.paragraph} onChange={(event) => updateField("paragraph", event.target.value)} required />
         </div>
       </div>
 
-      <div className="md:col-span-2 rounded-lg border border-border p-4 space-y-4">
+      <Separator />
+
+      {/* Stats */}
+      <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <p className="font-medium">Stats</p>
-          <Button type="button" variant="outline" size="sm" onClick={addStat} disabled={values.stats.length >= 6} className="gap-2">
-            <Plus size={16} />
+          <div>
+            <p className="text-sm font-medium">Stats</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Years Exp. dan Projects otomatis. Custom stat di sini (maks 6).
+            </p>
+          </div>
+          <Button type="button" variant="outline" size="sm" onClick={addStat} disabled={values.stats.length >= 6} className="gap-1.5 shrink-0">
+            <Plus size={14} />
             Add stat
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground">Years Exp. dan Projects dihitung otomatis dari data, jadi tidak ditampilkan di form manager.</p>
-        <p className="text-xs text-muted-foreground">Isi angka/range manual untuk stat custom. Contoh: 10+</p>
-        <div className="space-y-3">
-          {values.stats.map((stat, index) => {
-            return (
-              <div key={`stat-${index}`} className="grid gap-3 md:grid-cols-[1fr_1fr_auto] items-start">
-                <div className="space-y-2">
-                  <Label htmlFor={`statValue-${index}`}>Stat Value</Label>
-                  <Input id={`statValue-${index}`} name="statValue" value={stat.value} onChange={(event) => updateStat(index, "value", event.target.value)} required />
-                  <p className="text-xs text-muted-foreground">Isi angka/range manual. Contoh: 10+</p>
+
+        {values.stats.length > 0 && (
+          <div className="space-y-2">
+            {values.stats.map((stat, index) => (
+              <div key={`stat-${index}`} className="flex items-end gap-2">
+                <div className="flex-1 space-y-1.5">
+                  <Label htmlFor={`statValue-${index}`} className="text-xs text-muted-foreground">Value</Label>
+                  <Input id={`statValue-${index}`} name="statValue" value={stat.value} onChange={(event) => updateStat(index, "value", event.target.value)} placeholder="10+" required />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor={`statLabel-${index}`}>Stat Label</Label>
-                  <Input id={`statLabel-${index}`} name="statLabel" value={stat.label} onChange={(event) => updateStat(index, "label", event.target.value)} required />
-                  <p className="text-xs opacity-0 pointer-events-none select-none" aria-hidden="true">
-                    spacer
-                  </p>
+                <div className="flex-1 space-y-1.5">
+                  <Label htmlFor={`statLabel-${index}`} className="text-xs text-muted-foreground">Label</Label>
+                  <Input id={`statLabel-${index}`} name="statLabel" value={stat.label} onChange={(event) => updateStat(index, "label", event.target.value)} placeholder="Certificates" required />
                 </div>
-                <div className="space-y-2 shrink-0">
-                  <Label className="opacity-0 pointer-events-none select-none" aria-hidden="true">
-                    Delete
-                  </Label>
-                  <Button type="button" variant="destructive" size="icon" className="shrink-0" onClick={() => removeStat(index)} aria-label={`Remove stat ${index + 1}`}>
-                    <Trash2 size={16} />
-                  </Button>
-                  <p className="text-xs opacity-0 pointer-events-none select-none" aria-hidden="true">
-                    spacer
-                  </p>
-                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={() => removeStat(index)}
+                  aria-label={`Remove stat ${index + 1}`}
+                >
+                  <Trash2 size={15} />
+                </Button>
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="md:col-span-2 rounded-lg border border-border p-4 space-y-4">
+      <Separator />
+
+      {/* Skill Cards */}
+      <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <p className="font-medium">Skill Cards</p>
-          <Button type="button" variant="outline" size="sm" onClick={addSkill} disabled={values.skills.length >= 8} className="gap-2">
-            <Plus size={16} />
+          <div>
+            <p className="text-sm font-medium">Skill Cards</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Item dipisahkan koma. Contoh: React, Next.js, TypeScript
+            </p>
+          </div>
+          <Button type="button" variant="outline" size="sm" onClick={addSkill} disabled={values.skills.length >= 8} className="gap-1.5 shrink-0">
+            <Plus size={14} />
             Add skill card
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground">Isi item skill dipisahkan koma. Contoh: React, Next.js, TypeScript</p>
-        <div className="space-y-3">
-          {values.skills.map((skill, index) => (
-            <div key={`skill-${index}`} className="grid gap-3 md:grid-cols-[180px_1fr_1fr_auto] items-start">
-              <div className="space-y-2">
-                <Label htmlFor={`skillIcon-${index}`}>Skill Card Icon</Label>
-                <Select name="skillIcon" value={skill.icon} onValueChange={(nextValue) => updateSkill(index, "icon", nextValue as AboutSkillIconKey)}>
-                  <SelectTrigger id={`skillIcon-${index}`} className="w-full">
-                    <SelectValue placeholder="Choose icon" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ABOUT_SKILL_ICON_OPTIONS.map(({ value, label }) => {
-                      const Icon = SKILL_ICON_COMPONENTS[value];
 
-                      return (
-                        <SelectItem key={value} value={value}>
-                          <span className="flex items-center gap-2">
-                            <Icon size={14} />
-                            {label}
-                          </span>
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor={`skillTitle-${index}`}>Skill Card Title</Label>
-                <Input id={`skillTitle-${index}`} name="skillTitle" value={skill.title} onChange={(event) => updateSkill(index, "title", event.target.value)} required />
-                <p className="text-xs text-muted-foreground">Contoh: Frontend, Backend, Design</p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor={`skillItems-${index}`}>Skill Card Items</Label>
-                <Input id={`skillItems-${index}`} name="skillItemsRaw" value={skill.itemsRaw} onChange={(event) => updateSkill(index, "itemsRaw", event.target.value)} placeholder="React, Next.js, TypeScript" required />
-                <p className="text-xs opacity-0 pointer-events-none select-none" aria-hidden="true">
-                  spacer
-                </p>
-              </div>
-              <div className="space-y-2 shrink-0">
-                <Label className="opacity-0 pointer-events-none select-none" aria-hidden="true">
-                  Delete
-                </Label>
-                <Button type="button" variant="destructive" size="icon" className="shrink-0" onClick={() => removeSkill(index)} aria-label={`Remove skill card ${index + 1}`}>
-                  <Trash2 size={16} />
-                </Button>
-                <p className="text-xs opacity-0 pointer-events-none select-none" aria-hidden="true">
-                  spacer
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+        {values.skills.length > 0 && (
+          <div className="space-y-2">
+            {values.skills.map((skill, index) => {
+              const Icon = SKILL_ICON_COMPONENTS[skill.icon];
+
+              return (
+                <div key={`skill-${index}`} className="rounded-md border border-border bg-muted/30 p-3 space-y-2.5">
+                  {/* Header row: icon select + title + delete */}
+                  <div className="flex items-center gap-2">
+                    <Select
+                      name="skillIcon"
+                      value={skill.icon}
+                      onValueChange={(nextValue) => updateSkill(index, "icon", nextValue as AboutSkillIconKey)}
+                    >
+                      <SelectTrigger className="size-9 shrink-0 px-0 justify-center [&>svg:last-child]:hidden">
+                        <Icon size={15} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {ABOUT_SKILL_ICON_OPTIONS.map(({ value, label }) => {
+                          const OptionIcon = SKILL_ICON_COMPONENTS[value];
+                          return (
+                            <SelectItem key={value} value={value}>
+                              <span className="flex items-center gap-2">
+                                <OptionIcon size={13} />
+                                {label}
+                              </span>
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      id={`skillTitle-${index}`}
+                      name="skillTitle"
+                      value={skill.title}
+                      onChange={(event) => updateSkill(index, "title", event.target.value)}
+                      placeholder="Category (e.g. Frontend)"
+                      className="flex-1"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => removeSkill(index)}
+                      aria-label={`Remove skill card ${index + 1}`}
+                    >
+                      <Trash2 size={15} />
+                    </Button>
+                  </div>
+                  {/* Items textarea */}
+                  <Textarea
+                    id={`skillItems-${index}`}
+                    name="skillItemsRaw"
+                    value={skill.itemsRaw}
+                    onChange={(event) => updateSkill(index, "itemsRaw", event.target.value)}
+                    placeholder="React, Next.js, TypeScript"
+                    rows={2}
+                    className="resize-none text-sm"
+                    required
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      <div className="md:col-span-2">
-        <FormSubmitButton pendingLabel="Saving about...">Save About Section</FormSubmitButton>
-      </div>
+      <Separator />
+
+      <FormSubmitButton pendingLabel="Saving about..." className="w-full sm:w-fit">Save About Section</FormSubmitButton>
     </form>
   );
 }

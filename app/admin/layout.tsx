@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { AdminNavbar } from "@/components/admin/admin-navbar";
 import { NavigationProgress } from "@/components/admin/navigation-progress";
+import { Toaster } from "@/components/ui/sonner";
 import { apiFetch } from "@/lib/api-server";
 import { AUTH_COOKIE_NAME } from "@/lib/auth";
 import { requireAdmin } from "@/lib/server-auth";
@@ -37,7 +38,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <AdminNavbar logoutAction={logoutAction} />
         </div>
       </header>
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">{children}</section>
+      <section className="w-full px-4 sm:px-6 py-6 sm:py-8">{children}</section>
+      <Toaster richColors position="top-right" />
     </main>
   );
 }

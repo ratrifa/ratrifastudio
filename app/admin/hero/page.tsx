@@ -27,7 +27,7 @@ export default async function AdminHeroPage() {
   const content = (await apiGet<HeroSectionContent>("/api/hero")) ?? defaultHeroContent;
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-screen-2xl mx-auto space-y-6">
       <div>
         <h1 className="text-xl sm:text-2xl font-bold">Hero Section Manager</h1>
         <p className="text-sm text-muted-foreground">Edit teks, avatar, CTA, dan social link yang muncul di hero frontend.</p>

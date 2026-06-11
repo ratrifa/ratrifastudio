@@ -1,6 +1,5 @@
 "use client";
 
-import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { useActionState } from "react";
 
 import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
@@ -13,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { FormState } from "@/lib/form-state";
 import { initialFormState } from "@/lib/form-state";
+import { useFormToast } from "@/lib/use-form-toast";
 
 interface ProjectEditItemProps {
   project: {
@@ -32,6 +32,8 @@ interface ProjectEditItemProps {
 export function ProjectEditItem({ project, updateAction, deleteAction }: ProjectEditItemProps) {
   const [updateState, updateFormAction] = useActionState(updateAction, initialFormState);
   const [deleteState, deleteFormAction] = useActionState(deleteAction, initialFormState);
+  useFormToast(updateState);
+  useFormToast(deleteState);
 
   return (
     <div className="space-y-3">
@@ -48,19 +50,16 @@ export function ProjectEditItem({ project, updateAction, deleteAction }: Project
           <Label>Description</Label>
           <Textarea name="description" defaultValue={project.description} required />
         </div>
-        <div className="space-y-2">
-          {project.imageUrl ? (
-            <div className="space-y-1">
-              <Label>Current Image</Label>
-              <div className="relative h-28 w-full overflow-hidden rounded-md border border-border bg-muted">
-                <ImageWithFallback src={project.imageUrl} alt={project.title} fill className="object-cover" sizes="400px" unoptimized />
-              </div>
-            </div>
-          ) : (
-            <p className="text-xs text-muted-foreground">Belum ada gambar.</p>
-          )}
-          <FileDropInput name="imageFile" label={project.imageUrl ? "Ganti Image (opsional)" : "Upload Image (opsional)"} accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" maxBytes={2 * 1024 * 1024} />
-        </div>
+        <FileDropInput
+          name="imageFile"
+          label="Image"
+          accept="image/png,image/jpeg,image/webp"
+          helperText="PNG/JPG/WEBP, max 2MB"
+          maxBytes={2 * 1024 * 1024}
+          currentImageUrl={project.imageUrl}
+          className="md:col-span-2"
+          aspectRatio="16/10"
+        />
         <div className="space-y-2">
           <Label>Demo Link</Label>
           <Input name="link" defaultValue={project.link ?? ""} />
@@ -69,7 +68,7 @@ export function ProjectEditItem({ project, updateAction, deleteAction }: Project
           <Label>GitHub Link</Label>
           <Input name="githubUrl" defaultValue={project.githubUrl ?? ""} />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2 md:col-span-2">
           <Label>Tech Stack</Label>
           <Input name="techStackRaw" defaultValue={Array.isArray(project.techStack) ? project.techStack.join(", ") : ""} required />
         </div>

@@ -17,6 +17,7 @@ import { ProjectDetailHeader } from "@/components/project-detail-header";
 import { ProjectDetailLinks } from "@/components/project-detail-links";
 import { ProjectDetailTechstack } from "@/components/project-detail-techstack";
 import { CommitHistoryViewer } from "@/components/commit-history-viewer";
+import { TrackVisit } from "@/components/track-visit";
 
 interface PageProps {
   params: Promise<{
@@ -83,6 +84,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
   return (
     <PageTransition>
+    <TrackVisit path={`/projects/${id}`} />
     <div className="min-h-screen py-12 sm:py-16">
       <div className="mx-auto max-w-6xl px-6">
         {/* Back link */}

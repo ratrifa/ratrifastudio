@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { EXPERIENCE_TYPE_LABELS, EXPERIENCE_TYPE_OPTIONS, normalizeExperienceType, type ExperienceTypeValue } from "@/lib/experience-types";
 import type { FormState } from "@/lib/form-state";
 import { initialFormState } from "@/lib/form-state";
+import { useFormToast } from "@/lib/use-form-toast";
 import { apiUrl } from "@/lib/api";
 
 interface ExperiencePhotoType {
@@ -68,6 +69,8 @@ async function deleteExperiencePhoto(photoId: string) {
 export function ExperienceEditItem({ experience, updateAction, deleteAction }: ExperienceEditItemProps) {
   const [updateState, updateFormAction] = useActionState(updateAction, initialFormState);
   const [deleteState, deleteFormAction] = useActionState(deleteAction, initialFormState);
+  useFormToast(updateState);
+  useFormToast(deleteState);
   const [deletingPhotoId, setDeletingPhotoId] = useState<string | null>(null);
   const [photos, setPhotos] = useState(experience.photos ?? []);
   const [uploadResetSignal, setUploadResetSignal] = useState(0);

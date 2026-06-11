@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { FormState } from "@/lib/form-state";
 import { initialFormState } from "@/lib/form-state";
+import { useFormToast } from "@/lib/use-form-toast";
 
 interface CertificateEditItemProps {
   certificate: {
@@ -37,6 +38,8 @@ function toDateInputValue(value: Date | string) {
 export function CertificateEditItem({ certificate, updateAction, deleteAction }: CertificateEditItemProps) {
   const [updateState, updateFormAction] = useActionState(updateAction, initialFormState);
   const [deleteState, deleteFormAction] = useActionState(deleteAction, initialFormState);
+  useFormToast(updateState);
+  useFormToast(deleteState);
 
   return (
     <div className="space-y-3">
@@ -57,7 +60,16 @@ export function CertificateEditItem({ certificate, updateAction, deleteAction }:
           <Label>Issue Date</Label>
           <Input name="issueDate" type="date" defaultValue={toDateInputValue(certificate.issueDate)} required />
         </div>
-        <FileDropInput name="imageFile" label="Replace Image (optional)" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" maxBytes={2 * 1024 * 1024} />
+        <FileDropInput
+          name="imageFile"
+          label="Image"
+          accept="image/png,image/jpeg,image/webp"
+          helperText="PNG/JPG/WEBP, max 2MB"
+          maxBytes={2 * 1024 * 1024}
+          currentImageUrl={certificate.imageUrl}
+          className="md:col-span-2"
+          aspectRatio="1/1"
+        />
         <div className="space-y-2 md:col-span-2">
           <Label>Credential URL</Label>
           <Input name="credentialUrl" defaultValue={certificate.credentialUrl ?? ""} />

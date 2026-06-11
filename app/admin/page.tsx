@@ -5,22 +5,41 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { apiGet } from "@/lib/api-server";
 import { requireAdmin } from "@/lib/server-auth";
+import { VisitAnalyticsCard } from "@/components/admin/visit-charts";
+import type { DailyVisit, TopPage } from "@/components/admin/visit-charts";
+
+interface VisitSummary {
+  total_visits: number;
+  unique_visitors: number;
+  visits_today: number;
+  visits_this_month: number;
+  top_pages: TopPage[];
+}
+
+interface DailyData {
+  daily_visits: DailyVisit[];
+}
 
 export default async function AdminDashboardPage() {
   await requireAdmin();
 
-  const [projects, experiences, certificates] = await Promise.all([
+  const [projects, experiences, certificates, visitSummary, dailyData] = await Promise.all([
     apiGet<unknown[]>("/api/admin/projects"),
     apiGet<unknown[]>("/api/experiences"),
     apiGet<unknown[]>("/api/certificates"),
+    apiGet<VisitSummary>("/api/visits/summary"),
+    apiGet<DailyData>("/api/visits/daily?days=30"),
   ]);
 
   const projectCount = projects?.length ?? 0;
   const experienceCount = experiences?.length ?? 0;
   const certificateCount = certificates?.length ?? 0;
 
+  const sv = visitSummary;
+  const dailyVisits = dailyData?.daily_visits ?? [];
+
   return (
-    <div className="space-y-8">
+    <div className="max-w-6xl mx-auto space-y-8">
       <div>
         <h1 className="text-xl sm:text-2xl font-bold">Dashboard</h1>
         <p className="text-sm text-muted-foreground mt-1">Kelola semua konten portfolio.</p>
@@ -115,6 +134,22 @@ export default async function AdminDashboardPage() {
           </Link>
         </div>
       </div>
+
+      {sv && (
+        <div className="space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Website Visits
+          </p>
+          <VisitAnalyticsCard
+            visitsToday={sv.visits_today}
+            visitsThisMonth={sv.visits_this_month}
+            totalVisits={sv.total_visits}
+            uniqueVisitors={sv.unique_visitors}
+            dailyVisits={dailyVisits}
+            topPages={sv.top_pages}
+          />
+        </div>
+      )}
     </div>
   );
 }

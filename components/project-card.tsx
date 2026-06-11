@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
-import { ArrowUpRight, ExternalLink, Github } from "lucide-react";
+import { ArrowUpRight, ExternalLink, Github, Eye } from "lucide-react";
 
 export interface Project {
   id: string;
@@ -10,6 +10,7 @@ export interface Project {
   tech_stack: string[];
   demo_url?: string;
   repo_url?: string;
+  views?: number;
 }
 
 interface ProjectCardProps {
@@ -94,7 +95,15 @@ export function ProjectCard({ project, index = 0, featured = false }: ProjectCar
             ))}
           </ul>
 
-          <ProjectLinks project={project} className="mt-6 flex gap-5" />
+          <div className="mt-6 flex items-center justify-between">
+            <ProjectLinks project={project} className="flex gap-5" />
+            {(project.views ?? 0) > 0 && (
+              <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Eye className="size-3.5" />
+                {project.views!.toLocaleString()}
+              </span>
+            )}
+          </div>
         </div>
       </article>
     );
@@ -157,7 +166,15 @@ export function ProjectCard({ project, index = 0, featured = false }: ProjectCar
           )}
         </p>
 
-        <ProjectLinks project={project} className="mt-4 flex gap-5" />
+        <div className="mt-4 flex items-center justify-between">
+          <ProjectLinks project={project} className="flex gap-5" />
+          {(project.views ?? 0) > 0 && (
+            <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Eye className="size-3.5" />
+              {project.views!.toLocaleString()}
+            </span>
+          )}
+        </div>
       </div>
     </article>
   );

@@ -1,11 +1,16 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
-import { FileUp, Upload, X } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
+import { CloudUpload, X } from "lucide-react";
 
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
+interface FileEntry {
+  file: File;
+  preview: string | null;
+}
 
 interface MultiFileDropInputProps {
   id?: string;
@@ -19,110 +24,106 @@ interface MultiFileDropInputProps {
 }
 
 function matchesAccept(file: File, accept?: string) {
-  if (!accept) {
-    return true;
-  }
+  if (!accept) return true;
 
   const tokens = accept
     .split(",")
-    .map((token) => token.trim().toLowerCase())
+    .map((t) => t.trim().toLowerCase())
     .filter(Boolean);
 
-  if (tokens.length === 0) {
-    return true;
-  }
+  if (tokens.length === 0) return true;
 
   const fileType = file.type.toLowerCase();
   const fileName = file.name.toLowerCase();
 
   return tokens.some((token) => {
-    if (token.endsWith("/*")) {
-      const prefix = token.slice(0, -1);
-      return fileType.startsWith(prefix);
-    }
-
-    if (token.startsWith(".")) {
-      return fileName.endsWith(token);
-    }
-
+    if (token.endsWith("/*")) return fileType.startsWith(token.slice(0, -1));
+    if (token.startsWith(".")) return fileName.endsWith(token);
     return fileType === token;
   });
 }
 
-export function MultiFileDropInput({ id, name, label, accept, helperText, maxFiles = 10, resetSignal, className }: MultiFileDropInputProps) {
+export function MultiFileDropInput({
+  id,
+  name,
+  label,
+  accept,
+  helperText,
+  maxFiles = 10,
+  resetSignal,
+  className,
+}: MultiFileDropInputProps) {
   const generatedId = useId();
   const inputId = id ?? generatedId;
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [entries, setEntries] = useState<FileEntry[]>([]);
+  const allPreviewsRef = useRef<string[]>([]);
 
+  // Cleanup all object URLs on unmount
   useEffect(() => {
-    if (resetSignal === undefined) {
-      return;
-    }
+    return () => {
+      allPreviewsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, []);
 
-    setSelectedFiles([]);
-
+  // Reset when resetSignal changes
+  useEffect(() => {
+    if (resetSignal === undefined) return;
+    allPreviewsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    allPreviewsRef.current = [];
+    setEntries([]);
     if (inputRef.current) {
-      const dataTransfer = new DataTransfer();
-      inputRef.current.files = dataTransfer.files;
+      inputRef.current.files = new DataTransfer().files;
       inputRef.current.value = "";
     }
   }, [resetSignal]);
 
-  const acceptHint = useMemo(() => {
-    if (!accept) {
-      return `Drop files here or click to browse (max ${maxFiles} files)`;
-    }
+  const syncInputRef = (fileList: File[]) => {
+    if (!inputRef.current) return;
+    const dt = new DataTransfer();
+    fileList.forEach((f) => dt.items.add(f));
+    inputRef.current.files = dt.files;
+    inputRef.current.dispatchEvent(new Event("change", { bubbles: true }));
+  };
 
-    const labels = accept
-      .split(",")
-      .map((token) => token.trim())
-      .filter(Boolean)
-      .map((token) => token.replace("image/", "").replace("application/", "").toUpperCase());
-
-    return `Drop files here or click to browse (${labels.join(", ")}, max ${maxFiles} files)`;
-  }, [accept, maxFiles]);
-
-  const applyFilesToInput = (files: FileList) => {
-    if (!inputRef.current) {
-      return;
-    }
-
-    const validFiles: File[] = [];
+  const addFiles = (files: FileList | File[]) => {
+    const valid: File[] = [];
     for (const file of files) {
-      if (!matchesAccept(file, accept)) {
-        continue;
-      }
-      validFiles.push(file);
+      if (matchesAccept(file, accept)) valid.push(file);
     }
 
-    setSelectedFiles((prevSelectedFiles) => {
-      const allFiles = [...prevSelectedFiles, ...validFiles].slice(0, maxFiles);
-
-      const dataTransfer = new DataTransfer();
-      allFiles.forEach((file) => dataTransfer.items.add(file));
-      inputRef.current!.files = dataTransfer.files;
-      inputRef.current!.dispatchEvent(new Event("change", { bubbles: true }));
-
-      return allFiles;
+    setEntries((prev) => {
+      const capacity = maxFiles - prev.length;
+      const toAdd = valid.slice(0, capacity);
+      const newEntries = toAdd.map((file) => {
+        const preview = file.type.startsWith("image/") ? URL.createObjectURL(file) : null;
+        if (preview) allPreviewsRef.current.push(preview);
+        return { file, preview };
+      });
+      const combined = [...prev, ...newEntries];
+      syncInputRef(combined.map((e) => e.file));
+      return combined;
     });
   };
 
   const removeFile = (index: number) => {
-    const updated = selectedFiles.filter((_, i) => i !== index);
-    setSelectedFiles(updated);
-
-    if (!inputRef.current) return;
-
-    const dataTransfer = new DataTransfer();
-    updated.forEach((file) => dataTransfer.items.add(file));
-    inputRef.current.files = dataTransfer.files;
-    inputRef.current.dispatchEvent(new Event("change", { bubbles: true }));
+    setEntries((prev) => {
+      const entry = prev[index];
+      if (entry.preview) {
+        URL.revokeObjectURL(entry.preview);
+        allPreviewsRef.current = allPreviewsRef.current.filter((u) => u !== entry.preview);
+      }
+      const updated = prev.filter((_, i) => i !== index);
+      syncInputRef(updated.map((e) => e.file));
+      return updated;
+    });
   };
 
+  const remaining = maxFiles - entries.length;
+
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("space-y-1.5", className)}>
       <Label htmlFor={inputId}>{label}</Label>
       <input
         ref={inputRef}
@@ -132,92 +133,85 @@ export function MultiFileDropInput({ id, name, label, accept, helperText, maxFil
         accept={accept}
         multiple
         className="sr-only"
-        onChange={(event) => {
-          const files = event.target.files;
-          if (!files) return;
-
-          const validFiles: File[] = [];
-          for (const file of files) {
-            if (matchesAccept(file, accept)) {
-              validFiles.push(file);
-            }
-          }
-
-          setSelectedFiles((prevSelectedFiles) => {
-            const allFiles = [...prevSelectedFiles, ...validFiles].slice(0, maxFiles);
-
-            if (inputRef.current) {
-              const dataTransfer = new DataTransfer();
-              allFiles.forEach((file) => dataTransfer.items.add(file));
-              inputRef.current.files = dataTransfer.files;
-            }
-
-            return allFiles;
-          });
+        onChange={(e) => {
+          if (e.target.files) addFiles(e.target.files);
         }}
       />
 
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => inputRef.current?.click()}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            inputRef.current?.click();
-          }
-        }}
-        onDragEnter={(event) => {
-          event.preventDefault();
-          setIsDragging(true);
-        }}
-        onDragOver={(event) => {
-          event.preventDefault();
-          setIsDragging(true);
-        }}
-        onDragLeave={(event) => {
-          event.preventDefault();
-          if (event.currentTarget === event.target) {
+      {remaining > 0 && (
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => inputRef.current?.click()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              inputRef.current?.click();
+            }
+          }}
+          onDragEnter={(e) => { e.preventDefault(); setIsDragging(true); }}
+          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+          onDragLeave={(e) => {
+            e.preventDefault();
+            if (e.currentTarget === e.target) setIsDragging(false);
+          }}
+          onDrop={(e) => {
+            e.preventDefault();
             setIsDragging(false);
-          }
-        }}
-        onDrop={(event) => {
-          event.preventDefault();
-          setIsDragging(false);
-
-          const droppedFiles = event.dataTransfer.files;
-          if (droppedFiles) {
-            applyFilesToInput(droppedFiles);
-          }
-        }}
-        className={cn(
-          "group relative flex min-h-28 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-5 text-center transition-colors",
-          "bg-card/40 hover:bg-card/70",
-          isDragging ? "border-primary bg-primary/10" : "border-border",
-        )}
-      >
-        <div className="flex items-center gap-2 text-primary">
-          <Upload size={16} />
-          <FileUp size={16} />
+            if (e.dataTransfer.files) addFiles(e.dataTransfer.files);
+          }}
+          className={cn(
+            "flex min-h-24 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-4 text-center transition-colors",
+            isDragging
+              ? "border-primary bg-primary/10"
+              : "border-border hover:border-primary/40 hover:bg-muted/20",
+          )}
+        >
+          <CloudUpload
+            size={20}
+            className={cn("transition-colors", isDragging ? "text-primary" : "text-muted-foreground")}
+          />
+          <p className="text-sm text-muted-foreground">
+            Drop atau klik untuk upload
+            {entries.length > 0 && ` (${remaining} slot tersisa)`}
+          </p>
+          {helperText && (
+            <p className="text-xs text-muted-foreground/60">{helperText}</p>
+          )}
         </div>
-        <p className="text-sm text-foreground">{acceptHint}</p>
-        {selectedFiles.length > 0 && <p className="text-xs text-muted-foreground">{selectedFiles.length} file(s) selected</p>}
-        <p className="text-xs text-muted-foreground">{helperText ?? ""}</p>
-      </div>
+      )}
 
-      {selectedFiles.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-muted-foreground">Selected files:</p>
-          <div className="grid gap-2">
-            {selectedFiles.map((file, index) => (
-              <div key={`${file.name}-${index}`} className="flex items-center justify-between rounded-md bg-muted/50 px-3 py-2">
-                <p className="truncate text-xs text-foreground">{file.name}</p>
-                <Button type="button" variant="ghost" size="sm" onClick={() => removeFile(index)} className="h-5 w-5 p-0 hover:bg-destructive/20">
-                  <X size={14} />
-                </Button>
+      {entries.length > 0 && (
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {entries.map((entry, index) => (
+            <div
+              key={`${entry.file.name}-${index}`}
+              className="group relative overflow-hidden rounded-lg border border-border bg-muted"
+            >
+              {entry.preview ? (
+                <img
+                  src={entry.preview}
+                  alt={entry.file.name}
+                  className="h-20 w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-20 items-center justify-center">
+                  <p className="truncate px-2 text-xs text-muted-foreground">{entry.file.name}</p>
+                </div>
+              )}
+              <div className="absolute inset-x-0 bottom-0 bg-black/60 px-2 py-1">
+                <p className="truncate text-xs text-white/80">{entry.file.name}</p>
               </div>
-            ))}
-          </div>
+              <button
+                type="button"
+                onClick={() => removeFile(index)}
+                className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/80"
+                aria-label={`Remove ${entry.file.name}`}
+              >
+                <X size={11} />
+              </button>
+            </div>
+          ))}
         </div>
       )}
     </div>

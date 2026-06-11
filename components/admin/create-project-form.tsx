@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { FormState } from "@/lib/form-state";
 import { initialFormState } from "@/lib/form-state";
+import { useFormToast } from "@/lib/use-form-toast";
 
 interface CreateProjectFormProps {
   action: (state: FormState, formData: FormData) => Promise<FormState>;
@@ -18,6 +19,7 @@ interface CreateProjectFormProps {
 
 export function CreateProjectForm({ action }: CreateProjectFormProps) {
   const [state, formAction] = useActionState(action, initialFormState);
+  useFormToast(state);
 
   return (
     <form action={formAction} className="grid gap-3 md:grid-cols-2">
@@ -32,7 +34,7 @@ export function CreateProjectForm({ action }: CreateProjectFormProps) {
         <Label htmlFor="description">Description</Label>
         <Textarea id="description" name="description" required />
       </div>
-      <FileDropInput id="imageFile" name="imageFile" label="Image Upload" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" maxBytes={2 * 1024 * 1024} />
+      <FileDropInput id="imageFile" name="imageFile" label="Image" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB" maxBytes={2 * 1024 * 1024} className="md:col-span-2" aspectRatio="16/10" />
       <div className="space-y-2">
         <Label htmlFor="link">Demo Link</Label>
         <Input id="link" name="link" placeholder="https://..." />
@@ -41,8 +43,8 @@ export function CreateProjectForm({ action }: CreateProjectFormProps) {
         <Label htmlFor="githubUrl">GitHub Link</Label>
         <Input id="githubUrl" name="githubUrl" placeholder="https://..." />
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="techStackRaw">Tech Stack (comma separated)</Label>
+      <div className="space-y-2 md:col-span-2">
+        <Label htmlFor="techStackRaw">Tech Stack</Label>
         <Input id="techStackRaw" name="techStackRaw" placeholder="Next.js, TypeScript, MySQL" required />
       </div>
       <FormSwitchField name="isPublished" label="Published" defaultChecked className="md:col-span-2" />

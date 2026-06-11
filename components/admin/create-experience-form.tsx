@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { EXPERIENCE_TYPE_LABELS, EXPERIENCE_TYPE_OPTIONS, type ExperienceTypeValue } from "@/lib/experience-types";
 import type { FormState } from "@/lib/form-state";
 import { initialFormState } from "@/lib/form-state";
+import { useFormToast } from "@/lib/use-form-toast";
 
 interface CreateExperienceFormProps {
   action: (state: FormState, formData: FormData) => Promise<FormState>;
@@ -20,6 +21,7 @@ interface CreateExperienceFormProps {
 
 export function CreateExperienceForm({ action }: CreateExperienceFormProps) {
   const [state, formAction] = useActionState(action, initialFormState);
+  useFormToast(state);
   const [experienceType, setExperienceType] = useState<ExperienceTypeValue>("full-time");
 
   return (

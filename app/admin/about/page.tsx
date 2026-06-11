@@ -62,7 +62,7 @@ export default async function AdminAboutPage() {
 
   return (
     <PageTransition>
-    <div className="space-y-6">
+    <div className="max-w-screen-2xl mx-auto space-y-6">
       <div>
         <h1 className="text-xl sm:text-2xl font-bold">About Section Manager</h1>
         <p className="text-sm text-muted-foreground">Edit teks, stats, dan skill cards yang muncul di About section frontend.</p>

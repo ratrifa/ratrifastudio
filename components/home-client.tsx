@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useState } from "react";
+import { useTrackVisit } from "@/lib/use-track-visit";
 
 import { Navbar } from "@/components/navbar";
 import { HeroSection } from "@/components/hero-section";
@@ -34,6 +35,7 @@ interface ProjectApi {
   techStack: string[];
   link: string | null;
   githubUrl: string | null;
+  views?: number;
 }
 
 interface ExperienceApi {
@@ -103,6 +105,7 @@ async function fetchHomeData(): Promise<HomeData> {
     tech_stack: Array.isArray(p.techStack) ? p.techStack.map(String) : [],
     demo_url: p.link ?? undefined,
     repo_url: p.githubUrl ?? undefined,
+    views: p.views,
   }));
 
   const experiences: Experience[] = (experiencesData ?? [])
@@ -138,6 +141,8 @@ async function fetchHomeData(): Promise<HomeData> {
 }
 
 export function HomeClient() {
+  useTrackVisit("/");
+
   const [data, setData] = useState<HomeData | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [overlayMounted, setOverlayMounted] = useState(true);

@@ -1,16 +1,9 @@
 import { revalidatePath } from "next/cache";
 
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { apiFetch, apiGet, apiSubmit, toFormState } from "@/lib/api-server";
 import { requireAdmin } from "@/lib/server-auth";
 import { PageTransition } from "@/components/page-transition";
-import { CollapsibleCreate } from "@/components/admin/collapsible-create";
-import { CertificateViewer } from "@/components/admin/certificate-viewer";
-import { CreateCertificateForm } from "@/components/admin/create-certificate-form";
-import { CertificateEditItem } from "@/components/admin/certificate-edit-item";
+import { CertificatesManager } from "@/components/admin/certificates-manager";
 import type { FormState } from "@/lib/form-state";
 
 interface CertificateRecord {
@@ -76,77 +69,22 @@ export default async function AdminCertificatesPage() {
 
   return (
     <PageTransition>
-      <div className="space-y-6">
+      <div className="max-w-6xl mx-auto space-y-6">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold">Certificates</h1>
           <p className="text-sm text-muted-foreground mt-1">
             {certificates.length} certificate{certificates.length !== 1 ? "s" : ""}
             {" · "}
-            {certificates.filter((c) => c.featured).length === 1
-              ? "1 featured"
-              : "none featured"}
+            {certificates.filter((c) => c.featured).length === 1 ? "1 featured" : "none featured"}
           </p>
         </div>
 
-        <CollapsibleCreate label="New Certificate">
-          <CreateCertificateForm action={createCertificateAction} />
-        </CollapsibleCreate>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">All Certificates</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CertificateViewer certificates={certificates} />
-          </CardContent>
-        </Card>
-
-        {certificates.length > 0 && (
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <Separator className="flex-1" />
-              <p className="text-xs font-medium text-muted-foreground shrink-0">Edit items</p>
-              <Separator className="flex-1" />
-            </div>
-
-            <Accordion type="single" collapsible className="space-y-2">
-              {certificates.map((cert) => (
-                <AccordionItem
-                  key={cert.id}
-                  value={cert.id}
-                  className="rounded-lg border border-border px-4"
-                >
-                  <AccordionTrigger className="hover:no-underline py-3">
-                    <div className="flex min-w-0 flex-1 items-center gap-2.5 mr-2">
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold truncate">{cert.title}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {cert.issuer} ·{" "}
-                          {new Date(cert.issueDate).toLocaleDateString("id-ID", {
-                            year: "numeric",
-                            month: "short",
-                          })}
-                        </p>
-                      </div>
-                      {cert.featured && (
-                        <Badge variant="default" className="shrink-0 text-xs">
-                          Featured
-                        </Badge>
-                      )}
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="space-y-3">
-                    <CertificateEditItem
-                      certificate={cert}
-                      updateAction={updateCertificateAction}
-                      deleteAction={deleteCertificateAction}
-                    />
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
-        )}
+        <CertificatesManager
+          certificates={certificates}
+          createAction={createCertificateAction}
+          updateAction={updateCertificateAction}
+          deleteAction={deleteCertificateAction}
+        />
       </div>
     </PageTransition>
   );
