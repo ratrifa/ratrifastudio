@@ -1,10 +1,13 @@
 import { revalidatePath } from "next/cache";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { apiFetch, apiGet, apiSubmit, toFormState } from "@/lib/api-server";
 import { requireAdmin } from "@/lib/server-auth";
 import { PageTransition } from "@/components/page-transition";
+import { CollapsibleCreate } from "@/components/admin/collapsible-create";
 import { CertificateViewer } from "@/components/admin/certificate-viewer";
 import { CreateCertificateForm } from "@/components/admin/create-certificate-form";
 import { CertificateEditItem } from "@/components/admin/certificate-edit-item";
@@ -73,46 +76,78 @@ export default async function AdminCertificatesPage() {
 
   return (
     <PageTransition>
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-xl sm:text-2xl font-bold">Manage Certificates</h1>
-        <p className="text-sm text-muted-foreground">CRUD sertifikat dan badge unggulan.</p>
-      </div>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold">Certificates</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {certificates.length} certificate{certificates.length !== 1 ? "s" : ""}
+            {" · "}
+            {certificates.filter((c) => c.featured).length === 1
+              ? "1 featured"
+              : "none featured"}
+          </p>
+        </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Create Certificate</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CollapsibleCreate label="New Certificate">
           <CreateCertificateForm action={createCertificateAction} />
-        </CardContent>
-      </Card>
+        </CollapsibleCreate>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Certificates Overview</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <CertificateViewer certificates={certificates} />
-        </CardContent>
-      </Card>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">All Certificates</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CertificateViewer certificates={certificates} />
+          </CardContent>
+        </Card>
 
-      <Accordion type="single" collapsible className="space-y-3">
-        {certificates.map((cert) => (
-          <AccordionItem key={cert.id} value={cert.id} className="rounded-lg border border-border px-4">
-            <AccordionTrigger className="hover:no-underline">
-              <div className="min-w-0 text-left">
-                <p className="text-sm sm:text-base font-semibold truncate">{cert.title}</p>
-                <p className="text-xs text-muted-foreground">Tap to edit certificate</p>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="space-y-3">
-              <CertificateEditItem certificate={cert} updateAction={updateCertificateAction} deleteAction={deleteCertificateAction} />
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
-    </div>
+        {certificates.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Separator className="flex-1" />
+              <p className="text-xs font-medium text-muted-foreground shrink-0">Edit items</p>
+              <Separator className="flex-1" />
+            </div>
+
+            <Accordion type="single" collapsible className="space-y-2">
+              {certificates.map((cert) => (
+                <AccordionItem
+                  key={cert.id}
+                  value={cert.id}
+                  className="rounded-lg border border-border px-4"
+                >
+                  <AccordionTrigger className="hover:no-underline py-3">
+                    <div className="flex min-w-0 flex-1 items-center gap-2.5 mr-2">
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold truncate">{cert.title}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {cert.issuer} ·{" "}
+                          {new Date(cert.issueDate).toLocaleDateString("id-ID", {
+                            year: "numeric",
+                            month: "short",
+                          })}
+                        </p>
+                      </div>
+                      {cert.featured && (
+                        <Badge variant="default" className="shrink-0 text-xs">
+                          Featured
+                        </Badge>
+                      )}
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-3">
+                    <CertificateEditItem
+                      certificate={cert}
+                      updateAction={updateCertificateAction}
+                      deleteAction={deleteCertificateAction}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        )}
+      </div>
     </PageTransition>
   );
 }
