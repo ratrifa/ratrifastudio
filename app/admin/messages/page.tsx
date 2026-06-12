@@ -17,7 +17,7 @@ export interface MessageItem {
 export default async function AdminMessagesPage() {
   await requireAdmin();
 
-  const messages = await apiGet<MessageItem[]>("/admin/messages");
+  const messages = await apiGet<MessageItem[]>("/api/admin/messages");
 
   return (
     <PageTransition>
