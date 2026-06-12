@@ -17,36 +17,44 @@ const NAV_LINKS = [
   { label: "Projects", href: "/admin/projects" },
   { label: "Experiences", href: "/admin/experiences" },
   { label: "Certificates", href: "/admin/certificates" },
+  { label: "Messages", href: "/admin/messages" },
 ];
 
 type AdminNavbarProps = {
   logoutAction: () => Promise<void>;
+  messagesUnreadCount?: number;
 };
 
-export function AdminNavbar({ logoutAction }: AdminNavbarProps) {
+export function AdminNavbar({ logoutAction, messagesUnreadCount = 0 }: AdminNavbarProps) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className="flex items-center gap-2 sm:gap-3">
-      <nav className="hidden md:flex items-center gap-1 text-sm text-muted-foreground" aria-label="Admin navigation">
+      <nav className="hidden items-center gap-1 text-sm text-muted-foreground md:flex" aria-label="Admin navigation">
         {NAV_LINKS.map((link) => {
           const isActive = pathname === link.href;
+          const showBadge = link.href === "/admin/messages" && messagesUnreadCount > 0;
 
           return (
             <Link
               key={link.href}
               href={link.href}
-              className={cn("rounded-md px-3 py-2 font-medium transition-colors", isActive ? "bg-primary/10 text-primary" : "hover:text-foreground hover:bg-secondary")}
+              className={cn("relative rounded-md px-3 py-2 font-medium transition-colors", isActive ? "bg-primary/10 text-primary" : "hover:bg-secondary hover:text-foreground")}
               aria-current={isActive ? "page" : undefined}
             >
               {link.label}
+              {showBadge && (
+                <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
+                  {messagesUnreadCount > 9 ? "9+" : messagesUnreadCount}
+                </span>
+              )}
             </Link>
           );
         })}
       </nav>
 
-      <form action={logoutAction} className="hidden md:block shrink-0">
+      <form action={logoutAction} className="hidden shrink-0 md:block">
         <FormSubmitButton pendingLabel="Logging out..." variant="outline" className="shrink-0">
           Logout
         </FormSubmitButton>
@@ -56,7 +64,7 @@ export function AdminNavbar({ logoutAction }: AdminNavbarProps) {
         type="button"
         variant="outline"
         size="icon"
-        className="md:hidden shrink-0 touch-manipulation"
+        className="shrink-0 touch-manipulation md:hidden"
         aria-label="Open admin menu"
         aria-expanded={isMenuOpen}
         aria-controls="admin-mobile-menu"
@@ -77,15 +85,21 @@ export function AdminNavbar({ logoutAction }: AdminNavbarProps) {
             <div className="mt-6 flex flex-col gap-1">
               {NAV_LINKS.map((link) => {
                 const isActive = pathname === link.href;
+                const showBadge = link.href === "/admin/messages" && messagesUnreadCount > 0;
 
                 return (
                   <SheetClose asChild key={link.href}>
                     <Link
                       href={link.href}
-                      className={cn("rounded-md px-4 py-3 text-sm font-medium transition-colors", isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary")}
+                      className={cn("relative rounded-md px-4 py-3 text-sm font-medium transition-colors", isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground")}
                       aria-current={isActive ? "page" : undefined}
                     >
                       {link.label}
+                      {showBadge && (
+                        <span className="ml-2 inline-flex items-center justify-center rounded-full bg-primary px-1.5 py-0.5 text-[9px] font-bold text-primary-foreground">
+                          {messagesUnreadCount > 9 ? "9+" : messagesUnreadCount}
+                        </span>
+                      )}
                     </Link>
                   </SheetClose>
                 );
