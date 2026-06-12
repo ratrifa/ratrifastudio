@@ -26,7 +26,7 @@ async function logoutAction() {
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   await requireAdmin();
 
-  const unreadData = await apiGet<{ count: number }>("/admin/messages/unread-count");
+  const unreadData = await apiGet<{ count: number }>("/api/admin/messages/unread-count");
   const messagesUnreadCount = unreadData?.count ?? 0;
 
   return (
