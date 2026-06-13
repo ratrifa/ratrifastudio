@@ -52,6 +52,7 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  cacheComponents: true,
   turbopack: {
     root: projectRoot,
   },
