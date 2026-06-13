@@ -68,6 +68,8 @@ pnpm-debug.log*
 *.db
 !prisma/migrations/**/migration.sql
 
+docs/
+
 # Documentation (development notes)
 CMS_SETUP.md
 DEPLOYMENT_READY.md
