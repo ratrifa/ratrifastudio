@@ -3,7 +3,7 @@
 import { MapPin, ChevronDown, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EXPERIENCE_TYPE_LABELS, normalizeExperienceType, type ExperienceTypeValue } from "@/lib/experience-types";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { PhotoLightbox } from "@/components/photo-lightbox";
 import { SectionHeading, AccentWords } from "@/components/section-heading";
@@ -34,6 +34,20 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [expandedDescIds, setExpandedDescIds] = useState<Set<string>>(new Set());
   const toggleDesc = (id: string) => setExpandedDescIds((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
+  const [overflowingDescIds, setOverflowingDescIds] = useState<Set<string>>(new Set());
+  const descContainerRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
+  useEffect(() => {
+    const COLLAPSED_H = 72; // 4.5rem @ 16px
+    const check = () => {
+      const next = new Set<string>();
+      descContainerRefs.current.forEach((el, id) => { if (el && el.scrollHeight > COLLAPSED_H) next.add(id); });
+      setOverflowingDescIds(next);
+    };
+    check();
+    const ro = new ResizeObserver(check);
+    descContainerRefs.current.forEach((el) => { if (el) ro.observe(el); });
+    return () => ro.disconnect();
+  }, [experiences]);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxExpId, setLightboxExpId] = useState<string | null>(null);
   const [lightboxPhotoIndex, setLightboxPhotoIndex] = useState(0);
@@ -105,13 +119,18 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
                           {exp.location}
                         </p>
                       )}
-                      <div className={`mt-2 overflow-hidden transition-all duration-300 ease-in-out ${expandedDescIds.has(exp.id) ? "max-h-[600px]" : "max-h-[4.5rem]"}`}>
+                      <div
+                        ref={(el) => { descContainerRefs.current.set(exp.id, el); }}
+                        className={`mt-2 overflow-hidden transition-all duration-300 ease-in-out ${expandedDescIds.has(exp.id) ? "max-h-[600px]" : "max-h-[4.5rem]"}`}
+                      >
                         <p className="text-sm leading-relaxed text-muted-foreground">{exp.description}</p>
                       </div>
-                      <button type="button" onClick={() => toggleDesc(exp.id)} className="mt-1 flex cursor-pointer items-center gap-1 text-xs text-primary hover:underline">
-                        {expandedDescIds.has(exp.id) ? "Show less" : "Read more"}
-                        <ChevronDown className={`size-3 transition-transform duration-300 ${expandedDescIds.has(exp.id) ? "rotate-180" : ""}`} />
-                      </button>
+                      {overflowingDescIds.has(exp.id) && (
+                        <button type="button" onClick={() => toggleDesc(exp.id)} className="mt-1 flex cursor-pointer items-center gap-1 text-xs text-primary hover:underline">
+                          {expandedDescIds.has(exp.id) ? "Show less" : "Read more"}
+                          <ChevronDown className={`size-3 transition-transform duration-300 ${expandedDescIds.has(exp.id) ? "rotate-180" : ""}`} />
+                        </button>
+                      )}
 
                       {hasPhotos && (
                         <>

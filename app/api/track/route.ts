@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   try {
     const { path } = await req.json();
 
-    const ip =
+    const clientIp =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
       req.headers.get("x-real-ip") ??
       "unknown";
@@ -15,8 +15,12 @@ export async function POST(req: NextRequest) {
 
     await fetch(`${API_URL}/api/visits`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({ ip, user_agent: userAgent, path }),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-Forwarded-For": clientIp,
+      },
+      body: JSON.stringify({ user_agent: userAgent, path }),
     });
   } catch {
     // Silent fail — never surface tracking errors to the client
