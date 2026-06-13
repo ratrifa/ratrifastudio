@@ -1,5 +1,7 @@
 import { cacheLife } from "next/cache";
 import { API_BASE_URL } from "@/lib/api";
+
+export const dynamic = "force-dynamic";
 import { HomeClient } from "@/components/home-client";
 import { normalizeExperienceType } from "@/lib/experience-types";
 import type { HomeData } from "@/lib/home-data";
