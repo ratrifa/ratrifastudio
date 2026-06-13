@@ -1,5 +1,5 @@
 import { cacheLife } from "next/cache";
-import { apiGet } from "@/lib/api-server";
+import { API_BASE_URL } from "@/lib/api";
 import { HomeClient } from "@/components/home-client";
 import { normalizeExperienceType } from "@/lib/experience-types";
 import type { HomeData } from "@/lib/home-data";
@@ -8,6 +8,17 @@ import type { AboutSectionContent } from "@/lib/about-content";
 import type { Project } from "@/components/project-card";
 import type { Experience } from "@/components/experience-section";
 import type { Certificate } from "@/components/certificate-section";
+
+async function publicGet<T>(path: string): Promise<T | null> {
+  try {
+    const res = await fetch(`${API_BASE_URL}${path}`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (res.ok) return res.json() as Promise<T>;
+  } catch {}
+  return null;
+}
 
 interface ProjectApi {
   id: string;
@@ -51,11 +62,11 @@ async function fetchHomeData(): Promise<HomeData | null> {
   cacheLife({ revalidate: 60, stale: 300 });
 
   const [projectsData, experiencesData, certificatesData, hero, about] = await Promise.all([
-    apiGet<ProjectApi[]>("/api/projects"),
-    apiGet<ExperienceApi[]>("/api/experiences"),
-    apiGet<CertificateApi[]>("/api/certificates"),
-    apiGet<HeroSectionContent>("/api/hero"),
-    apiGet<AboutSectionContent>("/api/about"),
+    publicGet<ProjectApi[]>("/api/projects"),
+    publicGet<ExperienceApi[]>("/api/experiences"),
+    publicGet<CertificateApi[]>("/api/certificates"),
+    publicGet<HeroSectionContent>("/api/hero"),
+    publicGet<AboutSectionContent>("/api/about"),
   ]);
 
   if (!hero || !about || !projectsData || !experiencesData || !certificatesData) {
