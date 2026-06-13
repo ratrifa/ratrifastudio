@@ -9,8 +9,6 @@ import type { Project } from "@/components/project-card";
 import type { Experience } from "@/components/experience-section";
 import type { Certificate } from "@/components/certificate-section";
 
-export const dynamic = "force-dynamic";
-
 async function publicGet<T>(path: string): Promise<T | null> {
   try {
     const res = await fetch(`${API_BASE_URL}${path}`, {
@@ -72,6 +70,8 @@ async function fetchHomeData(): Promise<HomeData | null> {
   ]);
 
   if (!hero || !about || !projectsData || !experiencesData || !certificatesData) {
+    // Don't cache API failures — revalidate in 5s so the next request retries
+    cacheLife({ revalidate: 5, stale: 0 });
     return null;
   }
 
