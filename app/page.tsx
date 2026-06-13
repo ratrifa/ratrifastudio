@@ -1,7 +1,5 @@
 import { cacheLife } from "next/cache";
 import { API_BASE_URL } from "@/lib/api";
-
-export const dynamic = "force-dynamic";
 import { HomeClient } from "@/components/home-client";
 import { normalizeExperienceType } from "@/lib/experience-types";
 import type { HomeData } from "@/lib/home-data";
@@ -10,6 +8,8 @@ import type { AboutSectionContent } from "@/lib/about-content";
 import type { Project } from "@/components/project-card";
 import type { Experience } from "@/components/experience-section";
 import type { Certificate } from "@/components/certificate-section";
+
+export const dynamic = "force-dynamic";
 
 async function publicGet<T>(path: string): Promise<T | null> {
   try {
