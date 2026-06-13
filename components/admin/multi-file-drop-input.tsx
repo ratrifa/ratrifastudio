@@ -19,6 +19,7 @@ interface MultiFileDropInputProps {
   accept?: string;
   helperText?: string;
   maxFiles?: number;
+  maxBytes?: number;
   resetSignal?: number | string;
   className?: string;
 }
@@ -50,6 +51,7 @@ export function MultiFileDropInput({
   accept,
   helperText,
   maxFiles = 10,
+  maxBytes,
   resetSignal,
   className,
 }: MultiFileDropInputProps) {
@@ -58,6 +60,7 @@ export function MultiFileDropInput({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [entries, setEntries] = useState<FileEntry[]>([]);
+  const [rejectedFiles, setRejectedFiles] = useState<string[]>([]);
   const allPreviewsRef = useRef<string[]>([]);
 
   // Cleanup all object URLs on unmount
@@ -67,31 +70,42 @@ export function MultiFileDropInput({
     };
   }, []);
 
+  // Keep the hidden file input in sync with entries after every render
+  useEffect(() => {
+    if (!inputRef.current) return;
+    const dt = new DataTransfer();
+    entries.forEach((e) => dt.items.add(e.file));
+    inputRef.current.files = dt.files;
+  }, [entries]);
+
   // Reset when resetSignal changes
   useEffect(() => {
     if (resetSignal === undefined) return;
     allPreviewsRef.current.forEach((url) => URL.revokeObjectURL(url));
     allPreviewsRef.current = [];
     setEntries([]);
+    setRejectedFiles([]);
     if (inputRef.current) {
       inputRef.current.files = new DataTransfer().files;
       inputRef.current.value = "";
     }
   }, [resetSignal]);
 
-  const syncInputRef = (fileList: File[]) => {
-    if (!inputRef.current) return;
-    const dt = new DataTransfer();
-    fileList.forEach((f) => dt.items.add(f));
-    inputRef.current.files = dt.files;
-    inputRef.current.dispatchEvent(new Event("change", { bubbles: true }));
-  };
-
   const addFiles = (files: FileList | File[]) => {
     const valid: File[] = [];
+    const rejected: string[] = [];
+
     for (const file of files) {
-      if (matchesAccept(file, accept)) valid.push(file);
+      if (!matchesAccept(file, accept)) {
+        rejected.push(`${file.name}: format tidak didukung`);
+      } else if (maxBytes !== undefined && file.size > maxBytes) {
+        rejected.push(`${file.name}: ukuran melebihi ${(maxBytes / 1024 / 1024).toFixed(0)}MB`);
+      } else {
+        valid.push(file);
+      }
     }
+
+    if (rejected.length > 0) setRejectedFiles(rejected);
 
     setEntries((prev) => {
       const capacity = maxFiles - prev.length;
@@ -101,9 +115,7 @@ export function MultiFileDropInput({
         if (preview) allPreviewsRef.current.push(preview);
         return { file, preview };
       });
-      const combined = [...prev, ...newEntries];
-      syncInputRef(combined.map((e) => e.file));
-      return combined;
+      return [...prev, ...newEntries];
     });
   };
 
@@ -114,9 +126,7 @@ export function MultiFileDropInput({
         URL.revokeObjectURL(entry.preview);
         allPreviewsRef.current = allPreviewsRef.current.filter((u) => u !== entry.preview);
       }
-      const updated = prev.filter((_, i) => i !== index);
-      syncInputRef(updated.map((e) => e.file));
-      return updated;
+      return prev.filter((_, i) => i !== index);
     });
   };
 
@@ -211,6 +221,14 @@ export function MultiFileDropInput({
                 <X size={11} />
               </button>
             </div>
+          ))}
+        </div>
+      )}
+
+      {rejectedFiles.length > 0 && (
+        <div className="space-y-1">
+          {rejectedFiles.map((msg) => (
+            <p key={msg} className="text-xs text-destructive">{msg}</p>
           ))}
         </div>
       )}

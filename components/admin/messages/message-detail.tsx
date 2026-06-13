@@ -4,6 +4,16 @@ import { useState } from "react";
 import { Trash2, MailOpen, Mail } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { deleteMessageAction, toggleReadAction } from "@/app/admin/messages/actions";
 import { ReplyForm } from "./reply-form";
 import type { MessageDetailData } from "./message-inbox";
@@ -24,6 +34,7 @@ function formatDate(dateStr: string): string {
 export function MessageDetail({ detail, isLoading, onDeleted, onToggleRead, onReplySent }: MessageDetailProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isTogglingRead, setIsTogglingRead] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   if (isLoading) {
     return (
@@ -42,7 +53,6 @@ export function MessageDetail({ detail, isLoading, onDeleted, onToggleRead, onRe
   }
 
   const handleDelete = async () => {
-    if (!confirm(`Hapus pesan dari ${detail.name}?`)) return;
     setIsDeleting(true);
     try {
       await deleteMessageAction(detail.id);
@@ -91,7 +101,7 @@ export function MessageDetail({ detail, isLoading, onDeleted, onToggleRead, onRe
               size="icon"
               title="Hapus pesan"
               disabled={isDeleting}
-              onClick={handleDelete}
+              onClick={() => setShowDeleteDialog(true)}
               className="text-destructive hover:text-destructive"
             >
               {isDeleting ? <Spinner className="size-4" /> : <Trash2 className="size-4" />}
@@ -105,14 +115,33 @@ export function MessageDetail({ detail, isLoading, onDeleted, onToggleRead, onRe
         <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">{detail.message}</p>
 
         {detail.replies.length > 0 && (
-          <div className="space-y-3 border-t border-border pt-4">
+          <div className="space-y-4 border-t border-border pt-4">
             <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
               Balasan ({detail.replies.length})
             </p>
             {detail.replies.map((reply) => (
-              <div key={reply.id} className="rounded-md border border-border bg-secondary/30 px-4 py-3">
-                <p className="whitespace-pre-wrap text-sm leading-relaxed">{reply.body}</p>
-                <p className="mt-2 text-[11px] text-muted-foreground/60">Dikirim {formatDate(reply.sentAt)}</p>
+              <div key={reply.id} className="rounded-lg border border-border bg-card text-sm">
+                {/* Email header */}
+                <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
+                  <span className="font-medium text-foreground">ratrifastudio</span>
+                  <span className="text-[11px] text-muted-foreground/60">{formatDate(reply.sentAt)}</span>
+                </div>
+                {/* Email body preview */}
+                <div className="space-y-3 px-4 py-3 leading-relaxed text-foreground/90">
+                  <p>Halo <span className="font-semibold">{detail.name}</span>,</p>
+                  <p className="whitespace-pre-wrap">{reply.body}</p>
+                  <hr className="border-border" />
+                  <p className="text-xs italic text-muted-foreground">
+                    Balasan atas pesan yang kamu kirim melalui ratrifa.studio pada {formatDate(detail.createdAt)}:
+                  </p>
+                  <blockquote className="border-l-2 border-muted-foreground/30 pl-3 text-xs text-muted-foreground">
+                    {detail.message}
+                  </blockquote>
+                  <p className="text-muted-foreground">
+                    Salam,<br />
+                    <span className="font-semibold text-foreground">ratrifastudio</span>
+                  </p>
+                </div>
               </div>
             ))}
           </div>
@@ -121,6 +150,26 @@ export function MessageDetail({ detail, isLoading, onDeleted, onToggleRead, onRe
 
       {/* Reply form */}
       <ReplyForm messageId={detail.id} onReplySent={onReplySent} />
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus pesan?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Pesan dari <span className="font-medium text-foreground">{detail.name}</span> akan dihapus permanen dan tidak bisa dikembalikan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

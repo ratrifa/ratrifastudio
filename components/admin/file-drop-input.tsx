@@ -102,7 +102,6 @@ export function FileDropInput({
     const dt = new DataTransfer();
     dt.items.add(file);
     inputRef.current.files = dt.files;
-    inputRef.current.dispatchEvent(new Event("change", { bubbles: true }));
     setSelectedFile(file);
     setFilePreview(file);
   };

@@ -71,7 +71,7 @@ export function ProjectCard({ project, index = 0, featured = false }: ProjectCar
             src={project.image}
             alt={project.title}
             fill
-            className="object-cover grayscale-[30%] transition-all duration-700 group-hover:scale-[1.03] group-hover:grayscale-0"
+            className="object-cover img-hover-zoom"
           />
         </Link>
 
@@ -123,7 +123,7 @@ export function ProjectCard({ project, index = 0, featured = false }: ProjectCar
           src={project.image}
           alt={project.title}
           fill
-          className="object-cover grayscale-[30%] transition-all duration-700 group-hover:scale-[1.03] group-hover:grayscale-0"
+          className="object-cover img-hover-zoom"
         />
         <span className="absolute left-3 top-3 rounded-full bg-background/70 px-2.5 py-1 font-mono text-[11px] text-foreground backdrop-blur">
           {indexLabel}

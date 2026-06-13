@@ -12,6 +12,7 @@ interface ExperienceRecord {
   title: string;
   company: string;
   experienceType: ExperienceTypeValue | string | null;
+  category: string | null;
   periodStart: string;
   periodEnd: string | null;
   description: string;

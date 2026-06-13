@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Phone, MapPin, Github, Linkedin, Twitter, ArrowUpRight } from "lucide-react";
+import { Phone, MapPin, Github, Linkedin, Twitter, ArrowUpRight, Check, AlertCircle } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { AccentWords } from "@/components/section-heading";
 import { Reveal } from "@/components/ui/reveal";
@@ -32,6 +32,17 @@ export function ContactSection({ social }: { social?: { githubUrl?: string | nul
     status: "idle" | "loading" | "success" | "error";
     message?: string;
   }>({ status: "idle" });
+  const [isSuccessExiting, setIsSuccessExiting] = useState(false);
+  const [formKey, setFormKey] = useState(0);
+
+  const handleSendAnother = () => {
+    setIsSuccessExiting(true);
+    setTimeout(() => {
+      setSubmitState({ status: "idle" });
+      setFormKey((k) => k + 1);
+      setIsSuccessExiting(false);
+    }, 350);
+  };
 
   const handleContactSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -135,64 +146,124 @@ export function ContactSection({ social }: { social?: { githubUrl?: string | nul
             </div>
           </Reveal>
 
-          {/* Right: Form */}
+          {/* Right: Form / Success state */}
           <Reveal delay={0.1} className="lg:col-span-7">
-            <form ref={formRef} onSubmit={handleContactSubmit} className="space-y-8">
-              {/* Honeypot — hidden from humans, filled by bots */}
-              <div style={{ display: "none" }} aria-hidden="true">
-                <input name="website" type="text" tabIndex={-1} autoComplete="off" />
-              </div>
-
-              <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
-                <div>
-                  <label htmlFor="contact-name" className={labelClass}>Name</label>
-                  <input id="contact-name" name="name" type="text" placeholder="Your Name" required className={fieldClass} />
-                </div>
-                <div>
-                  <label htmlFor="contact-email" className={labelClass}>Email</label>
-                  <input id="contact-email" name="email" type="email" placeholder="you@email.com" required className={fieldClass} />
-                </div>
-              </div>
-              <div>
-                <label htmlFor="contact-subject" className={labelClass}>Subject</label>
-                <input id="contact-subject" name="subject" type="text" placeholder="What's this about?" className={fieldClass} />
-              </div>
-              <div>
-                <label htmlFor="contact-message" className={labelClass}>Message</label>
-                <textarea
-                  id="contact-message"
-                  name="message"
-                  rows={5}
-                  placeholder="Tell me about your project or idea..."
-                  required
-                  className={`${fieldClass} resize-none`}
-                />
-              </div>
-              <div>
-                <button
-                  type="submit"
-                  disabled={submitState.status === "loading"}
-                  className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition-all hover:gap-3 hover:opacity-90 disabled:pointer-events-none disabled:opacity-60"
+            {submitState.status === "success" ? (
+              <div
+                role="status"
+                aria-live="polite"
+                className={`flex h-full min-h-[360px] flex-col justify-center ${isSuccessExiting ? "animate-out fade-out-0 slide-out-to-bottom-4 fill-mode-forwards duration-[350ms]" : ""}`}
+              >
+                <div
+                  className="animate-in fade-in-0 slide-in-from-bottom-3 duration-500"
+                  style={{ animationFillMode: "both" }}
                 >
-                  {submitState.status === "loading" ? (
-                    <span className="inline-flex items-center gap-2">
-                      <Spinner className="size-4" />
-                      Sending...
-                    </span>
-                  ) : (
-                    <>
-                      Send Message
-                      <ArrowUpRight className="size-4" />
-                    </>
-                  )}
-                </button>
-                {submitState.message ? (
-                  <p className={`mt-3 text-xs ${submitState.status === "error" ? "text-destructive" : "text-muted-foreground"}`}>
-                    {submitState.message}
+                  <div className="flex items-center gap-3 border-t border-border pt-5">
+                    <Check className="size-3.5 text-primary" strokeWidth={2.5} />
+                    <p className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                      Message sent
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  className="animate-in fade-in-0 slide-in-from-bottom-4 duration-700"
+                  style={{ animationDelay: "120ms", animationFillMode: "both" }}
+                >
+                  <h3 className="mt-6 font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+                    Got it.{" "}
+                    <span className="text-muted-foreground/60">I'll be</span>
+                    <br />
+                    <span className="text-muted-foreground/60">in touch soon.</span>
+                  </h3>
+                </div>
+
+                <div
+                  className="animate-in fade-in-0 duration-700"
+                  style={{ animationDelay: "300ms", animationFillMode: "both" }}
+                >
+                  <p className="mt-5 leading-relaxed text-muted-foreground">
+                    Biasanya gue balas dalam 1–2 hari kerja.
                   </p>
-                ) : null}
+                </div>
+
+                <div
+                  className="animate-in fade-in-0 duration-700"
+                  style={{ animationDelay: "480ms", animationFillMode: "both" }}
+                >
+                  <button
+                    type="button"
+                    onClick={handleSendAnother}
+                    className="mt-10 inline-flex cursor-pointer items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground/60 transition-colors hover:text-foreground"
+                  >
+                    ← Send another message
+                  </button>
+                </div>
               </div>
-            </form>
+            ) : (
+              <form
+                key={formKey}
+                ref={formRef}
+                onSubmit={handleContactSubmit}
+                className={`space-y-8 ${formKey > 0 ? "animate-in fade-in-0 slide-in-from-bottom-4 duration-500" : ""}`}
+              >
+                {/* Honeypot — hidden from humans, filled by bots */}
+                <div style={{ display: "none" }} aria-hidden="true">
+                  <input name="website" type="text" tabIndex={-1} autoComplete="off" />
+                </div>
+
+                <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="contact-name" className={labelClass}>Name</label>
+                    <input id="contact-name" name="name" type="text" placeholder="Your Name" required className={fieldClass} />
+                  </div>
+                  <div>
+                    <label htmlFor="contact-email" className={labelClass}>Email</label>
+                    <input id="contact-email" name="email" type="email" placeholder="you@email.com" required className={fieldClass} />
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="contact-subject" className={labelClass}>Subject</label>
+                  <input id="contact-subject" name="subject" type="text" placeholder="What's this about?" className={fieldClass} />
+                </div>
+                <div>
+                  <label htmlFor="contact-message" className={labelClass}>Message</label>
+                  <textarea
+                    id="contact-message"
+                    name="message"
+                    rows={5}
+                    placeholder="Tell me about your project or idea..."
+                    required
+                    className={`${fieldClass} resize-none`}
+                  />
+                </div>
+                <div className="space-y-3">
+                  <button
+                    type="submit"
+                    disabled={submitState.status === "loading"}
+                    className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition-all hover:gap-3 hover:opacity-90 disabled:pointer-events-none disabled:opacity-60"
+                  >
+                    {submitState.status === "loading" ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Spinner className="size-4" />
+                        Sending...
+                      </span>
+                    ) : (
+                      <>
+                        Send Message
+                        <ArrowUpRight className="size-4" />
+                      </>
+                    )}
+                  </button>
+                  {submitState.status === "error" && submitState.message ? (
+                    <div role="alert" className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3">
+                      <AlertCircle className="mt-0.5 size-4 shrink-0 text-destructive" strokeWidth={1.75} />
+                      <p className="text-sm text-destructive">{submitState.message}</p>
+                    </div>
+                  ) : null}
+                </div>
+              </form>
+            )}
           </Reveal>
         </div>
       </div>

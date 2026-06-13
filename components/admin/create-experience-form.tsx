@@ -9,6 +9,7 @@ import { MultiFileDropInput } from "@/components/admin/multi-file-drop-input";
 import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { EXPERIENCE_TYPE_LABELS, EXPERIENCE_TYPE_OPTIONS, type ExperienceTypeValue } from "@/lib/experience-types";
 import type { FormState } from "@/lib/form-state";
@@ -38,6 +39,19 @@ export function CreateExperienceForm({ action }: CreateExperienceFormProps) {
         <Input id="company" name="company" required />
       </div>
       <div className="space-y-2">
+        <Label>Kategori</Label>
+        <RadioGroup name="category" defaultValue="education" className="flex flex-row gap-4">
+          <div className="flex items-center gap-2">
+            <RadioGroupItem value="work" id="create-cat-work" />
+            <Label htmlFor="create-cat-work" className="font-normal cursor-pointer">Kerja</Label>
+          </div>
+          <div className="flex items-center gap-2">
+            <RadioGroupItem value="education" id="create-cat-education" />
+            <Label htmlFor="create-cat-education" className="font-normal cursor-pointer">Kuliah</Label>
+          </div>
+        </RadioGroup>
+      </div>
+      <div className="space-y-2">
         <Label htmlFor="experienceType">Type</Label>
         <input type="hidden" name="experienceType" value={experienceType} />
         <Combobox value={experienceType} onValueChange={(value) => setExperienceType(value as ExperienceTypeValue)} items={EXPERIENCE_TYPE_OPTIONS}>
@@ -63,7 +77,7 @@ export function CreateExperienceForm({ action }: CreateExperienceFormProps) {
         <Label htmlFor="description">Description</Label>
         <Textarea id="description" name="description" required />
       </div>
-      <MultiFileDropInput name="imageFiles" label="Dokumentasi Foto (Opsional)" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB per file, max 10 files" maxFiles={10} className="md:col-span-2" />
+      <MultiFileDropInput name="imageFiles" label="Dokumentasi Foto (Opsional)" accept="image/png,image/jpeg,image/webp" helperText="PNG/JPG/WEBP, max 2MB per file, max 15 files" maxFiles={15} maxBytes={2 * 1024 * 1024} className="md:col-span-2" />
       <FormSubmitButton pendingLabel="Creating..." className="w-full sm:w-fit md:col-span-2">
         Create
       </FormSubmitButton>

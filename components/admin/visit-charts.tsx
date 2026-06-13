@@ -80,12 +80,12 @@ export function VisitAnalyticsCard({
   ];
 
   return (
-    <div className="space-y-3">
+    <div className="grid gap-3 lg:grid-cols-2">
       {/* Daily trend + stats */}
-      <Card>
-        <CardContent className="p-5 space-y-5">
+      <Card className="flex flex-col">
+        <CardContent className="p-5 space-y-5 flex flex-col flex-1">
           {/* Inline stats row */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-4">
             {stats.map((s) => (
               <div key={s.label} className="space-y-0.5">
                 <p className="text-2xl font-bold tabular-nums">{s.value.toLocaleString()}</p>
@@ -157,13 +157,13 @@ export function VisitAnalyticsCard({
 
       {/* Top pages chart */}
       {truncatedPages.length > 0 && (
-        <Card>
-          <CardContent className="p-5">
+        <Card className="flex flex-col">
+          <CardContent className="p-5 flex flex-col flex-1">
             <p className="text-sm font-semibold mb-4">Top Pages</p>
             <ChartContainer
               config={pagesConfig}
-              className="w-full"
-              style={{ height: Math.max(truncatedPages.length * 44 + 16, 80) }}
+              className="w-full flex-1"
+              style={{ minHeight: Math.max(truncatedPages.length * 44 + 16, 80) }}
             >
               <BarChart data={truncatedPages} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }} barSize={14}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />

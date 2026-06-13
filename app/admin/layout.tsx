@@ -1,5 +1,22 @@
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const isDev = process.env.NODE_ENV === "development";
+  let icon: string =
+    "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛠️</text></svg>";
+
+  if (!isDev) {
+    const hero = await apiGet<{ domainLogoUrl?: string; avatarUrl?: string }>("/api/hero");
+    icon = hero?.domainLogoUrl ?? hero?.avatarUrl ?? "/images/hero-avatar.jpg";
+  }
+
+  return {
+    title: isDev ? "CMS · ratrifaStudio [dev]" : "CMS · ratrifaStudio",
+    icons: { icon },
+  };
+}
 
 import { AdminNavbar } from "@/components/admin/admin-navbar";
 import { NavigationProgress } from "@/components/admin/navigation-progress";

@@ -96,7 +96,8 @@ export function CreateHeroForm({ action, values, onValuesChange }: CreateHeroFor
             name="domainLogoFile"
             label="Logo domain"
             accept="image/png,image/jpeg,image/webp,image/svg+xml"
-            helperText="PNG/JPG/WEBP/SVG"
+            helperText="PNG/JPG/WEBP/SVG, max 2MB"
+            maxBytes={2 * 1024 * 1024}
             currentImageUrl={values.domainLogoUrl ?? undefined}
             aspectRatio="1/1"
             className="w-32"

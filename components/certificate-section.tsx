@@ -67,7 +67,7 @@ export function CertificateSection({ certificates }: CertificateSectionProps) {
                         src={cert.image}
                         alt={cert.title}
                         fill
-                        className="object-cover grayscale-[30%] transition-all duration-700 group-hover:scale-[1.03] group-hover:grayscale-0"
+                        className="object-cover img-hover-zoom"
                       />
                     </div>
 

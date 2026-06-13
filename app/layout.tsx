@@ -37,14 +37,17 @@ async function getSiteIcon() {
 
 export async function generateMetadata(): Promise<Metadata> {
   const icon = await getSiteIcon();
+  const isDev = process.env.NODE_ENV === "development";
 
   return {
-    title: "ratrifaStudio",
+    title: isDev ? "ratrifaStudio [dev]" : "ratrifaStudio",
     description: "a personal web.",
     generator: "ratrifa",
     metadataBase: new URL(siteUrl),
     icons: {
-      icon,
+      icon: isDev
+        ? "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛠️</text></svg>"
+        : icon,
     },
   };
 }

@@ -18,6 +18,7 @@ export interface Experience {
   period_end: string | null;
   description: string;
   experienceType?: ExperienceTypeValue;
+  category?: string;
   photos?: Array<{
     id: string;
     imageUrl: string;
@@ -31,22 +32,26 @@ interface ExperienceSectionProps {
 
 export function ExperienceSection({ experiences }: ExperienceSectionProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedDescIds, setExpandedDescIds] = useState<Set<string>>(new Set());
+  const toggleDesc = (id: string) => setExpandedDescIds((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxExpId, setLightboxExpId] = useState<string | null>(null);
   const [lightboxPhotoIndex, setLightboxPhotoIndex] = useState(0);
 
-  const timelineItems: Experience[] = [
-    ...experiences,
-    {
-      id: "hardcoded-welcome-satria",
-      role: "Welcome, Satria Febry Andanu!",
-      company: "Earth",
-      period_start: "1 Feb 2005",
-      period_end: null,
-      description: "oeekk oeekkk",
-      experienceType: "full-time",
-    },
-  ];
+  const hasCategories = experiences.some((e) => e.category);
+
+  const groups: { title: string | null; items: Experience[] }[] = hasCategories
+    ? [
+        {
+          title: "Pengalaman Kerja",
+          items: experiences.filter((e) => !e.category || e.category === "WORK"),
+        },
+        {
+          title: "Pengalaman Kuliah",
+          items: experiences.filter((e) => e.category === "EDUCATION"),
+        },
+      ].filter((g) => g.items.length > 0)
+    : [{ title: null, items: experiences }];
 
   return (
     <section id="experience" className="py-24 sm:py-32">
@@ -58,9 +63,17 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
           description="Rekam jejak gua, mulai dari organisasi dan volunteer semasa kuliah sampai pengalaman kerja nyata di industri."
         />
 
-        {timelineItems.length > 0 ? (
+        <div className={groups.length > 1 ? "grid grid-cols-1 md:grid-cols-2 md:gap-x-12" : ""}>
+        {groups.map((group) => (
+          <div key={group.title ?? "all"}>
+            {group.title && (
+              <p className="mb-2 mt-12 font-mono text-xs uppercase tracking-widest text-muted-foreground md:mt-0">
+                {group.title}
+              </p>
+            )}
+            {group.items.length > 0 ? (
           <ol>
-            {timelineItems.map((exp, idx) => {
+            {group.items.map((exp, idx) => {
               const legacyType = (exp as Experience & { type?: Experience["experienceType"] }).type;
               const resolvedType = normalizeExperienceType(exp.experienceType ?? legacyType);
               const isPresent = !exp.period_end;
@@ -69,14 +82,14 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
 
               return (
                 <li key={exp.id} className="border-t border-border">
-                  <Reveal delay={Math.min(idx * 0.06, 0.3)} className="grid gap-3 py-10 sm:grid-cols-[200px_1fr] sm:gap-10">
-                    {/* Period + type */}
-                    <div>
-                      <p className="font-mono text-sm text-muted-foreground">
+                  <Reveal delay={Math.min(idx * 0.06, 0.3)} className="py-5">
+                    {/* Period + type: inline row */}
+                    <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <p className="font-mono text-xs text-muted-foreground">
                         {exp.period_start} — {isPresent ? <span className="font-medium text-primary">Now</span> : exp.period_end}
                       </p>
                       {resolvedType && (
-                        <p className="mt-2 w-fit rounded-full border border-border px-2.5 py-0.5 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                        <p className="w-fit rounded-full border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                           {EXPERIENCE_TYPE_LABELS[resolvedType] ?? resolvedType}
                         </p>
                       )}
@@ -84,15 +97,21 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
 
                     {/* Role + details */}
                     <div>
-                      <h3 className="font-display text-xl font-semibold tracking-tight text-foreground sm:text-2xl">{exp.role}</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">{exp.company}</p>
+                      <h3 className="font-display text-base font-semibold tracking-tight text-foreground">{exp.role}</h3>
+                      <p className="mt-0.5 text-sm text-muted-foreground">{exp.company}</p>
                       {exp.location && (
-                        <p className="mt-2 flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
-                          <MapPin className="size-3.5" />
+                        <p className="mt-1 flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
+                          <MapPin className="size-3" />
                           {exp.location}
                         </p>
                       )}
-                      <p className="mt-3 max-w-2xl leading-relaxed text-muted-foreground">{exp.description}</p>
+                      <div className={`mt-2 overflow-hidden transition-all duration-300 ease-in-out ${expandedDescIds.has(exp.id) ? "max-h-[600px]" : "max-h-[4.5rem]"}`}>
+                        <p className="text-sm leading-relaxed text-muted-foreground">{exp.description}</p>
+                      </div>
+                      <button type="button" onClick={() => toggleDesc(exp.id)} className="mt-1 flex cursor-pointer items-center gap-1 text-xs text-primary hover:underline">
+                        {expandedDescIds.has(exp.id) ? "Show less" : "Read more"}
+                        <ChevronDown className={`size-3 transition-transform duration-300 ${expandedDescIds.has(exp.id) ? "rotate-180" : ""}`} />
+                      </button>
 
                       {hasPhotos && (
                         <>
@@ -144,7 +163,7 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
                                   className="group relative h-24 w-32 shrink-0 cursor-pointer snap-start overflow-hidden rounded-lg border border-border bg-muted transition-colors hover:border-primary/50"
                                   aria-label={`View photo ${photoIdx + 1} of ${(exp.photos ?? []).length}`}
                                 >
-                                  <ImageWithFallback src={photo.imageUrl} alt={photo.caption || "Dokumentasi"} fill className="object-cover grayscale-[30%] transition-all duration-700 group-hover:scale-[1.03] group-hover:grayscale-0" sizes="128px" />
+                                  <ImageWithFallback src={photo.imageUrl} alt={photo.caption || "Dokumentasi"} fill className="object-cover img-hover-zoom" sizes="128px" />
                                 </button>
                               ))}
                             </div>
@@ -160,10 +179,13 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
         ) : (
           <p className="py-16 text-center text-muted-foreground">No experience entries yet.</p>
         )}
+          </div>
+        ))}
+        </div>
       </div>
 
       {/* Photo Lightbox */}
-      {lightboxExpId && <PhotoLightbox photos={timelineItems.find((e) => e.id === lightboxExpId)?.photos ?? []} initialIndex={lightboxPhotoIndex} isOpen={lightboxOpen} onClose={() => setLightboxOpen(false)} />}
+      {lightboxExpId && <PhotoLightbox photos={groups.flatMap((g) => g.items).find((e) => e.id === lightboxExpId)?.photos ?? []} initialIndex={lightboxPhotoIndex} isOpen={lightboxOpen} onClose={() => setLightboxOpen(false)} />}
     </section>
   );
 }

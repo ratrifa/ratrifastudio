@@ -12,6 +12,7 @@ import { MultiFileDropInput } from "@/components/admin/multi-file-drop-input";
 import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { EXPERIENCE_TYPE_LABELS, EXPERIENCE_TYPE_OPTIONS, normalizeExperienceType, type ExperienceTypeValue } from "@/lib/experience-types";
@@ -32,6 +33,7 @@ interface ExperienceEditItemProps {
     title: string;
     company: string;
     experienceType?: ExperienceTypeValue | string | null;
+    category?: string | null;
     periodStart: Date | string;
     periodEnd: Date | string | null;
     description: string;
@@ -131,6 +133,19 @@ export function ExperienceEditItem({ experience, updateAction, deleteAction }: E
           <Input name="company" defaultValue={experience.company} required />
         </div>
         <div className="space-y-2">
+          <Label>Kategori</Label>
+          <RadioGroup name="category" defaultValue={(experience.category ?? 'WORK').toLowerCase()} className="flex flex-row gap-4">
+            <div className="flex items-center gap-2">
+              <RadioGroupItem value="work" id={`cat-work-${experience.id}`} />
+              <Label htmlFor={`cat-work-${experience.id}`} className="font-normal cursor-pointer">Kerja</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <RadioGroupItem value="education" id={`cat-edu-${experience.id}`} />
+              <Label htmlFor={`cat-edu-${experience.id}`} className="font-normal cursor-pointer">Kuliah</Label>
+            </div>
+          </RadioGroup>
+        </div>
+        <div className="space-y-2">
           <Label>Type</Label>
           <input type="hidden" name="experienceType" value={experienceType} />
           <Combobox value={experienceType} onValueChange={(value) => setExperienceType(value as ExperienceTypeValue)} items={EXPERIENCE_TYPE_OPTIONS}>
@@ -160,8 +175,9 @@ export function ExperienceEditItem({ experience, updateAction, deleteAction }: E
           name="imageFiles"
           label="Tambah Dokumentasi Foto (Opsional)"
           accept="image/png,image/jpeg,image/webp"
-          helperText="PNG/JPG/WEBP, max 2MB per file, max 10 files"
-          maxFiles={10}
+          helperText="PNG/JPG/WEBP, max 2MB per file, max 15 files"
+          maxFiles={15}
+          maxBytes={2 * 1024 * 1024}
           resetSignal={uploadResetSignal}
           className="md:col-span-2"
         />

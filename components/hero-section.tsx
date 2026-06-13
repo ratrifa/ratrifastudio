@@ -104,7 +104,7 @@ export function HeroSection({ content = defaultHeroContent, previewAsBanner = fa
                   src={content.avatarUrl ?? defaultHeroContent.avatarUrl ?? "/images/hero-avatar.jpg"}
                   alt={content.avatarAlt}
                   fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+                  className="object-cover img-hover-zoom"
                   priority
                 />
               </div>

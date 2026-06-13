@@ -43,6 +43,7 @@ interface ExperienceApi {
   title: string;
   company: string;
   experienceType: string | null;
+  category: string | null;
   periodStart: string;
   periodEnd: string | null;
   description: string;
@@ -114,6 +115,7 @@ async function fetchHomeData(): Promise<HomeData> {
       role: e.title,
       company: e.company,
       experienceType: normalizeExperienceType(e.experienceType),
+      category: e.category ?? undefined,
       period_start: monthYear(e.periodStart, "short"),
       period_end: e.periodEnd ? monthYear(e.periodEnd, "short") : null,
       description: e.description,
