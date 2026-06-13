@@ -2,22 +2,8 @@ import { revalidatePath } from "next/cache";
 
 import { apiFetch, apiGet, apiSubmit, toFormState } from "@/lib/api-server";
 import { requireAdmin } from "@/lib/server-auth";
-import type { ExperienceTypeValue } from "@/lib/experience-types";
-import { PageTransition } from "@/components/page-transition";
-import { ExperiencesManager } from "@/components/admin/experiences-manager";
+import { AdminExperiencesPageClient, type ExperienceRecord } from "@/components/admin/experiences-page-client";
 import type { FormState } from "@/lib/form-state";
-
-interface ExperienceRecord {
-  id: string;
-  title: string;
-  company: string;
-  experienceType: ExperienceTypeValue | string | null;
-  category: string | null;
-  periodStart: string;
-  periodEnd: string | null;
-  description: string;
-  photos: { id: string; imageUrl: string; caption?: string | null }[];
-}
 
 function revalidateExperiences() {
   revalidatePath("/");
@@ -80,24 +66,11 @@ export default async function AdminExperiencesPage() {
   const experiences = (await apiGet<ExperienceRecord[]>("/api/experiences")) ?? [];
 
   return (
-    <PageTransition>
-      <div className="max-w-6xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold">Experiences</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {experiences.length} experience{experiences.length !== 1 ? "s" : ""}
-            {" · "}
-            {experiences.filter((e) => !e.periodEnd).length} ongoing
-          </p>
-        </div>
-
-        <ExperiencesManager
-          experiences={experiences}
-          createAction={createExperienceAction}
-          updateAction={updateExperienceAction}
-          deleteAction={deleteExperienceAction}
-        />
-      </div>
-    </PageTransition>
+    <AdminExperiencesPageClient
+      experiences={experiences}
+      createAction={createExperienceAction}
+      updateAction={updateExperienceAction}
+      deleteAction={deleteExperienceAction}
+    />
   );
 }

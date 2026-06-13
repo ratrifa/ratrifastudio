@@ -2,27 +2,8 @@ import { revalidatePath } from "next/cache";
 
 import { apiFetch, apiGet, apiSubmit, toFormState } from "@/lib/api-server";
 import { requireAdmin } from "@/lib/server-auth";
-import { PageTransition } from "@/components/page-transition";
-import { ProjectsManager } from "@/components/admin/projects-manager";
+import { AdminProjectsPageClient, type ProjectRecord, type ProjectViewItem } from "@/components/admin/projects-page-client";
 import type { FormState } from "@/lib/form-state";
-
-interface ProjectRecord {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl: string | null;
-  link: string | null;
-  githubUrl: string | null;
-  techStack: string[];
-  isPublished: boolean;
-  createdAt?: string;
-}
-
-interface ProjectViewItem {
-  project_id: string;
-  total_views: number;
-  unique_viewers: number;
-}
 
 function revalidateProjects() {
   revalidatePath("/");
@@ -79,31 +60,17 @@ export default async function AdminProjectsPage() {
   ]);
 
   const projectList = projects ?? [];
-
   const viewsMap = Object.fromEntries(
     (viewsData?.project_views ?? []).map((v) => [v.project_id, v]),
   );
 
   return (
-    <PageTransition>
-      <div className="max-w-6xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold">Projects</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {projectList.length} project{projectList.length !== 1 ? "s" : ""}
-            {" · "}
-            {projectList.filter((p) => p.isPublished).length} published
-          </p>
-        </div>
-
-        <ProjectsManager
-          projects={projectList}
-          viewsMap={viewsMap}
-          createAction={createProjectAction}
-          updateAction={updateProjectAction}
-          deleteAction={deleteProjectAction}
-        />
-      </div>
-    </PageTransition>
+    <AdminProjectsPageClient
+      projects={projectList}
+      viewsMap={viewsMap}
+      createAction={createProjectAction}
+      updateAction={updateProjectAction}
+      deleteAction={deleteProjectAction}
+    />
   );
 }

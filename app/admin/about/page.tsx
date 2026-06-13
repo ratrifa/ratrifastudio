@@ -1,12 +1,11 @@
 import { revalidatePath } from "next/cache";
 
-import { AboutSectionManager } from "@/components/admin/about-section-manager";
-import { PageTransition } from "@/components/page-transition";
-import type { FormState } from "@/lib/form-state";
 import { apiFetch, apiGet, toFormState } from "@/lib/api-server";
 import { requireAdmin } from "@/lib/server-auth";
+import { AdminAboutPageClient } from "@/components/admin/about-page-client";
 import { defaultAboutContent, type AboutSectionContent } from "@/lib/about-content";
 import type { AboutDerivedMetrics } from "@/lib/about-stats";
+import type { FormState } from "@/lib/form-state";
 
 type AboutResponse = AboutSectionContent & { derivedMetrics: AboutDerivedMetrics };
 
@@ -61,15 +60,10 @@ export default async function AdminAboutPage() {
   const derivedMetrics = content?.derivedMetrics ?? FALLBACK_METRICS;
 
   return (
-    <PageTransition>
-    <div className="max-w-screen-2xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-xl sm:text-2xl font-bold">About Section Manager</h1>
-        <p className="text-sm text-muted-foreground">Edit teks, stats, dan skill cards yang muncul di About section frontend.</p>
-      </div>
-
-      <AboutSectionManager action={saveAboutSectionAction} initialValues={initialValues} derivedMetrics={derivedMetrics} />
-    </div>
-    </PageTransition>
+    <AdminAboutPageClient
+      initialValues={initialValues}
+      derivedMetrics={derivedMetrics}
+      saveAction={saveAboutSectionAction}
+    />
   );
 }

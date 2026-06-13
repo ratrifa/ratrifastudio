@@ -2,19 +2,8 @@ import { revalidatePath } from "next/cache";
 
 import { apiFetch, apiGet, apiSubmit, toFormState } from "@/lib/api-server";
 import { requireAdmin } from "@/lib/server-auth";
-import { PageTransition } from "@/components/page-transition";
-import { CertificatesManager } from "@/components/admin/certificates-manager";
+import { AdminCertificatesPageClient, type CertificateRecord } from "@/components/admin/certificates-page-client";
 import type { FormState } from "@/lib/form-state";
-
-interface CertificateRecord {
-  id: string;
-  title: string;
-  issuer: string;
-  imageUrl: string | null;
-  issueDate: string;
-  credentialUrl: string | null;
-  featured: boolean;
-}
 
 function revalidateCertificates() {
   revalidatePath("/");
@@ -68,24 +57,11 @@ export default async function AdminCertificatesPage() {
   const certificates = (await apiGet<CertificateRecord[]>("/api/certificates")) ?? [];
 
   return (
-    <PageTransition>
-      <div className="max-w-6xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold">Certificates</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {certificates.length} certificate{certificates.length !== 1 ? "s" : ""}
-            {" · "}
-            {certificates.filter((c) => c.featured).length === 1 ? "1 featured" : "none featured"}
-          </p>
-        </div>
-
-        <CertificatesManager
-          certificates={certificates}
-          createAction={createCertificateAction}
-          updateAction={updateCertificateAction}
-          deleteAction={deleteCertificateAction}
-        />
-      </div>
-    </PageTransition>
+    <AdminCertificatesPageClient
+      certificates={certificates}
+      createAction={createCertificateAction}
+      updateAction={updateCertificateAction}
+      deleteAction={deleteCertificateAction}
+    />
   );
 }
