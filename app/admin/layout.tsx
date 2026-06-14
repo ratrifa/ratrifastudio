@@ -20,6 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 import { AdminNavbar } from "@/components/admin/admin-navbar";
 import { NavigationProgress } from "@/components/admin/navigation-progress";
+import { SessionGuard } from "@/components/admin/session-guard";
 import { Toaster } from "@/components/ui/sonner";
 import { apiFetch, apiGet } from "@/lib/api-server";
 import { AUTH_COOKIE_NAME } from "@/lib/auth";
@@ -56,6 +57,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </div>
       </header>
       <section className="w-full px-4 py-6 sm:px-6 sm:py-8">{children}</section>
+      <SessionGuard />
       <Toaster richColors position="top-right" />
     </main>
   );
