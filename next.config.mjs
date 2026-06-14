@@ -60,6 +60,10 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: "20mb",
     },
+    staleTimes: {
+      dynamic: 0,
+      static: 1800,
+    },
   },
   typescript: {
     ignoreBuildErrors: true,

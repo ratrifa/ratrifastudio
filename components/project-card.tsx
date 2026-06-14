@@ -64,6 +64,7 @@ export function ProjectCard({ project, index = 0, featured = false }: ProjectCar
       <article className="group mb-20 grid items-center gap-8 lg:grid-cols-12 lg:gap-12">
         <Link
           href={detailHref}
+          prefetch={true}
           aria-label={`View details of ${project.title}`}
           className="relative block aspect-[16/10] overflow-hidden rounded-2xl border border-border lg:col-span-7"
         >
@@ -78,7 +79,7 @@ export function ProjectCard({ project, index = 0, featured = false }: ProjectCar
         <div className="lg:col-span-5">
           <p className="font-mono text-xs text-primary">{indexLabel}</p>
           <h3 className="mt-3 font-display text-2xl font-semibold tracking-tight text-balance text-foreground sm:text-3xl">
-            <Link href={detailHref} className="transition-colors hover:text-primary">
+            <Link href={detailHref} prefetch={true} className="transition-colors hover:text-primary">
               {project.title}
             </Link>
           </h3>
@@ -116,6 +117,7 @@ export function ProjectCard({ project, index = 0, featured = false }: ProjectCar
     <article className="flex flex-col">
       <Link
         href={detailHref}
+        prefetch={true}
         aria-label={`View details of ${project.title}`}
         className="group relative block aspect-[16/11] overflow-hidden rounded-xl border border-border"
       >
@@ -138,7 +140,7 @@ export function ProjectCard({ project, index = 0, featured = false }: ProjectCar
 
       <div className="mt-5">
         <h3 className="font-display text-xl font-semibold tracking-tight text-foreground">
-          <Link href={detailHref} className="group inline-flex items-start gap-1.5 transition-colors hover:text-primary">
+          <Link href={detailHref} prefetch={true} className="group inline-flex items-start gap-1.5 transition-colors hover:text-primary">
             <span className="text-balance">{project.title}</span>
             <ArrowUpRight className="mt-1 size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </Link>

@@ -10,13 +10,16 @@ import type { Experience } from "@/components/experience-section";
 import type { Certificate } from "@/components/certificate-section";
 
 async function publicGet<T>(path: string): Promise<T | null> {
-  try {
-    const res = await fetch(`${API_BASE_URL}${path}`, {
-      headers: { Accept: "application/json" },
-      signal: AbortSignal.timeout(5000),
-    });
-    if (res.ok) return res.json() as Promise<T>;
-  } catch {}
+  for (let attempt = 0; attempt <= 1; attempt++) {
+    try {
+      const res = await fetch(`${API_BASE_URL}${path}`, {
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(8000),
+      });
+      if (res.ok) return res.json() as Promise<T>;
+      if (res.status < 500) return null; // 4xx — no point retrying
+    } catch {}
+  }
   return null;
 }
 
@@ -57,7 +60,7 @@ function monthYear(iso: string, month: "short" | "long") {
   return new Date(iso).toLocaleDateString("en-US", { month, year: "numeric" });
 }
 
-async function fetchHomeData(): Promise<HomeData | null> {
+async function fetchHomeDataCached(): Promise<HomeData | null> {
   "use cache";
   cacheLife({ revalidate: 60, stale: 300 });
 
@@ -70,8 +73,6 @@ async function fetchHomeData(): Promise<HomeData | null> {
   ]);
 
   if (!hero || !about || !projectsData || !experiencesData || !certificatesData) {
-    // Don't cache API failures — revalidate in 5s so the next request retries
-    cacheLife({ revalidate: 5, stale: 0 });
     return null;
   }
 
@@ -111,6 +112,20 @@ async function fetchHomeData(): Promise<HomeData | null> {
   }));
 
   return { hero, about, projects, experiences, certificates };
+}
+
+// Wrapper: cache null separately with short TTL so failures don't poison the
+// 60s success cache. Two functions = two independent cache entries.
+async function fetchHomeDataShortCache(): Promise<null> {
+  "use cache";
+  cacheLife({ revalidate: 5, stale: 0 });
+  return null;
+}
+
+async function fetchHomeData(): Promise<HomeData | null> {
+  const data = await fetchHomeDataCached();
+  if (!data) return fetchHomeDataShortCache();
+  return data;
 }
 
 export default async function Home() {

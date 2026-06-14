@@ -9,7 +9,8 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { apiGet } from "@/lib/api-server";
+import { cacheLife } from "next/cache";
+import { API_BASE_URL } from "@/lib/api";
 import { PageTransition } from "@/components/page-transition";
 import { fetchRepositoryCommits } from "@/lib/github-api";
 import type { Commit } from "@/lib/commit-types";
@@ -37,9 +38,22 @@ interface ProjectApi {
   updatedAt: string;
 }
 
+async function fetchProject(id: string): Promise<ProjectApi | null> {
+  "use cache";
+  cacheLife({ revalidate: 60, stale: 300 });
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/projects/${id}`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (res.ok) return (await res.json()) as ProjectApi;
+  } catch {}
+  return null;
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const project = await apiGet<ProjectApi>(`/api/projects/${id}`);
+  const project = await fetchProject(id);
 
   if (!project) {
     return { title: "Project Not Found" };
@@ -59,7 +73,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function ProjectDetailPage({ params }: PageProps) {
   const { id } = await params;
 
-  const project = await apiGet<ProjectApi>(`/api/projects/${id}`);
+  const project = await fetchProject(id);
 
   if (!project) {
     notFound();
