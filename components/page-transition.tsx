@@ -1,17 +1,21 @@
 "use client";
 
+import { useRef } from "react";
 import { motion } from "motion/react";
 
-/**
- * Wraps route content so it fades + slides up into view once data is ready
- * (mounted fresh by `app/template.tsx` on every navigation/load).
- */
 export function PageTransition({ children }: { children: React.ReactNode }) {
+  // Persist across Activity hide/show cycles (component stays mounted).
+  // First mount → animate in. Activity re-show → skip animation, appear instantly.
+  const hasAnimated = useRef(false);
+  const shouldAnimate = !hasAnimated.current;
+  hasAnimated.current = true;
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={shouldAnimate ? { opacity: 0, y: 16 } : false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: "easeOut" }}
+      suppressHydrationWarning
     >
       {children}
     </motion.div>
